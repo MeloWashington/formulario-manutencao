@@ -1,19 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <base target="_top">
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Solicitação de Manutenção Veicular</title>
   <style>
     :root {
       --primary: #2c3e50;
       --secondary: #3498db;
       --accent: #e74c3c;
-      --light: #ecf0f1;
-      --dark: #2c3e50;
       --success: #27ae60;
-      --warning: #f39c12;
     }
 
     * {
@@ -24,49 +20,236 @@
 
     body {
       background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: "Segoe UI", Tahoma, sans-serif;
       color: #333;
-      line-height: 1.6;
       padding: 20px;
       min-height: 100vh;
     }
 
     .container {
       max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
+      margin: auto;
     }
 
     .card {
       background: white;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-
-    .card-header {
-      background: linear-gradient(to right, var(--primary), #1a2530);
-      padding: 25px 20px;
-      color: white;
-      text-align: center;
-    }
-
-    .card-title {
-      font-weight: 700;
-      font-size: 1.8rem;
-      letter-spacing: 0.5px;
-      margin: 0;
-      text-transform: uppercase;
-    }
-
-    .card-content {
       padding: 30px;
     }
 
+    .card-title {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      background: var(--primary);
+      padding: 20px;
+      border-radius: 12px 12px 0 0;
+      margin: -30px -30px 30px -30px;
+    }
+
     .form-group {
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      margin-bottom
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--accent);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    .datetime-info {
+      background: #f2f2f2;
+      border-left: 4px solid var(--secondary);
+      padding: 10px;
+      margin-top: 20px;
+      font-size: 0.95rem;
+      border-radius: 8px;
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(to right, #25d366, #128c7e);
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+      text-align: center;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-title">Solicitação de Manutenção Veicular</div>
+
+      <div class="form-group">
+        <label class="required">Técnico Responsável</label>
+        <select id="nome">
+          <option value="" disabled selected>Selecione seu nome</option>
+          <option>BRUNO HENRIQUE SANTOS DE LIMA</option>
+          <option>DAVID ICARO</option>
+          <option>GEOVANY DEZIDERIO</option>
+          <option>GUILHERME RODRIGUES</option>
+          <option>MABIO DA CONCEIÇÃO</option>
+          <option>MARCOS VELOSO</option>
+          <option>MATHEUS EMANOEL</option>
+          <option>PHILIPE BARROS</option>
+          <option>WAGNER UCHOA</option>
+          <option>WALLESSON MATHEUS</option>
+          <option>WARLEY MARTINS</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Telefone (DDD + número)</label>
+        <input id="telefone" type="tel" placeholder="Ex: 61999999999" maxlength="11" />
+      </div>
+
+      <div class="form-group">
+        <label class="required">Placa do Veículo</label>
+        <input id="placa" type="text" placeholder="ABC1D23 ou ABC1234" maxlength="7" />
+      </div>
+
+      <div class="form-group">
+        <label class="required">KM do Veículo</label>
+        <input id="km" type="number" min="0" />
+      </div>
+
+      <div class="form-group">
+        <label class="required">Tipo de Manutenção</label>
+        <select id="tipo">
+          <option value="" disabled selected>Selecione</option>
+          <option>Preventiva</option>
+          <option>Corretiva</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Descrição do Serviço</label>
+        <textarea id="motivo" placeholder="Descreva detalhadamente o problema ou serviço necessário"></textarea>
+      </div>
+
+      <div class="datetime-info">
+        <div><strong>Data do Envio:</strong> <span id="data-envio"></span></div>
+        <div><strong>Hora do Envio:</strong> <span id="hora-envio"></span></div>
+        <div><strong>Dia da Semana:</strong> <span id="dia-semana"></span></div>
+      </div>
+
+      <button class="btn-whatsapp" id="btn-enviar">ENVIAR SOLICITAÇÃO</button>
+      <div class="message" id="message"></div>
+    </div>
+  </div>
+
+  <script>
+    function atualizarDataHora() {
+      const now = new Date();
+      const data = now.toLocaleDateString("pt-BR");
+      const hora = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      const diaSemana = dias[now.getDay()];
+      document.getElementById("data-envio").textContent = data;
+      document.getElementById("hora-envio").textContent = hora;
+      document.getElementById("dia-semana").textContent = diaSemana;
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      msg.className = `message ${type}`;
+      msg.style.display = "block";
+      setTimeout(() => msg.style.display = "none", 5000);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      atualizarDataHora();
+      setInterval(atualizarDataHora, 60000);
+
+      document.getElementById("btn-enviar").addEventListener("click", function () {
+        const nome = document.getElementById("nome").value;
+        const telefone = document.getElementById("telefone").value.trim();
+        const placa = document.getElementById("placa").value.trim().toUpperCase();
+        const km = document.getElementById("km").value;
+        const tipo = document.getElementById("tipo").value;
+        const motivo = document.getElementById("motivo").value.trim();
+        const data = document.getElementById("data-envio").textContent;
+        const hora = document.getElementById("hora-envio").textContent;
+        const diaSemana = document.getElementById("dia-semana").textContent;
+
+        if (!nome || !telefone || !placa || !km || !tipo || !motivo) {
+          showMessage("Preencha todos os campos obrigatórios!", "error");
+          return;
+        }
+
+        if (!/^\d{10,11}$/.test(telefone)) {
+          showMessage("Telefone inválido. Use DDD + número (ex: 61999999999)", "error");
+          return;
+        }
+
+        const placaRegex = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
+        if (!placaRegex.test(placa)) {
+          showMessage("Placa inválida. Use formato ABC1234 ou ABC1D23", "error");
+          return;
+        }
+
+        const mensagem = `*SOLICITAÇÃO DE MANUTENÇÃO VEICULAR*\n\n` +
+          `*Data:* ${data} (${diaSemana})\n` +
+          `*Hora:* ${hora}\n\n` +
+          `*Técnico:* ${nome}\n` +
+          `*Telefone:* ${telefone}\n` +
+          `*Placa:* ${placa}\n` +
+          `*KM:* ${km} km\n` +
+          `*Tipo:* ${tipo}\n\n` +
+          `*Descrição:*\n${motivo}\n\n` +
+          `_Solicitação enviada via sistema_`;
+
+        const url = `https://wa.me/5561996913101?text=${encodeURIComponent(mensagem)}`;
+        location.href = url;
+      });
+    });
+  </script>
+</body>
+</html>
+
