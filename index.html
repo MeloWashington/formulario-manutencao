@@ -245,11 +245,14 @@
           `*Descrição:*\n${motivo}\n\n` +
           `_Solicitação enviada via sistema_`;
 
-        const url = `https://wa.me/5561996913101?text=${encodeURIComponent(mensagem)}`;
-        location.href = url;
+        navigator.clipboard.writeText(mensagem).then(() => {
+          showMessage("Mensagem copiada! Cole no grupo do WhatsApp.", "success");
+          window.open("https://chat.whatsapp.com/LK9kO9BfMocKfRxa8AIwMN", "_blank");
+        }).catch(() => {
+          showMessage("Erro ao copiar a mensagem. Tente novamente.", "error");
+        });
       });
     });
   </script>
 </body>
 </html>
-
