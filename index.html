@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solicitação de Manutenção Veicular - AGETELECOM</title>
+  <title>Solicitação de Manutenção Veicular - ageFibra</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary: #0055a4; /* Azul principal da AGETELECOM */
-      --secondary: #00a651; /* Verde da AGETELECOM */
-      --accent: #ff6b00;   /* Laranja para destaques */
+      --primary: #FF6B00;       /* Laranja principal ageFibra */
+      --primary-dark: #E05E00;  /* Laranja escuro */
+      --primary-light: #FF8C42; /* Laranja claro */
+      --secondary: #333333;     /* Preto para textos */
+      --accent: #FF4500;        /* Laranja para destaques */
       --light: #f8f9fa;
-      --dark: #212529;
       --gray: #6c757d;
     }
 
@@ -22,9 +23,9 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0055a4, #003a73, #002952);
+      background: linear-gradient(135deg, #1a1a1a, #333333, #1a1a1a);
       font-family: 'Segoe UI', 'Roboto', Tahoma, sans-serif;
-      color: var(--dark);
+      color: var(--secondary);
       padding: 20px;
       min-height: 100vh;
       background-size: 400% 400%;
@@ -47,30 +48,59 @@
       margin-bottom: 30px;
     }
 
-    .logo {
+    .logo-container {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 15px;
       color: white;
       margin-bottom: 15px;
     }
 
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      padding: 15px 30px;
+      border-radius: 50px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
     .logo-icon {
       font-size: 2.5rem;
-      color: var(--secondary);
+      color: white;
     }
 
     .logo-text {
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 2.2rem;
+      font-weight: 800;
       letter-spacing: 1px;
       text-transform: uppercase;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      color: white;
     }
 
     .logo-text span {
-      color: var(--secondary);
+      color: white;
+      position: relative;
+    }
+
+    .logo-text span::after {
+      content: "FIBRA";
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: var(--primary-light);
+      text-shadow: 0 0 8px rgba(255, 107, 0, 0.7);
+    }
+
+    .tagline {
+      color: var(--primary-light);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      margin-top: 5px;
     }
 
     .card {
@@ -81,7 +111,7 @@
     }
 
     .card-title {
-      background: var(--primary);
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
       color: white;
       padding: 25px;
       text-align: center;
@@ -91,11 +121,12 @@
       align-items: center;
       justify-content: center;
       gap: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
     .card-title i {
       font-size: 1.5rem;
-      color: var(--secondary);
+      color: white;
     }
 
     .card-body {
@@ -119,14 +150,14 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--secondary);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     label i {
-      color: var(--secondary);
+      color: var(--primary);
       width: 20px;
       text-align: center;
     }
@@ -160,8 +191,8 @@
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.2);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
       outline: none;
       background-color: white;
     }
@@ -172,8 +203,8 @@
     }
 
     .datetime-info {
-      background: linear-gradient(to right, #e9f8f1, #f0f7ff);
-      border-left: 4px solid var(--secondary);
+      background: linear-gradient(to right, #fff3e8, #ffe8d9);
+      border-left: 4px solid var(--primary);
       padding: 15px;
       margin: 25px 0;
       font-size: 1rem;
@@ -257,14 +288,37 @@
       padding: 15px;
       font-size: 0.9rem;
       opacity: 0.8;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .contact-info {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-light);
+    }
+
+    .contact-item i {
+      font-size: 1.1rem;
     }
 
     .footer a {
-      color: var(--secondary);
+      color: var(--primary-light);
       text-decoration: none;
+      transition: color 0.3s;
     }
 
     .footer a:hover {
+      color: var(--primary);
       text-decoration: underline;
     }
 
@@ -290,6 +344,11 @@
       .logo-text {
         font-size: 1.7rem;
       }
+      
+      .contact-info {
+        flex-direction: column;
+        gap: 5px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -304,10 +363,11 @@
       .logo {
         flex-direction: column;
         gap: 8px;
+        padding: 12px 20px;
       }
       
       .logo-text {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -315,19 +375,19 @@
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">
-        <i class="fas fa-tools logo-icon"></i>
-        <div class="logo-text">AGETE<span>LECOM</span></div>
+      <div class="logo-container">
+        <div class="logo">
+          <i class="fas fa-bolt logo-icon"></i>
+          <div class="logo-text">age<span>FIBRA</span></div>
+        </div>
+        <div class="tagline">SOLICITAÇÃO DE MANUTENÇÃO VEICULAR</div>
       </div>
-      <p style="color: white; font-size: 1.1rem; max-width: 600px; margin: 0 auto; opacity: 0.9;">
-        Sistema de solicitação de manutenção veicular - Área técnica
-      </p>
     </div>
 
     <div class="card">
       <div class="card-title">
         <i class="fas fa-car"></i>
-        Solicitação de Manutenção Veicular
+        Formulário de Solicitação
       </div>
       
       <div class="card-body">
@@ -358,7 +418,7 @@
               <label class="required"><i class="fas fa-phone"></i> Telefone (DDD + número)</label>
               <div class="input-icon">
                 <i class="fas fa-mobile-alt"></i>
-                <input id="telefone" type="tel" placeholder="Ex: 61999999999" maxlength="11" />
+                <input id="telefone" type="tel" placeholder="Ex: (61) 93300-3785" maxlength="15" />
               </div>
             </div>
           </div>
@@ -368,7 +428,7 @@
               <label class="required"><i class="fas fa-car"></i> Placa do Veículo</label>
               <div class="input-icon">
                 <i class="fas fa-id-card"></i>
-                <input id="placa" type="text" placeholder="ABC1D23 ou ABC1234" maxlength="7" />
+                <input id="placa" type="text" placeholder="Ex: ABC1D23 ou ABC1234" maxlength="8" />
               </div>
             </div>
             
@@ -376,7 +436,7 @@
               <label class="required"><i class="fas fa-tachometer-alt"></i> KM do Veículo</label>
               <div class="input-icon">
                 <i class="fas fa-road"></i>
-                <input id="km" type="number" min="0" />
+                <input id="km" type="number" min="0" placeholder="Ex: 15000" />
               </div>
             </div>
           </div>
@@ -390,6 +450,8 @@
                   <option value="" disabled selected>Selecione</option>
                   <option>Preventiva</option>
                   <option>Corretiva</option>
+                  <option>Emergencial</option>
+                  <option>Preditiva</option>
                 </select>
               </div>
             </div>
@@ -415,8 +477,18 @@
     </div>
     
     <div class="footer">
-      <p>© 2023 AGETELECOM - Todos os direitos reservados</p>
-      <p>Desenvolvido pela equipe técnica | <a href="https://agetelecom.com.br" target="_blank">agetelecom.com.br</a></p>
+      <p>© 2023 ageFibra - Todos os direitos reservados</p>
+      <div class="contact-info">
+        <div class="contact-item">
+          <i class="fas fa-phone"></i>
+          <span>Suporte: <a href="tel:+5561933003785">(61) 93300-3785</a></span>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email: <a href="mailto:suporte@agefibra.com.br">suporte@agefibra.com.br</a></span>
+        </div>
+      </div>
+      <p>Desenvolvido pela equipe técnica | <a href="https://agefibra.com.br" target="_blank">agefibra.com.br</a></p>
     </div>
   </div>
 
@@ -443,8 +515,8 @@
     function formatarPlaca(placa) {
       // Formatar placa no padrão brasileiro (AAA-0A00 ou AAA-0000)
       placa = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      if (placa.length === 7) {
-        return placa.substring(0, 3) + '-' + placa.substring(3);
+      if (placa.length > 3) {
+        return placa.substring(0, 3) + '-' + placa.substring(3, 7);
       }
       return placa;
     }
@@ -456,6 +528,8 @@
         return telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
       } else if (telefone.length === 10) {
         return telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      } else if (telefone.length > 0) {
+        return telefone.replace(/(\d{0,2})(\d{0,5})(\d{0,4})/, '($1) $2-$3').trim();
       }
       return telefone;
     }
@@ -495,7 +569,7 @@
         }
 
         if (!/^\d{10,11}$/.test(telefone)) {
-          showMessage("Telefone inválido. Use DDD + número (ex: 61999999999)", "error");
+          showMessage("Telefone inválido. Use DDD + número (ex: 61933003785)", "error");
           return;
         }
 
@@ -509,7 +583,7 @@
         const placaFormatada = formatarPlaca(placa);
         const telefoneFormatado = formatarTelefone(telefone);
 
-        const mensagem = `*SOLICITAÇÃO DE MANUTENÇÃO VEICULAR - AGETELECOM*\n\n` +
+        const mensagem = `*SOLICITAÇÃO DE MANUTENÇÃO VEICULAR - ageFibra*\n\n` +
           `*Data:* ${data} (${diaSemana})\n` +
           `*Hora:* ${hora}\n\n` +
           `*Técnico:* ${nome}\n` +
@@ -518,12 +592,14 @@
           `*KM:* ${km} km\n` +
           `*Tipo:* ${tipo}\n\n` +
           `*Descrição do Serviço:*\n${motivo}\n\n` +
-          `_Solicitação enviada via sistema técnico AGETELECOM_`;
+          `_Solicitação enviada via sistema técnico ageFibra_`;
 
         navigator.clipboard.writeText(mensagem).then(() => {
-          showMessage("Mensagem copiada com sucesso! Cole no grupo do WhatsApp.", "success");
+          showMessage("Mensagem copiada com sucesso! Cole no WhatsApp.", "success");
+          
+          // Abrir WhatsApp com o número especificado
           setTimeout(() => {
-            window.open("https://chat.whatsapp.com/LK9kO9BfMocKfRxa8AIwMN", "_blank");
+            window.open(`https://wa.me/5561933003785?text=${encodeURIComponent(mensagem)}`, '_blank');
           }, 1500);
         }).catch(() => {
           showMessage("Erro ao copiar a mensagem. Tente novamente.", "error");
