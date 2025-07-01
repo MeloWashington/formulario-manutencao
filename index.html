@@ -6,6 +6,7 @@
     <title>Sistema de Gestão de OS - Age Telecom</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Estilos anteriores mantidos */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
@@ -159,6 +160,26 @@
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn.loading {
+            position: relative;
+            color: transparent;
+        }
+        
+        .btn.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         .user-header {
@@ -664,8 +685,7 @@
                 <div class="form-group">
                     <label for="tech-select"><i class="fas fa-user"></i> Selecione seu nome</label>
                     <select id="tech-select">
-                        <option value="">Selecione seu nome</option>
-                        <!-- Técnicos serão carregados via JavaScript -->
+                        <option value="">Carregando técnicos...</option>
                     </select>
                 </div>
                 
@@ -940,891 +960,32 @@
         <i class="fas fa-check-circle"></i> <span id="notification-text">Mensagem de notificação</span>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
     <script>
-        // Dados do sistema com IDs únicos
-        const users = {
-            // Administrador
-            "admin@age.com": { 
-                id: "ADM-001",
-                password: "Age", 
-                name: "Administrador Master", 
-                role: "admin" 
-            },
-            
-            // Supervisores
-            "guilherme@age.com": { 
-                id: "SUP-001",
-                password: "123456", 
-                name: "Guilherme", 
-                role: "supervisor",
-                team: ["TEC-001", "TEC-002", "TEC-003", "TEC-004", "TEC-005", "TEC-006", "TEC-007", "TEC-008"]
-            },
-            "joao.paulo@age.com": { 
-                id: "SUP-002",
-                password: "123456", 
-                name: "João Paulo", 
-                role: "supervisor",
-                team: ["TEC-009", "TEC-010", "TEC-011", "TEC-012", "TEC-013", "TEC-014", "TEC-015", "TEC-016", 
-                       "TEC-017", "TEC-018", "TEC-019", "TEC-020", "TEC-021", "TEC-022", "TEC-023", "TEC-024",
-                       "TEC-025", "TEC-026", "TEC-027", "TEC-028"]
-            },
-            "jonathan@age.com": { 
-                id: "SUP-003",
-                password: "123456", 
-                name: "Jonathan", 
-                role: "supervisor",
-                team: ["TEC-029", "TEC-030", "TEC-031", "TEC-032", "TEC-033", "TEC-034", "TEC-035", "TEC-036",
-                       "TEC-037", "TEC-038", "TEC-039", "TEC-040", "TEC-041", "TEC-042", "TEC-043", "TEC-044",
-                       "TEC-045", "TEC-046", "TEC-047", "TEC-048", "TEC-049", "TEC-050"]
-            },
-            "marcos.vinicius@age.com": { 
-                id: "SUP-004",
-                password: "123456", 
-                name: "Marcos Vinicius", 
-                role: "supervisor",
-                team: ["TEC-051", "TEC-052", "TEC-053", "TEC-054", "TEC-055", "TEC-056", "TEC-057", "TEC-058",
-                       "TEC-059", "TEC-060", "TEC-061", "TEC-062", "TEC-063", "TEC-064", "TEC-065", "TEC-066",
-                       "TEC-067", "TEC-068"]
-            },
-            "patrick@age.com": { 
-                id: "SUP-005",
-                password: "123456", 
-                name: "Patrick", 
-                role: "supervisor",
-                team: ["TEC-069", "TEC-070", "TEC-071", "TEC-072", "TEC-073", "TEC-074", "TEC-075", "TEC-076",
-                       "TEC-077", "TEC-078", "TEC-079", "TEC-080", "TEC-081", "TEC-082", "TEC-083"]
-            },
-            "washington@age.com": { 
-                id: "SUP-006",
-                password: "123456", 
-                name: "Washington", 
-                role: "supervisor",
-                team: ["TEC-084", "TEC-085", "TEC-086", "TEC-087", "TEC-088", "TEC-089", "TEC-090", "TEC-091",
-                       "TEC-092", "TEC-093", "TEC-094", "TEC-095", "TEC-096", "TEC-097", "TEC-098", "TEC-099"]
-            },
-            
-            // Técnicos
-            "bruno.barbosa@age.com": { 
-                id: "TEC-001",
-                name: "Bruno Da Silva Barbosa", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "felipe.lucena@age.com": { 
-                id: "TEC-002",
-                name: "Felipe Morais De Lucena", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "gabriel.medeiros@age.com": { 
-                id: "TEC-003",
-                name: "Gabriel Muller Martins De Medeiros", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "mateus.sousa@age.com": { 
-                id: "TEC-004",
-                name: "Mateus Vieira De Sousa", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "wilker.pinto@age.com": { 
-                id: "TEC-005",
-                name: "Wilker Rodrigues Pinto", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "daniel.soares@age.com": { 
-                id: "TEC-006",
-                name: "Daniel Nascimento Soares", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "lucas.santos@age.com": { 
-                id: "TEC-007",
-                name: "Lucas Nascimento Dos Santos", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "felipe.reis@age.com": { 
-                id: "TEC-008",
-                name: "Felipe Davi de Souza Reis", 
-                role: "tech", 
-                supervisor: "SUP-001",
-                team: "SUP-001",
-                active: true
-            },
-            "andre.nascimento@age.com": { 
-                id: "TEC-009",
-                name: "André Luis Martins Nascimento", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "antonio.figueira@age.com": { 
-                id: "TEC-010",
-                name: "Antonio Marcos Dos Santos Figueira", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "carlos.porto@age.com": { 
-                id: "TEC-011",
-                name: "Carlos Andre De Oliveira Porto", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "daniel.sousa@age.com": { 
-                id: "TEC-012",
-                name: "Daniel Antonio Batista De Sousa", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "daniel.jesus@age.com": { 
-                id: "TEC-013",
-                name: "Daniel Cristiano De Jesus", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "david.lemos@age.com": { 
-                id: "TEC-014",
-                name: "David Freire Lemos", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "delcio.araujo@age.com": { 
-                id: "TEC-015",
-                name: "Delcio Fernandes De Araujo", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "itamar.souza@age.com": { 
-                id: "TEC-016",
-                name: "Itamar Cordeiro De Souza", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "jeovani.almeida@age.com": { 
-                id: "TEC-017",
-                name: "Jeovani Pereira De Almeida", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "luan.ferreira@age.com": { 
-                id: "TEC-018",
-                name: "Luan Da Costa Ferreira", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "lucas.melo@age.com": { 
-                id: "TEC-019",
-                name: "Lucas Pereira De Melo", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "matheus.anjos@age.com": { 
-                id: "TEC-020",
-                name: "Matheus Rodrigues Dos Anjos", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "maykon.silva@age.com": { 
-                id: "TEC-021",
-                name: "Maykon Wesley Gomes Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "moises.teixeira@age.com": { 
-                id: "TEC-022",
-                name: "Moises Fernando De Jesus Teixeira", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "pablo.goncalves@age.com": { 
-                id: "TEC-023",
-                name: "Pablo Morais Gonçalves", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "pedro.santos@age.com": { 
-                id: "TEC-024",
-                name: "Pedro Henrique Soares Dos Santos", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "pedro.nogueira@age.com": { 
-                id: "TEC-025",
-                name: "Pedro Henrique Silva Nogueira", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "thyago.sobrinho@age.com": { 
-                id: "TEC-026",
-                name: "Thyago Cardoso Sobrinho", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "ueder.morais@age.com": { 
-                id: "TEC-027",
-                name: "Ueder Pereira De Morais", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "wagner.peixoto@age.com": { 
-                id: "TEC-028",
-                name: "Wagner Gomes Peixoto Junior", 
-                role: "tech", 
-                supervisor: "SUP-002",
-                team: "SUP-002",
-                active: true
-            },
-            "aloi.santana@age.com": { 
-                id: "TEC-029",
-                name: "Aloi Lima De Santana", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "antonio.santos@age.com": { 
-                id: "TEC-030",
-                name: "Antonio Filipe Ricarte L. Dos Santos", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "daniel.silva@age.com": { 
-                id: "TEC-031",
-                name: "Daniel Melo da Silva", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "diego.goncalves@age.com": { 
-                id: "TEC-032",
-                name: "Diego da Conceição Gonçalves", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "diego.soares@age.com": { 
-                id: "TEC-033",
-                name: "Diego Edgard Soares", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "douglas.madeira@age.com": { 
-                id: "TEC-034",
-                name: "Douglas Da Silva Madeira", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "eliseu.silva@age.com": { 
-                id: "TEC-035",
-                name: "Eliseu Clefferson Lopes Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "felipe.dias@age.com": { 
-                id: "TEC-036",
-                name: "Felipe Martins Dias", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "felipe.rodrigues@age.com": { 
-                id: "TEC-037",
-                name: "Felipe Sousa Rodrigues", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "hegel.matos@age.com": { 
-                id: "TEC-038",
-                name: "Hegel Alves de Matos", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "jose.nascimento@age.com": { 
-                id: "TEC-039",
-                name: "José Wandderson S. Nascimento", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "josias.barbosa@age.com": { 
-                id: "TEC-040",
-                name: "Josias Ferreira Barbosa", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "kleyton.silva@age.com": { 
-                id: "TEC-041",
-                name: "Kleyton Douglas Dos Santos Silva", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "manoel.neto@age.com": { 
-                id: "TEC-042",
-                name: "Manoel J. da Silva Neto", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "mesaque.silva@age.com": { 
-                id: "TEC-043",
-                name: "Mesaque Salviano Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "paulo.cruz@age.com": { 
-                id: "TEC-044",
-                name: "Paulo Henrique Alexandre Da Cruz", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "rafael.lima@age.com": { 
-                id: "TEC-045",
-                name: "Rafael De Oliveira Lima", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "romario.campos@age.com": { 
-                id: "TEC-046",
-                name: "Romário Oliveira Campos", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "savio.ferreira@age.com": { 
-                id: "TEC-047",
-                name: "Sávio dos Reis Ferreira", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "samuel.castro@age.com": { 
-                id: "TEC-048",
-                name: "Samuel Barbosa De Castro", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "vitor.prado@age.com": { 
-                id: "TEC-049",
-                name: "Vitor Guimaraes Do Prado", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "willban.silva@age.com": { 
-                id: "TEC-050",
-                name: "Willban Marques Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "willians.albuquerque@age.com": { 
-                id: "TEC-051",
-                name: "Willians Anunciaçao Albuquerque", 
-                role: "tech", 
-                supervisor: "SUP-003",
-                team: "SUP-003",
-                active: true
-            },
-            "ednaldo.ribeiro@age.com": { 
-                id: "TEC-052",
-                name: "Ednaldo Lopes Ribeiro", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "filipe.oliveira@age.com": { 
-                id: "TEC-053",
-                name: "Filipe Castro De Oliveira", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "gilvan.felisberto@age.com": { 
-                id: "TEC-054",
-                name: "Gilvan Alves Felisberto", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "heverton.venceslau@age.com": { 
-                id: "TEC-055",
-                name: "Heverton Reis Venceslau", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "magno.rodrigues@age.com": { 
-                id: "TEC-056",
-                name: "Magno Miranda Rodrigues", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "marcelo.ferreira@age.com": { 
-                id: "TEC-057",
-                name: "Marcelo Martins Ferreira", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "marllon.dias@age.com": { 
-                id: "TEC-058",
-                name: "Marllon Andrey Freitas Dias", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "michael.lima@age.com": { 
-                id: "TEC-059",
-                name: "Michael Anderson Silva Lima", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "paulo.silva@age.com": { 
-                id: "TEC-060",
-                name: "Paulo Henrique S. Silva", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "paulo.cavalcante@age.com": { 
-                id: "TEC-061",
-                name: "Paulo Roberto Ferreira Cavalcante", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "paulo.lacerda@age.com": { 
-                id: "TEC-062",
-                name: "Paulo Victor Da Silva Lacerda", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "samuel.silva@age.com": { 
-                id: "TEC-063",
-                name: "Samuel Batista Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "vinicius.paiva@age.com": { 
-                id: "TEC-064",
-                name: "Vinicius Alex de Paiva", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "wanderson.anjos@age.com": { 
-                id: "TEC-065",
-                name: "Wanderson Barbosa Dos Anjos", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "welinton.freire@age.com": { 
-                id: "TEC-066",
-                name: "Welinton Pereira Freire", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "wilckson.silva@age.com": { 
-                id: "TEC-067",
-                name: "Wilckson Dias Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "wellynton.santos@age.com": { 
-                id: "TEC-068",
-                name: "Wellynton de Jesus Santos", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "thiago.siqueira@age.com": { 
-                id: "TEC-069",
-                name: "Thiago Da Silva Siqueira", 
-                role: "tech", 
-                supervisor: "SUP-004",
-                team: "SUP-004",
-                active: true
-            },
-            "maurilio.silva@age.com": { 
-                id: "TEC-070",
-                name: "Maurilio Amaro Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "eduardo.bandeira@age.com": { 
-                id: "TEC-071",
-                name: "Eduardo Gusmao Bandeira", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "bruno.pires@age.com": { 
-                id: "TEC-072",
-                name: "Bruno Marques Pires", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "italo.neres@age.com": { 
-                id: "TEC-073",
-                name: "Italo Alencar Neres", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "gustavo.silva@age.com": { 
-                id: "TEC-074",
-                name: "Gustavo De Araujo Silva", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "marcos.couto@age.com": { 
-                id: "TEC-075",
-                name: "Marcos Henrique Pussente Couto", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "mateus.silva@age.com": { 
-                id: "TEC-076",
-                name: "Mateus Pereira Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "matheus.boaventura@age.com": { 
-                id: "TEC-077",
-                name: "Matheus Queiroz Boaventura", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "maxsuel.santos@age.com": { 
-                id: "TEC-078",
-                name: "Maxsuel Da Silva Santos", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "maycom.carmo@age.com": { 
-                id: "TEC-079",
-                name: "Maycom Medeiros Da S. Do Carmo", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "nathan.caetano@age.com": { 
-                id: "TEC-080",
-                name: "Nathan Dutra Caetano", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "thiago.dourado@age.com": { 
-                id: "TEC-081",
-                name: "Thiago Emanuel Silva Dourado", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "wagner.silva@age.com": { 
-                id: "TEC-082",
-                name: "Wagner Felix Da Silva", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "felipe.batista@age.com": { 
-                id: "TEC-083",
-                name: "Felipe Barros Batista", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "luiz.santos@age.com": { 
-                id: "TEC-084",
-                name: "Luiz Phelipe Rodrigues dos Santos", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "joao.folha@age.com": { 
-                id: "TEC-085",
-                name: "João Carlos Alves Folha", 
-                role: "tech", 
-                supervisor: "SUP-005",
-                team: "SUP-005",
-                active: true
-            },
-            "guilherme.alves@age.com": { 
-                id: "TEC-086",
-                name: "Guilherme Rodrigues Alves", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "bruno.lima@age.com": { 
-                id: "TEC-087",
-                name: "Bruno Henrique Santos De Lima", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "david.barros@age.com": { 
-                id: "TEC-088",
-                name: "David Icaro Pereira Barros", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "geovany.rocha@age.com": { 
-                id: "TEC-089",
-                name: "Geovany Deziderio Rocha", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "guilherme.bezerra@age.com": { 
-                id: "TEC-090",
-                name: "Guilherme Rodrigues Bezerra", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "josinaldo.brito@age.com": { 
-                id: "TEC-091",
-                name: "Josinaldo Da Silva Brito", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "mabio.ribeiro@age.com": { 
-                id: "TEC-092",
-                name: "Mabio Da Conceicao Oliveira Ribeiro", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "marcos.caciano@age.com": { 
-                id: "TEC-093",
-                name: "Marcos Henrique G. Veloso Caciano", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "matheus.pereira@age.com": { 
-                id: "TEC-094",
-                name: "Matheus Emanoel De Sousa Pereira", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "peterson.souza@age.com": { 
-                id: "TEC-095",
-                name: "Peterson Campos De Souza", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "peterson.silva@age.com": { 
-                id: "TEC-096",
-                name: "Peterson Nunes Silva", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "philipe.barros@age.com": { 
-                id: "TEC-097",
-                name: "Philipe Da Silva Barros", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "wagner.uchoa@age.com": { 
-                id: "TEC-098",
-                name: "Wagner Rodrigues Uchoa", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "wallesson.araujo@age.com": { 
-                id: "TEC-099",
-                name: "Wallesson Matheus Ribeiro Araujo", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "wanderson.nascimento@age.com": { 
-                id: "TEC-100",
-                name: "Wanderson Lopes Do Nascimento", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            },
-            "warley.nascimento@age.com": { 
-                id: "TEC-101",
-                name: "Warley Martins Nascimento", 
-                role: "tech", 
-                supervisor: "SUP-006",
-                team: "SUP-006",
-                active: true
-            }
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwgRDqqyuICq9L4R00J6ZfOtgjrDK4JH4",
+            authDomain: "cadastroage.firebaseapp.com",
+            projectId: "cadastroage",
+            storageBucket: "cadastroage.firebasestorage.app",
+            messagingSenderId: "561318294785",
+            appId: "1:561318294785:web:3d9799b357bd5f661e5700",
+            measurementId: "G-2WLC0MECDQ"
         };
+
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
         
-        // Dados das ordens de serviço
-        let osDatabase = [
-            { id: 1, cliente: "Maria Silva", contrato: "CT2023001", servico: "ATIVAÇÃO", tecnico: "TEC-001", supervisor: "SUP-001", data: "01/10/2023 10:30" },
-            { id: 2, cliente: "José Oliveira", contrato: "CT2023002", servico: "VISITA TÉCNICA", tecnico: "TEC-002", supervisor: "SUP-001", data: "01/10/2023 14:15" },
-            { id: 3, cliente: "Ana Costa", contrato: "CT2023003", servico: "MUDANÇA DE ENDEREÇO", tecnico: "TEC-003", supervisor: "SUP-001", data: "02/10/2023 09:45" },
-            { id: 4, cliente: "Carlos Santos", contrato: "CT2023004", servico: "MESH", tecnico: "TEC-004", supervisor: "SUP-002", data: "02/10/2023 11:20" },
-            { id: 5, cliente: "Fernanda Lima", contrato: "CT2023005", servico: "ATIVAÇÃO", tecnico: "TEC-005", supervisor: "SUP-002", data: "03/10/2023 16:00" },
-            { id: 6, cliente: "Roberto Almeida", contrato: "CT2023006", servico: "VISITA TÉCNICA", tecnico: "TEC-001", supervisor: "SUP-001", data: "03/10/2023 13:30" },
-            { id: 7, cliente: "Patrícia Mendes", contrato: "CT2023007", servico: "MUDANÇA DE ENDEREÇO", tecnico: "TEC-002", supervisor: "SUP-001", data: "04/10/2023 10:00" },
-            { id: 8, cliente: "Ricardo Souza", contrato: "CT2023008", servico: "ATIVAÇÃO", tecnico: "TEC-006", supervisor: "SUP-002", data: "04/10/2023 14:45" }
-        ];
+        // Referências do Firestore
+        const usersRef = db.collection("users");
+        const ordersRef = db.collection("orders");
+        const techniciansRef = db.collection("technicians");
         
         // Estado atual do usuário
         let currentUser = null;
@@ -1891,22 +1052,6 @@
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notification-text');
         
-        // Preencher dropdown de técnicos
-        function populateTechDropdown() {
-            techSelect.innerHTML = '<option value="">Selecione seu nome</option>';
-            
-            // Adicionar todos os técnicos ao dropdown
-            Object.keys(users).forEach(email => {
-                const user = users[email];
-                if (user.role === "tech") {
-                    const option = document.createElement('option');
-                    option.value = email;
-                    option.textContent = user.name;
-                    techSelect.appendChild(option);
-                }
-            });
-        }
-        
         // Função para mostrar notificação
         function showNotification(message, isError = false) {
             notificationText.textContent = message;
@@ -1916,6 +1061,24 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+        
+        // Preencher dropdown de técnicos
+        function populateTechDropdown() {
+            techniciansRef.get().then(snapshot => {
+                techSelect.innerHTML = '<option value="">Selecione seu nome</option>';
+                snapshot.forEach(doc => {
+                    const tech = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = tech.name;
+                    techSelect.appendChild(option);
+                });
+            }).catch(error => {
+                console.error("Erro ao carregar técnicos: ", error);
+                techSelect.innerHTML = '<option value="">Erro ao carregar técnicos</option>';
+                showNotification("Erro ao carregar lista de técnicos", true);
+            });
         }
         
         // Função para fazer login
@@ -1929,76 +1092,113 @@
                 return;
             }
             
-            // Verificar se o usuário existe
-            if (users[email]) {
-                // Verificar senha
-                if (users[email].password === password) {
-                    currentUser = users[email];
-                    currentUser.email = email;
-                    
-                    // Atualizar UI com base no perfil
-                    updateUIForUser();
-                    
-                    // Mostrar painel apropriado
-                    loginContainer.style.display = "none";
-                    
-                    if (currentUser.role === "tech") {
-                        techContainer.style.display = "block";
-                        updateTechDashboard();
-                        body.className = "";
-                        document.title = "Age Telecom | Painel do Técnico";
-                    } else if (currentUser.role === "supervisor") {
-                        supervisorContainer.style.display = "block";
-                        loadSupervisorData();
-                        body.className = "supervisor-mode";
-                        document.title = "Age Telecom | Painel do Supervisor";
-                    } else if (currentUser.role === "admin") {
-                        adminContainer.style.display = "block";
-                        loadAdminData();
-                        body.className = "admin-mode";
-                        document.title = "Age Telecom | Painel Master";
+            // Botão de loading
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            
+            // Autenticar com Firebase
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const userId = userCredential.user.uid;
+                    return usersRef.doc(userId).get();
+                })
+                .then(doc => {
+                    if (doc.exists) {
+                        currentUser = doc.data();
+                        currentUser.id = doc.id;
+                        
+                        // Atualizar UI com base no perfil
+                        updateUIForUser();
+                        
+                        // Mostrar painel apropriado
+                        loginContainer.style.display = "none";
+                        
+                        if (currentUser.role === "tech") {
+                            techContainer.style.display = "block";
+                            updateTechDashboard();
+                            body.className = "";
+                            document.title = "Age Telecom | Painel do Técnico";
+                        } else if (currentUser.role === "supervisor") {
+                            supervisorContainer.style.display = "block";
+                            loadSupervisorData();
+                            body.className = "supervisor-mode";
+                            document.title = "Age Telecom | Painel do Supervisor";
+                        } else if (currentUser.role === "admin") {
+                            adminContainer.style.display = "block";
+                            loadAdminData();
+                            body.className = "admin-mode";
+                            document.title = "Age Telecom | Painel Master";
+                        }
+                        
+                        showNotification(`Bem-vindo, ${currentUser.name}!`);
+                    } else {
+                        showNotification("Perfil de usuário não encontrado", true);
                     }
-                    
-                    showNotification(`Bem-vindo, ${currentUser.name}!`);
-                } else {
-                    // Senha incorreta
-                    passwordError.style.display = 'block';
-                    showNotification("Senha incorreta. Tente novamente.", true);
-                }
-            } else {
-                // Email não encontrado
-                emailError.style.display = 'block';
-                showNotification("Email não encontrado. Verifique suas credenciais.", true);
-            }
+                })
+                .catch(error => {
+                    console.error("Erro de login: ", error);
+                    if (error.code === "auth/user-not-found") {
+                        emailError.style.display = 'block';
+                    } else if (error.code === "auth/wrong-password") {
+                        passwordError.style.display = 'block';
+                    }
+                    showNotification(error.message, true);
+                })
+                .finally(() => {
+                    loginBtn.classList.remove('loading');
+                    loginBtn.disabled = false;
+                });
         }
         
         // Login para técnicos (sem senha)
-        function loginTech(email) {
-            if (!email) {
+        function loginTech(techId) {
+            if (!techId) {
                 showNotification("Por favor, selecione seu nome", true);
                 return;
             }
             
-            if (users[email]) {
-                currentUser = users[email];
-                currentUser.email = email;
-                
-                // Atualizar UI
-                updateUIForUser();
-                
-                // Mostrar painel do técnico
-                loginContainer.style.display = "none";
-                techContainer.style.display = "block";
-                body.className = "";
-                document.title = "Age Telecom | Painel do Técnico";
-                
-                // Atualizar dashboard
-                updateTechDashboard();
-                
-                showNotification(`Bem-vindo, ${currentUser.name}!`);
-            } else {
-                showNotification("Técnico não encontrado", true);
-            }
+            // Botão de loading
+            techLoginBtn.classList.add('loading');
+            techLoginBtn.disabled = true;
+            
+            techniciansRef.doc(techId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        currentUser = doc.data();
+                        currentUser.id = doc.id;
+                        
+                        // Buscar o supervisor para obter o nome
+                        return usersRef.doc(currentUser.supervisor).get();
+                    }
+                    throw new Error("Técnico não encontrado");
+                })
+                .then(supervisorDoc => {
+                    if (supervisorDoc && supervisorDoc.exists) {
+                        currentUser.supervisorName = supervisorDoc.data().name;
+                    }
+                    
+                    // Atualizar UI
+                    updateUIForUser();
+                    
+                    // Mostrar painel do técnico
+                    loginContainer.style.display = "none";
+                    techContainer.style.display = "block";
+                    body.className = "";
+                    document.title = "Age Telecom | Painel do Técnico";
+                    
+                    // Atualizar dashboard
+                    updateTechDashboard();
+                    
+                    showNotification(`Bem-vindo, ${currentUser.name}!`);
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar técnico: ", error);
+                    showNotification(error.message || "Erro ao carregar dados do técnico", true);
+                })
+                .finally(() => {
+                    techLoginBtn.classList.remove('loading');
+                    techLoginBtn.disabled = false;
+                });
         }
         
         // Atualizar UI para o usuário atual
@@ -2030,161 +1230,205 @@
         
         // Atualizar dashboard do técnico
         function updateTechDashboard() {
-            const techOS = osDatabase.filter(os => os.tecnico === currentUser.id);
-            const ativacoes = techOS.filter(os => os.servico === "ATIVAÇÃO").length;
-            const visitas = techOS.filter(os => os.servico === "VISITA TÉCNICA").length;
-            const mudancas = techOS.filter(os => os.servico === "MUDANÇA DE ENDEREÇO").length;
-            
-            osCount.textContent = techOS.length;
-            ativacaoCount.textContent = ativacoes;
-            visitaCount.textContent = visitas;
-            mudancaCount.textContent = mudancas;
+            ordersRef.where("tecnico", "==", currentUser.id).get()
+                .then(snapshot => {
+                    const techOS = snapshot.docs.map(doc => doc.data());
+                    const ativacoes = techOS.filter(os => os.servico === "ATIVAÇÃO").length;
+                    const visitas = techOS.filter(os => os.servico === "VISITA TÉCNICA").length;
+                    const mudancas = techOS.filter(os => os.servico === "MUDANÇA DE ENDEREÇO").length;
+                    
+                    osCount.textContent = techOS.length;
+                    ativacaoCount.textContent = ativacoes;
+                    visitaCount.textContent = visitas;
+                    mudancaCount.textContent = mudancas;
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar OS: ", error);
+                    showNotification("Erro ao carregar dados", true);
+                });
         }
         
         // Carregar dados para supervisor
         function loadSupervisorData() {
-            // Obter OS da equipe
-            const teamTechIds = currentUser.team;
-            const supervisorOS = osDatabase.filter(os => teamTechIds.includes(os.tecnico));
-            
-            // Atualizar contadores
-            techCount.textContent = teamTechIds.length;
-            teamOsCount.textContent = supervisorOS.length;
-            activeTechs.textContent = teamTechIds.filter(id => {
-                const tech = Object.values(users).find(u => u.id === id);
-                return tech && tech.active;
-            }).length;
-            
-            // OS este mês
-            const thisMonth = new Date().getMonth() + 1;
-            const monthOS = supervisorOS.filter(os => {
-                const osMonth = parseInt(os.data.split('/')[1]);
-                return osMonth === thisMonth;
-            });
-            osMes.textContent = monthOS.length;
-            
-            // Atualizar lista de técnicos
-            techList.innerHTML = '';
-            teamTechIds.forEach(techId => {
-                const tech = Object.values(users).find(u => u.id === techId);
-                
-                if (tech) {
-                    const techOS = osDatabase.filter(os => os.tecnico === techId);
+            // Carregar técnicos da equipe
+            techniciansRef.where("supervisor", "==", currentUser.id).get()
+                .then(snapshot => {
+                    const teamTechs = snapshot.docs;
+                    techCount.textContent = teamTechs.length;
                     
-                    const techCard = document.createElement('div');
-                    techCard.className = 'tech-card';
-                    techCard.innerHTML = `
-                        <div class="tech-avatar">${tech.name.charAt(0)}</div>
-                        <div class="tech-info">
-                            <h4>${tech.name}</h4>
-                            <p>ID: ${techId} | OS: ${techOS.length}</p>
-                        </div>
-                    `;
-                    techList.appendChild(techCard);
-                }
-            });
-            
-            // Atualizar tabela de OS
-            const tableBody = document.getElementById('super-table-body');
-            const noData = document.getElementById('super-no-data');
-            
-            tableBody.innerHTML = '';
-            
-            if (supervisorOS.length === 0) {
-                noData.style.display = 'block';
-                return;
-            }
-            
-            noData.style.display = 'none';
-            
-            // Mostrar apenas as últimas 5 OS
-            const recentOS = supervisorOS.slice(-5);
-            
-            recentOS.forEach(os => {
-                const tech = Object.values(users).find(u => u.id === os.tecnico);
-                
-                const row = document.createElement('tr');
-                
-                // Determinar classe do badge
-                let badgeClass = 'badge-ativacao';
-                if (os.servico.includes('VISITA')) badgeClass = 'badge-visita';
-                if (os.servico.includes('MUDANÇA')) badgeClass = 'badge-mudanca';
-                if (os.servico.includes('MESH')) badgeClass = 'badge-mesh';
-                
-                row.innerHTML = `
-                    <td>${os.data}</td>
-                    <td>${os.cliente}</td>
-                    <td>${os.contrato}</td>
-                    <td><span class="service-badge ${badgeClass}">${os.servico}</span></td>
-                    <td>${tech ? tech.name : 'Técnico não encontrado'}</td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
+                    // Obter IDs dos técnicos
+                    const teamTechIds = teamTechs.map(doc => doc.id);
+                    
+                    // Contar técnicos ativos
+                    const activeCount = teamTechs.filter(doc => doc.data().active).length;
+                    activeTechs.textContent = activeCount;
+                    
+                    // Atualizar lista de técnicos
+                    techList.innerHTML = '';
+                    teamTechs.forEach(doc => {
+                        const tech = doc.data();
+                        
+                        // Buscar contagem de OS para cada técnico
+                        ordersRef.where("tecnico", "==", doc.id).get()
+                            .then(ordersSnapshot => {
+                                const techCard = document.createElement('div');
+                                techCard.className = 'tech-card';
+                                techCard.innerHTML = `
+                                    <div class="tech-avatar">${tech.name.charAt(0)}</div>
+                                    <div class="tech-info">
+                                        <h4>${tech.name}</h4>
+                                        <p>ID: ${doc.id} | OS: ${ordersSnapshot.size}</p>
+                                    </div>
+                                `;
+                                techList.appendChild(techCard);
+                            });
+                    });
+                    
+                    // Carregar OS da equipe
+                    return ordersRef.where("tecnico", "in", teamTechIds).get();
+                })
+                .then(snapshot => {
+                    const supervisorOS = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            ...data
+                        };
+                    });
+                    
+                    teamOsCount.textContent = supervisorOS.length;
+                    
+                    // OS este mês
+                    const thisMonth = new Date().getMonth() + 1;
+                    const monthOS = supervisorOS.filter(os => {
+                        const osMonth = parseInt(os.data.split('/')[1]);
+                        return osMonth === thisMonth;
+                    });
+                    osMes.textContent = monthOS.length;
+                    
+                    // Atualizar tabela de OS
+                    const tableBody = document.getElementById('super-table-body');
+                    const noData = document.getElementById('super-no-data');
+                    
+                    tableBody.innerHTML = '';
+                    
+                    if (supervisorOS.length === 0) {
+                        noData.style.display = 'block';
+                        return;
+                    }
+                    
+                    noData.style.display = 'none';
+                    
+                    // Ordenar por data (mais recente primeiro)
+                    supervisorOS.sort((a, b) => {
+                        return new Date(b.data) - new Date(a.data);
+                    });
+                    
+                    // Mostrar apenas as últimas 10 OS
+                    const recentOS = supervisorOS.slice(0, 10);
+                    
+                    recentOS.forEach(os => {
+                        const row = document.createElement('tr');
+                        
+                        // Determinar classe do badge
+                        let badgeClass = 'badge-ativacao';
+                        if (os.servico.includes('VISITA')) badgeClass = 'badge-visita';
+                        if (os.servico.includes('MUDANÇA')) badgeClass = 'badge-mudanca';
+                        if (os.servico.includes('MESH')) badgeClass = 'badge-mesh';
+                        
+                        row.innerHTML = `
+                            <td>${os.data}</td>
+                            <td>${os.cliente}</td>
+                            <td>${os.contrato}</td>
+                            <td><span class="service-badge ${badgeClass}">${os.servico}</span></td>
+                            <td>${os.tecnicoName || 'Técnico não encontrado'}</td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar dados do supervisor: ", error);
+                    showNotification("Erro ao carregar dados da equipe", true);
+                });
         }
         
         // Carregar dados para admin
         function loadAdminData() {
-            // Atualizar contadores
-            const supervisors = Object.values(users).filter(u => u.role === "supervisor");
-            supervisorCount.textContent = supervisors.length;
-            
-            const technicians = Object.values(users).filter(u => u.role === "tech");
-            technicianCount.textContent = technicians.length;
-            
-            totalOsCount.textContent = osDatabase.length;
-            
-            // Contar OS de hoje
-            const today = new Date().toLocaleDateString('pt-BR');
-            const todayOS = osDatabase.filter(os => os.data.includes(today.split('/')[0] + '/' + today.split('/')[1]));
-            osToday.textContent = todayOS.length;
-            
-            // Contar OS deste mês
-            const thisMonth = new Date().getMonth() + 1;
-            const monthOS = osDatabase.filter(os => {
-                const osMonth = parseInt(os.data.split('/')[1]);
-                return osMonth === thisMonth;
-            });
-            osMonth.textContent = monthOS.length;
-            
-            // Atualizar tabela de OS
-            const tableBody = document.getElementById('admin-table-body');
-            const noData = document.getElementById('admin-no-data');
-            
-            tableBody.innerHTML = '';
-            
-            if (osDatabase.length === 0) {
-                noData.style.display = 'block';
-                return;
-            }
-            
-            noData.style.display = 'none';
-            
-            // Mostrar apenas as últimas 10 OS
-            const recentOS = osDatabase.slice(-10).reverse();
-            
-            recentOS.forEach(os => {
-                const tech = Object.values(users).find(u => u.id === os.tecnico);
-                const supervisor = Object.values(users).find(u => u.id === os.supervisor);
+            // Carregar estatísticas
+            Promise.all([
+                usersRef.where("role", "==", "supervisor").get(),
+                techniciansRef.get(),
+                ordersRef.orderBy("createdAt", "desc").limit(100).get()
+            ])
+            .then(([supervisorsSnapshot, techsSnapshot, ordersSnapshot]) => {
+                // Atualizar contadores
+                supervisorCount.textContent = supervisorsSnapshot.size;
+                technicianCount.textContent = techsSnapshot.size;
+                totalOsCount.textContent = ordersSnapshot.size;
                 
-                const row = document.createElement('tr');
+                // Contar OS de hoje
+                const today = new Date();
+                const todayString = today.toLocaleDateString('pt-BR');
+                const todayOS = ordersSnapshot.docs.filter(doc => {
+                    const osDate = doc.data().data.split(' ')[0];
+                    return osDate === todayString;
+                });
+                osToday.textContent = todayOS.length;
                 
-                // Determinar classe do badge
-                let badgeClass = 'badge-ativacao';
-                if (os.servico.includes('VISITA')) badgeClass = 'badge-visita';
-                if (os.servico.includes('MUDANÇA')) badgeClass = 'badge-mudanca';
-                if (os.servico.includes('MESH')) badgeClass = 'badge-mesh';
+                // Contar OS deste mês
+                const thisMonth = today.getMonth() + 1;
+                const monthOS = ordersSnapshot.docs.filter(doc => {
+                    const osDate = new Date(doc.data().createdAt?.toDate() || doc.data().data);
+                    return osDate.getMonth() + 1 === thisMonth;
+                });
+                osMonth.textContent = monthOS.length;
                 
-                row.innerHTML = `
-                    <td>${os.data}</td>
-                    <td>${os.cliente}</td>
-                    <td>${os.contrato}</td>
-                    <td><span class="service-badge ${badgeClass}">${os.servico}</span></td>
-                    <td>${tech ? tech.name : 'Técnico não encontrado'}</td>
-                    <td>${supervisor ? supervisor.name : 'Supervisor não encontrado'}</td>
-                `;
+                // Atualizar tabela de OS
+                const tableBody = document.getElementById('admin-table-body');
+                const noData = document.getElementById('admin-no-data');
                 
-                tableBody.appendChild(row);
+                tableBody.innerHTML = '';
+                
+                if (ordersSnapshot.size === 0) {
+                    noData.style.display = 'block';
+                    return;
+                }
+                
+                noData.style.display = 'none';
+                
+                // Mostrar apenas as últimas 20 OS
+                const recentOS = ordersSnapshot.docs.slice(0, 20);
+                
+                recentOS.forEach(doc => {
+                    const os = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    // Determinar classe do badge
+                    let badgeClass = 'badge-ativacao';
+                    if (os.servico.includes('VISITA')) badgeClass = 'badge-visita';
+                    if (os.servico.includes('MUDANÇA')) badgeClass = 'badge-mudanca';
+                    if (os.servico.includes('MESH')) badgeClass = 'badge-mesh';
+                    
+                    // Formatar data para exibição
+                    const displayDate = os.data || 
+                        (os.createdAt ? new Date(os.createdAt.toDate()).toLocaleString('pt-BR') : '');
+                    
+                    row.innerHTML = `
+                        <td>${displayDate}</td>
+                        <td>${os.cliente}</td>
+                        <td>${os.contrato}</td>
+                        <td><span class="service-badge ${badgeClass}">${os.servico}</span></td>
+                        <td>${os.tecnicoName || 'Técnico não encontrado'}</td>
+                        <td>${os.supervisorName || 'Supervisor não encontrado'}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar dados de admin: ", error);
+                showNotification("Erro ao carregar dados administrativos", true);
             });
         }
         
@@ -2211,31 +1455,47 @@
                 return;
             }
             
+            // Botão de loading
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
             // Criar objeto OS
             const today = new Date();
             const osData = {
-                id: Date.now(),
                 cliente: document.getElementById('cliente').value,
                 contrato: document.getElementById('contrato').value,
                 servico: servicoInput.value,
                 tecnico: currentUser.id,
+                tecnicoName: currentUser.name,
                 supervisor: currentUser.supervisor,
-                data: today.toLocaleDateString('pt-BR') + ' ' + today.toLocaleTimeString('pt-BR').slice(0, 5)
+                supervisorName: currentUser.supervisorName,
+                data: today.toLocaleDateString('pt-BR') + ' ' + today.toLocaleTimeString('pt-BR').slice(0, 5),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // Adicionar ao banco de dados
-            osDatabase.push(osData);
-            
-            // Feedback
-            showNotification('OS cadastrada com sucesso!');
-            
-            // Atualizar dashboard
-            updateTechDashboard();
-            
-            // Limpar formulário
-            osForm.reset();
-            serviceTypes.forEach(t => t.classList.remove('selected'));
-            servicoInput.value = '';
+            // Adicionar ao Firestore
+            ordersRef.add(osData)
+                .then(() => {
+                    showNotification('OS cadastrada com sucesso!');
+                    osForm.reset();
+                    serviceTypes.forEach(t => t.classList.remove('selected'));
+                    servicoInput.value = '';
+                    
+                    // Atualizar dashboard
+                    if (currentUser.role === "tech") {
+                        updateTechDashboard();
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao salvar OS: ", error);
+                    showNotification(`Erro ao cadastrar OS: ${error.message}`, true);
+                })
+                .finally(() => {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                });
         });
         
         // Evento de login para técnicos
@@ -2261,6 +1521,11 @@
         adminLogoutBtn.addEventListener('click', logout);
         
         function logout() {
+            // Fazer logout do Firebase se estiver autenticado
+            if (auth.currentUser) {
+                auth.signOut();
+            }
+            
             currentUser = null;
             techContainer.style.display = "none";
             supervisorContainer.style.display = "none";
