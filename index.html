@@ -629,6 +629,90 @@
             margin-top: 5px;
         }
         
+        /* Nova seção de estatísticas por operador */
+        .operator-stats {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .operator-stats h3 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .operator-stats h3 i {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .operator-stats h3 .toggle-icon {
+            margin-left: auto;
+            font-size: 1.1rem;
+        }
+        
+        .operator-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .operator-stats-table th {
+            background-color: var(--secondary);
+            color: white;
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 600;
+        }
+        
+        .operator-stats-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .operator-stats-table tr:nth-child(even) {
+            background-color: var(--light);
+        }
+        
+        .operator-stats-table tr:hover {
+            background-color: rgba(44, 62, 80, 0.05);
+        }
+        
+        .stats-collapsed {
+            display: none;
+        }
+        
+        .stats-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .toggle-stats-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+        }
+        
+        .toggle-stats-btn:hover {
+            text-decoration: underline;
+        }
+        
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -663,17 +747,24 @@
                 margin-top: 10px;
             }
             
-            .orders-table {
+            .orders-table, .operator-stats-table {
                 font-size: 0.85rem;
             }
             
             .orders-table th,
-            .orders-table td {
+            .orders-table td,
+            .operator-stats-table th,
+            .operator-stats-table td {
                 padding: 8px 10px;
             }
             
             .btn-submit, .btn-whatsapp {
                 max-width: 100%;
+            }
+            
+            .stats-controls {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -684,36 +775,36 @@
             <div class="logo">
                 <i class="fas fa-clipboard-check"></i>
                 <div>
-                    <h1>Validação de Ordens de Serviço</h1>
-                    <p class="subtitle">Sistema para validação e controle de qualidade - Age Fibra</p>
+                    <h1>VALIDACAO DE ORDENS DE SERVICO</h1>
+                    <p class="subtitle">SISTEMA PARA VALIDACAO E CONTROLE DE QUALIDADE - AGE FIBRA</p>
                 </div>
             </div>
             <div id="firebaseStatus" class="firebase-status disconnected">
-                <i class="fas fa-circle"></i> <span>Firebase: Verificando conexão...</span>
+                <i class="fas fa-circle"></i> <span>FIREBASE: VERIFICANDO CONEXAO...</span>
             </div>
         </header>
         
         <div class="notification" id="notification">
             <i class="fas fa-check-circle"></i>
-            <div class="notification-content">Notificação</div>
+            <div class="notification-content">NOTIFICACAO</div>
         </div>
         
         <div class="statistics" id="statistics">
             <div class="stat-card">
                 <div class="stat-value" id="totalOS">0</div>
-                <div class="stat-label">Total de OS</div>
+                <div class="stat-label">TOTAL DE OS</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="approvedOS">0</div>
-                <div class="stat-label">OS Aprovadas</div>
+                <div class="stat-label">OS APROVADAS</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="rejectedOS">0</div>
-                <div class="stat-label">OS Reprovadas</div>
+                <div class="stat-label">OS REPROVADAS</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="todayOS">0</div>
-                <div class="stat-label">OS Hoje</div>
+                <div class="stat-label">OS HOJE</div>
             </div>
         </div>
         
@@ -728,77 +819,77 @@
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-user"></i>
-                    <h2>Informações da Ordem de Serviço</h2>
+                    <h2>INFORMACOES DA ORDEM DE SERVICO</h2>
                 </div>
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="operator" class="required">Operador</label>
+                        <label for="operator" class="required">OPERADOR</label>
                         <select id="operator" required>
-                            <option value="">Selecione um operador</option>
-                            <option>Camila Brito Pereira</option>
-                            <option>João Victor Borges Lima</option>
-                            <option>Marcos Barros de Oliveira</option>
-                            <option>Davi Soares de Sa</option>
-                            <option>Ricardo Rodrigues Lima</option>
-                            <option>Helena Bispo da Silva</option>
-                            <option>Eline Vieira Geronimo de Paulo</option>
-                            <option>Juliane Miranda de Araújo</option>
-                            <option>Luciene Sousa da Silva</option>
-                            <option>Raylane Stefany Silva da Costa</option>
-                            <option>Robson de Oliveira Silva</option>
-                            <option>Barbara Hyad Nunes Siqueira</option>
-                            <option>Vicktoria Goncalves Freire Motta</option>
-                            <option>Ana Paula Alves Lima</option>
-                            <option>Laura Borges Lima</option>
-                            <option>Marcio Vinicus</option>
-                            <option>Tamara Laura Sousa Soares</option>
-                            <option>Kaline Morais dos Santos</option>
-                            <option>Thayene dos santos ferreira</option>
-                            <option>Felipe Junior</option>
-                            <option>Barbara Silva dos Santos</option>
+                            <option value="">SELECIONE UM OPERADOR</option>
+                            <option>CAMILA BRITO PEREIRA</option>
+                            <option>JOAO VICTOR BORGES LIMA</option>
+                            <option>MARCOS BARROS DE OLIVEIRA</option>
+                            <option>DAVI SOARES DE SA</option>
+                            <option>RICARDO RODRIGUES LIMA</option>
+                            <option>HELENA BISPO DA SILVA</option>
+                            <option>ELINE VIEIRA GERONIMO DE PAULO</option>
+                            <option>JULIANE MIRANDA DE ARAUJO</option>
+                            <option>LUCIENE SOUSA DA SILVA</option>
+                            <option>RAYLANE STEFANY SILVA DA COSTA</option>
+                            <option>ROBSON DE OLIVEIRA SILVA</option>
+                            <option>BARBARA HYAD NUNES SIQUEIRA</option>
+                            <option>VICKTORIA GONCALVES FREIRE MOTTA</option>
+                            <option>ANA PAULA ALVES LIMA</option>
+                            <option>LAURA BORGES LIMA</option>
+                            <option>MARCIO VINICUS</option>
+                            <option>TAMARA LAURA SOUSA SOARES</option>
+                            <option>KALINE MORAIS DOS SANTOS</option>
+                            <option>THAYENE DOS SANTOS FERREIRA</option>
+                            <option>FELIPE JUNIOR</option>
+                            <option>BARBARA SILVA DOS SANTOS</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="supervisor" class="required">Supervisor</label>
+                        <label for="supervisor" class="required">SUPERVISOR</label>
                         <select id="supervisor" required>
-                            <option value="">Selecione um supervisor</option>
-                            <option selected>Washington Melo</option>
+                            <option value="">SELECIONE UM SUPERVISOR</option>
+                            <option selected>WASHINGTON MELO</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="technician" class="required">Técnico</label>
+                        <label for="technician" class="required">TECNICO</label>
                         <select id="technician" required>
-                            <option value="">Selecione um técnico</option>
+                            <option value="">SELECIONE UM TECNICO</option>
                             <option>BRUNO HENRIQUE SANTOS DE LIMA</option>
                             <option>DAVID ICARO PEREIRA BARROS</option>
-                            <option>GEOVANY DEZIDERIO ROCHA</option>
                             <option>GUILHERME RODRIGUES BEZERRA</option>
-                            <option>MABIO DA CONCEIÇÃO O. RIBEIRO</option>
+                            <option>MABIO DA CONCEICAO O. RIBEIRO</option>
                             <option>MARCOS HENRIQUE VELOSO</option>
                             <option>PHILIPE DA SILVA BARROS</option>
                             <option>WAGNER RODRIGUES UCHOA</option>
                             <option>WALLESSON MATHEUS RIBEIRO ARAUJO</option>
                             <option>WARLEY MARTINS NASCIMENTO</option>
-                            <option>SAVIO FERREIRA DE MELO</option>
+                            <option>SAVIO DOS REIS FERREIRA</option>
+                            <option>MATHEUS EMANOEL DE SOUSA FERREIRA</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="client" class="required">Nome Completo do Cliente</label>
-                        <input type="text" id="client" placeholder="Digite o nome completo do cliente" required>
+                        <label for="client" class="required">NOME COMPLETO DO CLIENTE</label>
+                        <input type="text" id="client" placeholder="DIGITE O NOME COMPLETO DO CLIENTE" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="service-type" class="required">Tipo de Ordem de Serviço</label>
+                        <label for="service-type" class="required">TIPO DE ORDEM DE SERVICO</label>
                         <select id="service-type" required disabled>
-                            <option value="">Selecione o tipo de serviço</option>
-                            <option>ATIVAÇÃO</option>
-                            <option>Mudança de endereço</option>
-                            <option>Visita Técnica</option>
-                            <option>Upgrade Mesh</option>
+                            <option value="">SELECIONE O TIPO DE SERVICO</option>
+                            <option>ATIVACAO</option>
+                            <option>MUDANCA DE ENDERECO</option>
+                            <option>VISITA TECNICA</option>
+                            <option>UPGRADE MESH</option>
                         </select>
                     </div>
                 </div>
@@ -807,162 +898,162 @@
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-tasks"></i>
-                    <h2>Validação Técnica</h2>
+                    <h2>VALIDACAO TECNICA</h2>
                 </div>
                 
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
-                <div class="questions-counter" id="questionsCounter">0/8 perguntas respondidas</div>
+                <div class="questions-counter" id="questionsCounter">0/8 PERGUNTAS RESPONDIDAS</div>
                 
                 <div class="validation-item active" id="question-1">
                     <div class="validation-text">
-                        <div class="validation-title">1. Fotos obrigatórias inseridas no Vtasks?</div>
+                        <div class="validation-title">1. FOTOS OBRIGATORIAS INSERIDAS NO VTASKS?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="photos-yes" name="photos" value="sim" required>
-                                <label for="photos-yes">Sim</label>
+                                <label for="photos-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="photos-no" name="photos" value="nao" required>
-                                <label for="photos-no">Não</label>
+                                <label for="photos-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="photos-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="photos-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-2">
                     <div class="validation-text">
-                        <div class="validation-title">2. Vídeo avaliado e de acordo com a qualidade Age Fibra?</div>
+                        <div class="validation-title">2. VIDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="video-yes" name="video" value="sim" required>
-                                <label for="video-yes">Sim</label>
+                                <label for="video-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="video-no" name="video" value="nao" required>
-                                <label for="video-no">Não</label>
+                                <label for="video-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="video-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="video-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-3">
                     <div class="validation-text">
-                        <div class="validation-title">3. Foram realizados testes em sites?</div>
+                        <div class="validation-title">3. FORAM REALIZADOS TESTES EM SITES?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="sites-yes" name="sites" value="sim" required>
-                                <label for="sites-yes">Sim</label>
+                                <label for="sites-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="sites-no" name="sites" value="nao" required>
-                                <label for="sites-no">Não</label>
+                                <label for="sites-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="sites-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="sites-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-4">
                     <div class="validation-text">
-                        <div class="validation-title">4. Foram realizados testes em aplicativos?</div>
+                        <div class="validation-title">4. FORAM REALIZADOS TESTES EM APLICATIVOS?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="apps-yes" name="apps" value="sim" required>
-                                <label for="apps-yes">Sim</label>
+                                <label for="apps-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="apps-no" name="apps" value="nao" required>
-                                <label for="apps-no">Não</label>
+                                <label for="apps-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="apps-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="apps-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-5">
                     <div class="validation-text">
-                        <div class="validation-title">5. Cliente foi orientado quanto às redes 2.4 GHz e 5 GHz e cabo?</div>
+                        <div class="validation-title">5. CLIENTE FOI ORIENTADO QUANTO AS REDES 2.4 GHZ E 5 GHZ E CABO?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="orientation-yes" name="orientation" value="sim" required>
-                                <label for="orientation-yes">Sim</label>
+                                <label for="orientation-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="orientation-no" name="orientation" value="nao" required>
-                                <label for="orientation-no">Não</label>
+                                <label for="orientation-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="orientation-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="orientation-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-6">
                     <div class="validation-text">
-                        <div class="validation-title">6. Ambiente ficou limpo e organizado?</div>
+                        <div class="validation-title">6. AMBIENTE FICOU LIMPO E ORGANIZADO?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="clean-yes" name="clean" value="sim" required>
-                                <label for="clean-yes">Sim</label>
+                                <label for="clean-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="clean-no" name="clean" value="nao" required>
-                                <label for="clean-no">Não</label>
+                                <label for="clean-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="clean-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="clean-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-7">
                     <div class="validation-text">
-                        <div class="validation-title">7. Técnico deixou contato corporativo do cliente?</div>
+                        <div class="validation-title">7. TECNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="contact-yes" name="contact" value="sim" required>
-                                <label for="contact-yes">Sim</label>
+                                <label for="contact-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="contact-no" name="contact" value="nao" required>
-                                <label for="contact-no">Não</label>
+                                <label for="contact-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="contact-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="contact-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
                 
                 <div class="validation-item" id="question-8">
                     <div class="validation-text">
-                        <div class="validation-title">8. Todas as dúvidas do cliente foram sanadas?</div>
+                        <div class="validation-title">8. TODAS AS DUVIDAS DO CLIENTE FORAM SANADAS?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="doubts-yes" name="doubts" value="sim" required>
-                                <label for="doubts-yes">Sim</label>
+                                <label for="doubts-yes">SIM</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="doubts-no" name="doubts" value="nao" required>
-                                <label for="doubts-no">Não</label>
+                                <label for="doubts-no">NAO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="doubts-comment" placeholder="Comentários (opcional)">
+                            <input type="text" id="doubts-comment" placeholder="COMENTARIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
@@ -971,100 +1062,138 @@
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-clipboard-list"></i>
-                    <h2>Resultado da Validação</h2>
+                    <h2>RESULTADO DA VALIDACAO</h2>
                 </div>
                 
                 <div class="form-group">
-                    <label for="validation" class="required">Validação</label>
+                    <label for="validation" class="required">VALIDACAO</label>
                     <div class="radio-group">
                         <div class="radio-option">
                             <input type="radio" id="approved" name="validation" value="approved" required>
-                            <label for="approved">Aprovada</label>
+                            <label for="approved">APROVADA</label>
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="rejected" name="validation" value="rejected" required>
-                            <label for="rejected">Reprovada</label>
+                            <label for="rejected">REPROVADA</label>
                         </div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="observations">Observações</label>
-                    <textarea id="observations" rows="4" placeholder="Digite observações relevantes sobre a validação"></textarea>
+                    <label for="observations">OBSERVACOES</label>
+                    <textarea id="observations" rows="4" placeholder="DIGITE OBSERVACOES RELEVANTES SOBRE A VALIDACAO"></textarea>
                 </div>
                 
                 <div class="rejection-reason" id="rejectionReason">
                     <div class="form-group">
-                        <label for="rejection-details" class="required">Motivo da Reprovação</label>
-                        <textarea id="rejection-details" rows="3" placeholder="Descreva detalhadamente o motivo da reprovação" required></textarea>
+                        <label for="rejection-details" class="required">MOTIVO DA REPROVACAO</label>
+                        <textarea id="rejection-details" rows="3" placeholder="DESCREVA DETALHADAMENTE O MOTIVO DA REPROVACAO" required></textarea>
                     </div>
                 </div>
             </div>
             
             <button class="btn-submit" id="submitBtn">
-                <i class="fas fa-check-circle"></i> Validar Ordem de Serviço
+                <i class="fas fa-check-circle"></i> VALIDAR ORDEM DE SERVICO
             </button>
             
             <button class="btn-whatsapp" id="whatsappBtn">
-                <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                <i class="fab fa-whatsapp"></i> ENVIAR POR WHATSAPP
             </button>
             
             <div class="last-orders">
-                <h3><i class="fas fa-history"></i> Últimas 5 Ordens Validadas</h3>
+                <h3><i class="fas fa-history"></i> ULTIMAS 5 ORDENS VALIDADAS</h3>
                 <div id="ordersTableContainer">
                     <table class="orders-table">
                         <thead>
                             <tr>
-                                <th>Data</th>
-                                <th>Operador</th>
-                                <th>Técnico</th>
-                                <th>Cliente</th>
-                                <th>Status</th>
-                                <th>Ações</th>
+                                <th>DATA</th>
+                                <th>OPERADOR</th>
+                                <th>TECNICO</th>
+                                <th>CLIENTE</th>
+                                <th>STATUS</th>
+                                <th>ACOES</th>
                             </tr>
                         </thead>
                         <tbody id="ordersTableBody">
                             <tr>
-                                <td colspan="6" style="text-align: center;">Carregando dados...</td>
+                                <td colspan="6" style="text-align: center;">CARREGANDO DADOS...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <button class="export-btn" id="exportBtn">
-                    <i class="fas fa-file-excel"></i> Exportar para Excel
+                    <i class="fas fa-file-excel"></i> EXPORTAR PARA EXCEL
                 </button>
+            </div>
+            
+            <!-- Nova seção de estatísticas por operador -->
+            <div class="operator-stats">
+                <h3 id="statsToggle">
+                    <i class="fas fa-chart-bar"></i> ESTATISTICAS POR OPERADOR 
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </h3>
+                
+                <div id="statsContainer" class="stats-collapsed">
+                    <div id="operatorStatsContainer">
+                        <table class="operator-stats-table">
+                            <thead>
+                                <tr>
+                                    <th>OPERADOR</th>
+                                    <th>TOTAL DE OS</th>
+                                    <th>APROVADAS</th>
+                                    <th>REPROVADAS</th>
+                                    <th>TAXA DE APROVACAO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="operatorStatsBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">CARREGANDO ESTATISTICAS...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="stats-controls">
+                        <button class="toggle-stats-btn" id="toggleStatsBtn">
+                            <i class="fas fa-eye-slash"></i> OCULTAR ESTATISTICAS
+                        </button>
+                        <button class="export-btn" id="exportStatsBtn">
+                            <i class="fas fa-file-excel"></i> EXPORTAR ESTATISTICAS
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div class="connection-panel">
                 <div class="connection-header">
-                    <h3>Configuração do Firebase</h3>
+                    <h3>CONFIGURACAO DO FIREBASE</h3>
                     <div class="connection-status">
                         <span class="status-dot" id="statusDot"></span>
-                        <span id="connectionStatusText">Verificando...</span>
+                        <span id="connectionStatusText">VERIFICANDO...</span>
                     </div>
                 </div>
                 
                 <div class="firebase-config">
-                    <div class="config-title">Configuração Atual:</div>
-                    <div class="config-key">apiKey:</div>
-                    <div class="config-value">AIzaSyBwTvjKbFP3AIyEhlihsf7VDtafjxAvM24</div>
+                    <div class="config-title">CONFIGURACAO ATUAL:</div>
+                    <div class="config-key">APIKEY:</div>
+                    <div class="config-value">AIZASYBWTVJKBFP3AIYEHLIHSF7VDTAFJXAVM24</div>
                     
-                    <div class="config-key">authDomain:</div>
-                    <div class="config-value">validaage.firebaseapp.com</div>
+                    <div class="config-key">AUTHDOMAIN:</div>
+                    <div class="config-value">VALIDAGE.FIREBASEAPP.COM</div>
                     
-                    <div class="config-key">projectId:</div>
-                    <div class="config-value">validaage</div>
+                    <div class="config-key">PROJECTID:</div>
+                    <div class="config-value">VALIDAGE</div>
                     
-                    <div class="config-key">storageBucket:</div>
-                    <div class="config-value">validaage.appspot.com</div>
+                    <div class="config-key">STORAGEBUCKET:</div>
+                    <div class="config-value">VALIDAGE.APPSPOT.COM</div>
                     
-                    <div class="config-key">messagingSenderId:</div>
+                    <div class="config-key">MESSAGINGSENDERID:</div>
                     <div class="config-value">654383800536</div>
                     
-                    <div class="config-key">appId:</div>
-                    <div class="config-value">1:654383800536:web:1d247bb420b1f91dea77ad</div>
+                    <div class="config-key">APPID:</div>
+                    <div class="config-value">1:654383800536:WEB:1D247BB420B1F91DEA77AD</div>
                     
-                    <div class="config-key">measurementId:</div>
+                    <div class="config-key">MEASUREMENTID:</div>
                     <div class="config-value">G-CWSFTXQ3T2</div>
                 </div>
                 
@@ -1072,15 +1201,15 @@
                 
                 <div class="action-buttons">
                     <button class="btn btn-primary" id="retryBtn">
-                        <i class="fas fa-sync-alt"></i> Tentar Reconexão
+                        <i class="fas fa-sync-alt"></i> TENTAR RECONEXAO
                     </button>
                 </div>
             </div>
         </main>
         
         <footer>
-            <p>Sistema de Validação de OS - Age Fibra | Desenvolvido com <i class="fas fa-heart" style="color: var(--primary);"></i> para qualidade do atendimento</p>
-            <p>© 2023 Todos os direitos reservados</p>
+            <p>SISTEMA DE VALIDACAO DE OS - AGE FIBRA | DESENVOLVIDO COM <i class="fas fa-heart" style="color: var(--primary);"></i> PARA QUALIDADE DO ATENDIMENTO</p>
+            <p>© 2023 TODOS OS DIREITOS RESERVADOS</p>
         </footer>
     </div>
     
@@ -1109,6 +1238,11 @@
         const whatsappBtn = document.getElementById('whatsappBtn');
         const progressBar = document.getElementById('progressBar');
         const questionsCounter = document.getElementById('questionsCounter');
+        const statsToggle = document.getElementById('statsToggle');
+        const statsContainer = document.getElementById('statsContainer');
+        const toggleStatsBtn = document.getElementById('toggleStatsBtn');
+        const exportStatsBtn = document.getElementById('exportStatsBtn');
+        const toggleIcon = document.querySelector('.toggle-icon');
         
         // Elementos de estatísticas
         const totalOS = document.getElementById('totalOS');
@@ -1118,6 +1252,9 @@
         
         // Elementos da tabela de últimas ordens
         const ordersTableBody = document.getElementById('ordersTableBody');
+        
+        // Elementos da nova tabela de estatísticas por operador
+        const operatorStatsBody = document.getElementById('operatorStatsBody');
         
         // Elementos para sequência de perguntas
         const questions = document.querySelectorAll('.validation-item');
@@ -1129,33 +1266,41 @@
         let analytics;
         let firebaseConnected = false;
         let orders = [];
-        let currentQuestion = 1;
         let answeredQuestions = 0;
+        let operatorStats = {};
+        let statsExpanded = false;
+        
+        // Função para remover acentos e converter para maiúsculas
+        function normalizeText(text) {
+            return text
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .toUpperCase();
+        }
         
         // Atualizar status do Firebase
         function updateFirebaseStatus(connected, message = "") {
             firebaseConnected = connected;
             
             if (connected) {
-                firebaseStatus.innerHTML = '<i class="fas fa-circle"></i> <span>Firebase: Conectado</span>';
+                firebaseStatus.innerHTML = '<i class="fas fa-circle"></i> <span>FIREBASE: CONECTADO</span>';
                 firebaseStatus.classList.remove('disconnected');
                 firebaseStatus.classList.add('connected');
                 
                 statusDot.className = 'status-dot status-connected';
-                connectionStatusText.textContent = 'Conectado';
+                connectionStatusText.textContent = 'CONECTADO';
                 firebaseError.textContent = '';
                 
-                showNotification('Conexão com Firebase estabelecida com sucesso!', true);
+                showNotification('CONEXAO COM FIREBASE ESTABELECIDA COM SUCESSO!', true);
             } else {
-                firebaseStatus.innerHTML = '<i class="fas fa-circle"></i> <span>Firebase: Desconectado</span>';
+                firebaseStatus.innerHTML = '<i class="fas fa-circle"></i> <span>FIREBASE: DESCONECTADO</span>';
                 firebaseStatus.classList.remove('connected');
                 firebaseStatus.classList.add('disconnected');
                 
                 statusDot.className = 'status-dot status-disconnected';
-                connectionStatusText.textContent = 'Desconectado';
-                firebaseError.textContent = message || 'Erro na conexão com Firebase';
+                connectionStatusText.textContent = 'DESCONECTADO';
+                firebaseError.textContent = message || 'ERRO NA CONEXAO COM FIREBASE';
                 
-                showNotification(message || 'Erro na conexão com Firebase', false);
+                showNotification(message || 'ERRO NA CONEXAO COM FIREBASE', false);
             }
         }
         
@@ -1177,6 +1322,74 @@
             }, 5000);
         }
         
+        // Calcular estatísticas por operador
+        function calculateOperatorStats() {
+            operatorStats = {};
+            
+            // Inicializar estatísticas para todos os operadores
+            const operatorSelect = document.getElementById('operator');
+            for (let i = 0; i < operatorSelect.options.length; i++) {
+                if (operatorSelect.options[i].value) {
+                    const operator = operatorSelect.options[i].text;
+                    operatorStats[operator] = {
+                        total: 0,
+                        approved: 0,
+                        rejected: 0
+                    };
+                }
+            }
+            
+            // Contar as OS de cada operador
+            orders.forEach(order => {
+                if (operatorStats[order.operator]) {
+                    operatorStats[order.operator].total++;
+                    if (order.result === 'approved') {
+                        operatorStats[order.operator].approved++;
+                    } else {
+                        operatorStats[order.operator].rejected++;
+                    }
+                }
+            });
+            
+            return operatorStats;
+        }
+        
+        // Exibir estatísticas por operador
+        function displayOperatorStats(stats) {
+            operatorStatsBody.innerHTML = '';
+            
+            // Ordenar operadores por quantidade de OS (do maior para o menor)
+            const sortedOperators = Object.entries(stats)
+                .sort((a, b) => b[1].total - a[1].total);
+            
+            if (sortedOperators.length === 0) {
+                operatorStatsBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            sortedOperators.forEach(([operator, stat]) => {
+                const row = document.createElement('tr');
+                
+                // Calcular taxa de aprovação
+                const approvalRate = stat.total > 0 
+                    ? ((stat.approved / stat.total) * 100).toFixed(1) + '%' 
+                    : '0%';
+                
+                row.innerHTML = `
+                    <td>${operator}</td>
+                    <td>${stat.total}</td>
+                    <td>${stat.approved}</td>
+                    <td>${stat.rejected}</td>
+                    <td>${approvalRate}</td>
+                `;
+                operatorStatsBody.appendChild(row);
+            });
+        }
+        
         // Carregar estatísticas e últimas ordens
         async function loadStatisticsAndOrders() {
             try {
@@ -1184,16 +1397,31 @@
                 const allOrdersSnapshot = await db.collection("ordens_servico").get();
                 orders = [];
                 allOrdersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Normalizar os dados para maiúsculas e sem acentos
                     orders.push({
                         id: doc.id,
-                        ...doc.data()
+                        operator: normalizeText(data.operator),
+                        supervisor: normalizeText(data.supervisor),
+                        technician: normalizeText(data.technician),
+                        client: normalizeText(data.client),
+                        serviceType: normalizeText(data.serviceType),
+                        validation: data.validation,
+                        result: data.result,
+                        observations: data.observations,
+                        rejectionReason: data.rejectionReason,
+                        timestamp: data.timestamp
                     });
                 });
                 
-                // Atualizar estatísticas
+                // Atualizar estatísticas gerais
                 totalOS.textContent = orders.length;
                 approvedOS.textContent = orders.filter(order => order.result === 'approved').length;
                 rejectedOS.textContent = orders.filter(order => order.result === 'rejected').length;
+                
+                // Calcular e exibir estatísticas por operador
+                operatorStats = calculateOperatorStats();
+                displayOperatorStats(operatorStats);
                 
                 // Ordenar por data (mais recentes primeiro)
                 const sortedOrders = [...orders].sort((a, b) => 
@@ -1203,13 +1431,13 @@
                 // Pegar as últimas 5
                 const last5Orders = sortedOrders.slice(0, 5);
                 
-                // Atualizar tabela
+                // Atualizar tabela de últimas ordens
                 ordersTableBody.innerHTML = '';
                 
                 if (last5Orders.length === 0) {
                     ordersTableBody.innerHTML = `
                         <tr>
-                            <td colspan="6" style="text-align: center;">Nenhuma ordem validada ainda</td>
+                            <td colspan="6" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td>
                         </tr>
                     `;
                 } else {
@@ -1224,11 +1452,11 @@
                             <td>${order.technician}</td>
                             <td>${order.client}</td>
                             <td class="${order.result === 'approved' ? 'status-approved' : 'status-rejected'}">
-                                ${order.result === 'approved' ? 'Aprovada' : 'Reprovada'}
+                                ${order.result === 'approved' ? 'APROVADA' : 'REPROVADA'}
                             </td>
                             <td>
                                 <button class="delete-btn" data-id="${order.id}">
-                                    <i class="fas fa-trash"></i> Excluir
+                                    <i class="fas fa-trash"></i> EXCLUIR
                                 </button>
                             </td>
                         `;
@@ -1244,24 +1472,24 @@
                     });
                 }
             } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                showNotification('Erro ao carregar dados: ' + error.message, false);
+                console.error("ERRO AO CARREGAR DADOS:", error);
+                showNotification('ERRO AO CARREGAR DADOS: ' + error.message, false);
             }
         }
         
         // Excluir uma ordem
         async function deleteOrder(orderId) {
-            if (!confirm('Tem certeza que deseja excluir esta ordem? Esta ação não pode ser desfeita.')) {
+            if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTA ORDEM? ESTA ACAO NAO PODE SER DESFEITA.')) {
                 return;
             }
             
             try {
                 await db.collection("ordens_servico").doc(orderId).delete();
-                showNotification('Ordem excluída com sucesso!', true);
+                showNotification('ORDEM EXCLUIDA COM SUCESSO!', true);
                 loadStatisticsAndOrders();
             } catch (error) {
-                console.error("Erro ao excluir ordem:", error);
-                showNotification('Erro ao excluir ordem: ' + error.message, false);
+                console.error("ERRO AO EXCLUIR ORDEM:", error);
+                showNotification('ERRO AO EXCLUIR ORDEM: ' + error.message, false);
             }
         }
         
@@ -1270,7 +1498,7 @@
             // Tentar inicializar o Firebase
             try {
                 firebase.initializeApp(firebaseConfig);
-                console.log("Firebase inicializado com sucesso!");
+                console.log("FIREBASE INICIALIZADO COM SUCESSO!");
                 db = firebase.firestore();
                 analytics = firebase.analytics();
                 
@@ -1279,15 +1507,15 @@
                 
                 testDocRef.get()
                     .then(() => {
-                        updateFirebaseStatus(true, "Firebase conectado com sucesso!");
-                        console.log("Conexão com Firebase estabelecida!");
+                        updateFirebaseStatus(true, "FIREBASE CONECTADO COM SUCESSO!");
+                        console.log("CONEXAO COM FIREBASE ESTABELECIDA!");
                         
                         // Carregar dados
                         loadStatisticsAndOrders();
                     })
                     .catch(error => {
-                        console.error("Erro ao conectar com Firebase:", error);
-                        updateFirebaseStatus(false, "Erro ao acessar Firestore: " + error.message);
+                        console.error("ERRO AO CONECTAR COM FIREBASE:", error);
+                        updateFirebaseStatus(false, "ERRO AO ACESSAR FIRESTORE: " + error.message);
                         
                         // Tentar criar o documento de teste
                         testDocRef.set({
@@ -1295,20 +1523,20 @@
                             timestamp: new Date()
                         })
                         .then(() => {
-                            updateFirebaseStatus(true, "Firestore funcionando após criação de documento");
-                            console.log("Documento de teste criado com sucesso!");
+                            updateFirebaseStatus(true, "FIRESTORE FUNCIONANDO APOS CRIACAO DE DOCUMENTO");
+                            console.log("DOCUMENTO DE TESTE CRIADO COM SUCESSO!");
                             
                             // Carregar dados
                             loadStatisticsAndOrders();
                         })
                         .catch(createError => {
-                            console.error("Erro ao criar documento de teste:", createError);
-                            updateFirebaseStatus(false, "Erro ao gravar no Firestore: " + createError.message);
+                            console.error("ERRO AO CRIAR DOCUMENTO DE TESTE:", createError);
+                            updateFirebaseStatus(false, "ERRO AO GRAVAR NO FIRESTORE: " + createError.message);
                         });
                     });
             } catch (error) {
-                console.error("Erro ao inicializar Firebase:", error);
-                updateFirebaseStatus(false, "Erro na inicialização: " + error.message);
+                console.error("ERRO AO INICIALIZAR FIREBASE:", error);
+                updateFirebaseStatus(false, "ERRO NA INICIALIZACAO: " + error.message);
             }
         }
         
@@ -1316,7 +1544,7 @@
         function updateProgressBar() {
             const progress = (answeredQuestions / 8) * 100;
             progressBar.style.width = `${progress}%`;
-            questionsCounter.textContent = `${answeredQuestions}/8 perguntas respondidas`;
+            questionsCounter.textContent = `${answeredQuestions}/8 PERGUNTAS RESPONDIDAS`;
         }
         
         // Gerenciar sequência de perguntas
@@ -1369,34 +1597,34 @@
         // Enviar dados por WhatsApp
         function sendViaWhatsApp() {
             // Coletar dados básicos
-            const operator = document.getElementById('operator').value || 'Não informado';
-            const technician = document.getElementById('technician').value || 'Não informado';
-            const client = document.getElementById('client').value || 'Não informado';
-            const serviceType = document.getElementById('service-type').value || 'Não informado';
+            const operator = document.getElementById('operator').value || 'NAO INFORMADO';
+            const technician = document.getElementById('technician').value || 'NAO INFORMADO';
+            const client = document.getElementById('client').value || 'NAO INFORMADO';
+            const serviceType = document.getElementById('service-type').value || 'NAO INFORMADO';
             const result = document.querySelector('input[name="validation"]:checked') ? 
-                (document.querySelector('input[name="validation"]:checked').value === 'approved' ? 'Aprovada' : 'Reprovada') : 'Não definido';
+                (document.querySelector('input[name="validation"]:checked').value === 'approved' ? 'APROVADA' : 'REPROVADA') : 'NAO DEFINIDO';
             
             // Montar mensagem
-            let message = `*Validação de OS - Age Fibra*\n\n`;
-            message += `*Operador:* ${operator}\n`;
-            message += `*Técnico:* ${technician}\n`;
-            message += `*Cliente:* ${client}\n`;
-            message += `*Tipo de OS:* ${serviceType}\n`;
-            message += `*Resultado:* ${result}\n\n`;
+            let message = `*VALIDACAO DE OS - AGE FIBRA*\n\n`;
+            message += `*OPERADOR:* ${operator}\n`;
+            message += `*TECNICO:* ${technician}\n`;
+            message += `*CLIENTE:* ${client}\n`;
+            message += `*TIPO DE OS:* ${serviceType}\n`;
+            message += `*RESULTADO:* ${result}\n\n`;
             
             // Adicionar respostas às perguntas
-            message += `*Respostas:*\n`;
+            message += `*RESPOSTAS:*\n`;
             
             // Lista de perguntas
             const questionTitles = [
-                "Fotos obrigatórias inseridas no Vtasks?",
-                "Vídeo avaliado e de acordo com a qualidade Age Fibra?",
-                "Foram realizados testes em sites?",
-                "Foram realizados testes em aplicativos?",
-                "Cliente foi orientado quanto às redes 2.4 GHz e 5 GHz e cabo?",
-                "Ambiente ficou limpo e organizado?",
-                "Técnico deixou contato corporativo do cliente?",
-                "Todas as dúvidas do cliente foram sanadas?"
+                "FOTOS OBRIGATORIAS INSERIDAS NO VTASKS?",
+                "VIDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?",
+                "FORAM REALIZADOS TESTES EM SITES?",
+                "FORAM REALIZADOS TESTES EM APLICATIVOS?",
+                "CLIENTE FOI ORIENTADO QUANTO AS REDES 2.4 GHZ E 5 GHZ E CABO?",
+                "AMBIENTE FICOU LIMPO E ORGANIZADO?",
+                "TECNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?",
+                "TODAS AS DUVIDAS DO CLIENTE FORAM SANADAS?"
             ];
             
             // Coletar respostas
@@ -1406,10 +1634,10 @@
                 const radios = questionElement.querySelectorAll('input[type="radio"]');
                 const comment = document.getElementById(`${title.split(' ')[0].toLowerCase()}-comment`)?.value || '';
                 
-                let response = 'Não respondido';
+                let response = 'NAO RESPONDIDO';
                 radios.forEach(radio => {
                     if (radio.checked) {
-                        response = radio.value === 'sim' ? 'Sim' : 'Não';
+                        response = radio.value === 'sim' ? 'SIM' : 'NAO';
                     }
                 });
                 
@@ -1421,12 +1649,12 @@
             // Adicionar observações
             const observations = document.getElementById('observations').value;
             if (observations) {
-                message += `\n*Observações:* ${observations}\n`;
+                message += `\n*OBSERVACOES:* ${observations}\n`;
             }
             
             // Se reprovado, adicionar motivo
-            if (result === 'Reprovada' && rejectionDetails.value) {
-                message += `\n*Motivo da reprovação:* ${rejectionDetails.value}\n`;
+            if (result === 'REPROVADA' && rejectionDetails.value) {
+                message += `\n*MOTIVO DA REPROVACAO:* ${rejectionDetails.value}\n`;
             }
             
             // Codificar mensagem para URL
@@ -1434,6 +1662,60 @@
             
             // Abrir WhatsApp
             window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        }
+        
+        // Alternar visibilidade das estatísticas
+        function toggleStatsVisibility() {
+            statsExpanded = !statsExpanded;
+            
+            if (statsExpanded) {
+                statsContainer.classList.remove('stats-collapsed');
+                toggleStatsBtn.innerHTML = '<i class="fas fa-eye-slash"></i> OCULTAR ESTATISTICAS';
+                toggleIcon.className = 'fas fa-chevron-up toggle-icon';
+            } else {
+                statsContainer.classList.add('stats-collapsed');
+                toggleStatsBtn.innerHTML = '<i class="fas fa-eye"></i> VER ESTATISTICAS';
+                toggleIcon.className = 'fas fa-chevron-down toggle-icon';
+            }
+        }
+        
+        // Exportar estatísticas para Excel
+        function exportStatsToExcel() {
+            if (Object.keys(operatorStats).length === 0) {
+                showNotification('NENHUMA ESTATISTICA PARA EXPORTAR', 'info');
+                return;
+            }
+            
+            // Preparar dados para exportação
+            const dataForExport = [];
+            
+            // Ordenar operadores por quantidade de OS (do maior para o menor)
+            const sortedOperators = Object.entries(operatorStats)
+                .sort((a, b) => b[1].total - a[1].total);
+            
+            sortedOperators.forEach(([operator, stat]) => {
+                const approvalRate = stat.total > 0 
+                    ? ((stat.approved / stat.total) * 100).toFixed(1) + '%' 
+                    : '0%';
+                
+                dataForExport.push({
+                    'OPERADOR': operator,
+                    'TOTAL DE OS': stat.total,
+                    'APROVADAS': stat.approved,
+                    'REPROVADAS': stat.rejected,
+                    'TAXA DE APROVACAO': approvalRate
+                });
+            });
+            
+            // Criar planilha
+            const worksheet = XLSX.utils.json_to_sheet(dataForExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Estatisticas Operadores");
+            
+            // Gerar arquivo XLSX
+            XLSX.writeFile(workbook, "estatisticas_operadores_age_fibra.xlsx");
+            
+            showNotification('ESTATISTICAS EXPORTADAS COM SUCESSO!', true);
         }
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -1471,11 +1753,11 @@
             // Coletar dados do formulário
             function collectFormData() {
                 return {
-                    operator: operatorSelect.value,
-                    supervisor: supervisorSelect.value,
-                    technician: technicianSelect.value,
-                    client: clientInput.value,
-                    serviceType: serviceTypeSelect.value,
+                    operator: normalizeText(operatorSelect.value),
+                    supervisor: normalizeText(supervisorSelect.value),
+                    technician: normalizeText(technicianSelect.value),
+                    client: normalizeText(clientInput.value),
+                    serviceType: normalizeText(serviceTypeSelect.value),
                     validation: {
                         photos: document.querySelector('input[name="photos"]:checked')?.value || '',
                         photosComment: document.getElementById('photos-comment').value,
@@ -1515,7 +1797,7 @@
                     
                     return true;
                 } catch (error) {
-                    console.error("Erro ao salvar no Firestore: ", error);
+                    console.error("ERRO AO SALVAR NO FIRESTORE: ", error);
                     return false;
                 }
             }
@@ -1526,32 +1808,32 @@
                 
                 // Verificar se Firebase está conectado
                 if (!firebaseConnected) {
-                    showNotification('Erro: Sem conexão com Firebase', false);
+                    showNotification('ERRO: SEM CONEXAO COM FIREBASE', false);
                     return;
                 }
                 
                 // Validação básica
                 if (!operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || 
                     !clientInput.value || !serviceTypeSelect.value) {
-                    showNotification('Preencha todas as informações básicas da OS', false);
+                    showNotification('PREENCHA TODAS AS INFORMACOES BASICAS DA OS', false);
                     return;
                 }
                 
                 // Verificar se todas as perguntas foram respondidas
                 if (answeredQuestions < 8) {
-                    showNotification('Responda todas as perguntas de validação', false);
+                    showNotification('RESPONDA TODAS AS PERGUNTAS DE VALIDACAO', false);
                     return;
                 }
                 
                 const validationSelected = document.querySelector('input[name="validation"]:checked');
                 if (!validationSelected) {
-                    showNotification('Selecione o resultado da validação', false);
+                    showNotification('SELECIONE O RESULTADO DA VALIDACAO', false);
                     return;
                 }
                 
                 // Se reprovado, verificar motivo
                 if (validationSelected.value === 'rejected' && !rejectionDetails.value) {
-                    showNotification('Preencha o motivo da reprovação', false);
+                    showNotification('PREENCHA O MOTIVO DA REPROVACAO', false);
                     return;
                 }
                 
@@ -1560,14 +1842,14 @@
                 
                 // Mostrar loading no botão
                 const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
                 submitBtn.disabled = true;
                 
                 // Salvar no Firestore
                 const saved = await saveToFirestore(formData);
                 
                 if (saved) {
-                    showNotification('OS validada com sucesso! Dados salvos no Firebase.', true);
+                    showNotification('OS VALIDADA COM SUCESSO! DADOS SALVOS NO FIREBASE.', true);
                     
                     // Atualizar estatísticas e últimas ordens
                     await loadStatisticsAndOrders();
@@ -1599,7 +1881,7 @@
                     updateProgressBar();
                     setupQuestionSequence();
                 } else {
-                    showNotification('Erro ao salvar os dados. Tente novamente.', false);
+                    showNotification('ERRO AO SALVAR OS DADOS. TENTE NOVAMENTE.', false);
                 }
                 
                 // Restaurar botão
@@ -1609,71 +1891,71 @@
             
             // Botão para tentar reconexão
             retryBtn.addEventListener('click', function() {
-                showNotification('Tentando reconectar ao Firebase...', 'info');
+                showNotification('TENTANDO RECONECTAR AO FIREBASE...', 'info');
                 checkFirebaseConnection();
             });
             
             // Botão para exportar para Excel
             exportBtn.addEventListener('click', async function() {
                 if (!firebaseConnected) {
-                    showNotification('Erro: Sem conexão com Firebase', false);
+                    showNotification('ERRO: SEM CONEXAO COM FIREBASE', false);
                     return;
                 }
                 
                 if (orders.length === 0) {
-                    showNotification('Nenhuma ordem para exportar', 'info');
+                    showNotification('NENHUMA ORDEM PARA EXPORTAR', 'info');
                     return;
                 }
                 
                 // Mostrar loading no botão
                 const originalText = exportBtn.innerHTML;
-                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> EXPORTANDO...';
                 exportBtn.disabled = true;
                 
                 try {
                     // Preparar dados para exportação
                     const dataForExport = orders.map(order => {
                         return {
-                            'Data': order.timestamp.toDate().toLocaleString('pt-BR'),
-                            'Operador': order.operator,
-                            'Supervisor': order.supervisor,
-                            'Técnico': order.technician,
-                            'Cliente': order.client,
-                            'Tipo de OS': order.serviceType,
-                            'Fotos': order.validation.photos,
-                            'Comentário Fotos': order.validation.photosComment,
-                            'Vídeo': order.validation.video,
-                            'Comentário Vídeo': order.validation.videoComment,
-                            'Testes em sites': order.validation.sites,
-                            'Comentário Sites': order.validation.sitesComment,
-                            'Testes em apps': order.validation.apps,
-                            'Comentário Apps': order.validation.appsComment,
-                            'Orientação redes': order.validation.orientation,
-                            'Comentário Orientação': order.validation.orientationComment,
-                            'Ambiente limpo': order.validation.clean,
-                            'Comentário Limpeza': order.validation.cleanComment,
-                            'Contato deixado': order.validation.contact,
-                            'Comentário Contato': order.validation.contactComment,
-                            'Dúvidas sanadas': order.validation.doubts,
-                            'Comentário Dúvidas': order.validation.doubtsComment,
-                            'Resultado': order.result === 'approved' ? 'Aprovada' : 'Reprovada',
-                            'Observações': order.observations,
-                            'Motivo Reprovação': order.rejectionReason || 'N/A'
+                            'DATA': order.timestamp.toDate().toLocaleString('pt-BR'),
+                            'OPERADOR': order.operator,
+                            'SUPERVISOR': order.supervisor,
+                            'TECNICO': order.technician,
+                            'CLIENTE': order.client,
+                            'TIPO DE OS': order.serviceType,
+                            'FOTOS': order.validation.photos,
+                            'COMENTARIO FOTOS': order.validation.photosComment,
+                            'VIDEO': order.validation.video,
+                            'COMENTARIO VIDEO': order.validation.videoComment,
+                            'TESTES EM SITES': order.validation.sites,
+                            'COMENTARIO SITES': order.validation.sitesComment,
+                            'TESTES EM APPS': order.validation.apps,
+                            'COMENTARIO APPS': order.validation.appsComment,
+                            'ORIENTACAO REDES': order.validation.orientation,
+                            'COMENTARIO ORIENTACAO': order.validation.orientationComment,
+                            'AMBIENTE LIMPO': order.validation.clean,
+                            'COMENTARIO LIMPEZA': order.validation.cleanComment,
+                            'CONTATO DEIXADO': order.validation.contact,
+                            'COMENTARIO CONTATO': order.validation.contactComment,
+                            'DUVIDAS SANADAS': order.validation.doubts,
+                            'COMENTARIO DUVIDAS': order.validation.doubtsComment,
+                            'RESULTADO': order.result === 'approved' ? 'APROVADA' : 'REPROVADA',
+                            'OBSERVACOES': order.observations,
+                            'MOTIVO REPROVACAO': order.rejectionReason || 'N/A'
                         };
                     });
                     
                     // Criar planilha
                     const worksheet = XLSX.utils.json_to_sheet(dataForExport);
                     const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "Ordens de Serviço");
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "ORDENS DE SERVICO");
                     
                     // Gerar arquivo XLSX
                     XLSX.writeFile(workbook, "ordens_servico_age_fibra.xlsx");
                     
-                    showNotification('Exportação para Excel concluída com sucesso!', true);
+                    showNotification('EXPORTACAO PARA EXCEL CONCLUIDA COM SUCESSO!', true);
                 } catch (error) {
-                    console.error("Erro ao exportar para Excel:", error);
-                    showNotification('Erro ao exportar para Excel: ' + error.message, false);
+                    console.error("ERRO AO EXPORTAR PARA EXCEL:", error);
+                    showNotification('ERRO AO EXPORTAR PARA EXCEL: ' + error.message, false);
                 }
                 
                 // Restaurar botão
@@ -1685,6 +1967,13 @@
             whatsappBtn.addEventListener('click', function() {
                 sendViaWhatsApp();
             });
+            
+            // Alternar visibilidade das estatísticas
+            statsToggle.addEventListener('click', toggleStatsVisibility);
+            toggleStatsBtn.addEventListener('click', toggleStatsVisibility);
+            
+            // Exportar estatísticas
+            exportStatsBtn.addEventListener('click', exportStatsToExcel);
         });
     </script>
 </body>
