@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Validação de OS - Age Fibra</title>
+    <title>SISTEMA DE VALIDACAO DE OS - AGE FIBRA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        /* ESTILOS PERMANECEM IGUAIS */
         :root {
             --primary: #FF6B00;
             --primary-dark: #D45A00;
@@ -629,7 +630,6 @@
             margin-top: 5px;
         }
         
-        /* Nova seção de estatísticas por operador */
         .operator-stats {
             margin-top: 30px;
             background: white;
@@ -855,7 +855,8 @@
                         <label for="supervisor" class="required">SUPERVISOR</label>
                         <select id="supervisor" required>
                             <option value="">SELECIONE UM SUPERVISOR</option>
-                            <option selected>WASHINGTON MELO</option>
+                            <option>WASHINGTON MELO</option>
+                            <option>PATRICK DE SOUSA BARRETO</option>
                         </select>
                     </div>
                     
@@ -863,17 +864,7 @@
                         <label for="technician" class="required">TECNICO</label>
                         <select id="technician" required>
                             <option value="">SELECIONE UM TECNICO</option>
-                            <option>BRUNO HENRIQUE SANTOS DE LIMA</option>
-                            <option>DAVID ICARO PEREIRA BARROS</option>
-                            <option>GUILHERME RODRIGUES BEZERRA</option>
-                            <option>MABIO DA CONCEICAO O. RIBEIRO</option>
-                            <option>MARCOS HENRIQUE VELOSO</option>
-                            <option>PHILIPE DA SILVA BARROS</option>
-                            <option>WAGNER RODRIGUES UCHOA</option>
-                            <option>WALLESSON MATHEUS RIBEIRO ARAUJO</option>
-                            <option>WARLEY MARTINS NASCIMENTO</option>
-                            <option>SAVIO DOS REIS FERREIRA</option>
-                            <option>MATHEUS EMANOEL DE SOUSA FERREIRA</option>
+                            <!-- Será preenchido dinamicamente conforme o supervisor selecionado -->
                         </select>
                     </div>
                     
@@ -894,6 +885,8 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- ... (restante do formulário permanece igual) ... -->
             
             <div class="form-section">
                 <div class="section-title">
@@ -1214,7 +1207,7 @@
     </div>
     
     <script>
-        // Configuração do Firebase fornecida
+        // CONFIGURACOES
         const firebaseConfig = {
             apiKey: "AIzaSyBwTvjKbFP3AIyEhlihsf7VDtafjxAvM24",
             authDomain: "validaage.firebaseapp.com",
@@ -1225,7 +1218,7 @@
             measurementId: "G-CWSFTXQ3T2"
         };
 
-        // Elementos da interface
+        // ELEMENTOS DA INTERFACE
         const firebaseStatus = document.getElementById('firebaseStatus');
         const statusDot = document.getElementById('statusDot');
         const connectionStatusText = document.getElementById('connectionStatusText');
@@ -1244,24 +1237,54 @@
         const exportStatsBtn = document.getElementById('exportStatsBtn');
         const toggleIcon = document.querySelector('.toggle-icon');
         
-        // Elementos de estatísticas
+        // ELEMENTOS DE ESTATISTICAS
         const totalOS = document.getElementById('totalOS');
         const approvedOS = document.getElementById('approvedOS');
         const rejectedOS = document.getElementById('rejectedOS');
         const todayOS = document.getElementById('todayOS');
         
-        // Elementos da tabela de últimas ordens
+        // ELEMENTOS DA TABELA
         const ordersTableBody = document.getElementById('ordersTableBody');
-        
-        // Elementos da nova tabela de estatísticas por operador
         const operatorStatsBody = document.getElementById('operatorStatsBody');
-        
-        // Elementos para sequência de perguntas
         const questions = document.querySelectorAll('.validation-item');
         const rejectionReason = document.getElementById('rejectionReason');
         const rejectionDetails = document.getElementById('rejection-details');
         
-        // Variáveis globais
+        // ELEMENTOS DO FORMULARIO
+        const supervisorSelect = document.getElementById('supervisor');
+        const technicianSelect = document.getElementById('technician');
+        
+        // LISTA DE TECNICOS POR SUPERVISOR
+        const tecnicosPorSupervisor = {
+            "WASHINGTON MELO": [
+                { nome: "BRUNO HENRIQUE SANTOS DE LIMA", codigo: "V19001" },
+                { nome: "DAVID ICARO PEREIRA BARROS", codigo: "V19002" },
+                { nome: "GUILHERME RODRIGUES BEZERRA", codigo: "V19003" },
+                { nome: "MABIO DA CONCEICAO O. RIBEIRO", codigo: "V19004" },
+                { nome: "MARCOS HENRIQUE VELOSO", codigo: "V19005" },
+                { nome: "PHILIPE DA SILVA BARROS", codigo: "V19006" },
+                { nome: "WAGNER RODRIGUES UCHOA", codigo: "V19007" },
+                { nome: "WALLESSON MATHEUS RIBEIRO ARAUJO", codigo: "V19008" },
+                { nome: "WARLEY MARTINS NASCIMENTO", codigo: "V19009" },
+                { nome: "SAVIO DOS REIS FERREIRA", codigo: "V19010" },
+                { nome: "MATHEUS EMANOEL DE SOUSA FERREIRA", codigo: "V19011" }
+            ],
+            "PATRICK DE SOUSA BARRETO": [
+                { nome: "WAGNER FELIX DA SILVA", codigo: "V20001" },
+                { nome: "MATHEUS QUEIROZ BOAVENTURA", codigo: "V20002" },
+                { nome: "THIAGO EMANUEL S DOURADO", codigo: "V20003" },
+                { nome: "ITALO ALENCAR NERES", codigo: "V20004" },
+                { nome: "BRUNO MARQUES PIRES", codigo: "V20005" },
+                { nome: "FILIPE BARROS BATISTA", codigo: "V20006" },
+                { nome: "MAXSUEL DA SILVA SANTOS", codigo: "V20007" },
+                { nome: "NATHAN DUTRA CAETANO", codigo: "V20008" },
+                { nome: "MAURILIO AMARO DA SILVA", codigo: "V20009" },
+                { nome: "MARCOS HENRIQUE PUSSENTE COUTO", codigo: "V20010" },
+                { nome: "MAYCOM MEDEIROS DA SILVA DO CARMO", codigo: "V20011" }
+            ]
+        };
+        
+        // VARIAVEIS GLOBAIS
         let db;
         let analytics;
         let firebaseConnected = false;
@@ -1270,14 +1293,14 @@
         let operatorStats = {};
         let statsExpanded = false;
         
-        // Função para remover acentos e converter para maiúsculas
+        // FUNCAO PARA REMOVER ACENTOS E CONVERTER PARA MAIUSCULAS
         function normalizeText(text) {
             return text
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .toUpperCase();
         }
         
-        // Atualizar status do Firebase
+        // ATUALIZAR STATUS DO FIREBASE
         function updateFirebaseStatus(connected, message = "") {
             firebaseConnected = connected;
             
@@ -1304,11 +1327,10 @@
             }
         }
         
-        // Mostrar notificação
+        // MOSTRAR NOTIFICACAO
         function showNotification(message, isSuccess = true) {
             notificationContent.textContent = message;
             
-            // Definir ícone e classe apropriada
             if (isSuccess) {
                 notification.innerHTML = '<i class="fas fa-check-circle"></i> ' + notificationContent.outerHTML;
                 notification.className = 'notification success show';
@@ -1322,11 +1344,25 @@
             }, 5000);
         }
         
-        // Calcular estatísticas por operador
+        // PREENCHER TECNICOS COM BASE NO SUPERVISOR SELECIONADO
+        function preencherTecnicos() {
+            const supervisor = supervisorSelect.value;
+            technicianSelect.innerHTML = '<option value="">SELECIONE UM TECNICO</option>';
+            
+            if (supervisor && tecnicosPorSupervisor[supervisor]) {
+                tecnicosPorSupervisor[supervisor].forEach(tecnico => {
+                    const option = document.createElement('option');
+                    option.value = tecnico.nome;
+                    option.textContent = `${tecnico.nome} (${tecnico.codigo})`;
+                    technicianSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // CALCULAR ESTATISTICAS POR OPERADOR
         function calculateOperatorStats() {
             operatorStats = {};
             
-            // Inicializar estatísticas para todos os operadores
             const operatorSelect = document.getElementById('operator');
             for (let i = 0; i < operatorSelect.options.length; i++) {
                 if (operatorSelect.options[i].value) {
@@ -1339,7 +1375,6 @@
                 }
             }
             
-            // Contar as OS de cada operador
             orders.forEach(order => {
                 if (operatorStats[order.operator]) {
                     operatorStats[order.operator].total++;
@@ -1354,11 +1389,10 @@
             return operatorStats;
         }
         
-        // Exibir estatísticas por operador
+        // EXIBIR ESTATISTICAS POR OPERADOR
         function displayOperatorStats(stats) {
             operatorStatsBody.innerHTML = '';
             
-            // Ordenar operadores por quantidade de OS (do maior para o menor)
             const sortedOperators = Object.entries(stats)
                 .sort((a, b) => b[1].total - a[1].total);
             
@@ -1373,8 +1407,6 @@
             
             sortedOperators.forEach(([operator, stat]) => {
                 const row = document.createElement('tr');
-                
-                // Calcular taxa de aprovação
                 const approvalRate = stat.total > 0 
                     ? ((stat.approved / stat.total) * 100).toFixed(1) + '%' 
                     : '0%';
@@ -1390,15 +1422,13 @@
             });
         }
         
-        // Carregar estatísticas e últimas ordens
+        // CARREGAR ESTATISTICAS E ULTIMAS ORDENS
         async function loadStatisticsAndOrders() {
             try {
-                // Buscar todas as ordens (para estatísticas)
                 const allOrdersSnapshot = await db.collection("ordens_servico").get();
                 orders = [];
                 allOrdersSnapshot.forEach(doc => {
                     const data = doc.data();
-                    // Normalizar os dados para maiúsculas e sem acentos
                     orders.push({
                         id: doc.id,
                         operator: normalizeText(data.operator),
@@ -1414,24 +1444,18 @@
                     });
                 });
                 
-                // Atualizar estatísticas gerais
                 totalOS.textContent = orders.length;
                 approvedOS.textContent = orders.filter(order => order.result === 'approved').length;
                 rejectedOS.textContent = orders.filter(order => order.result === 'rejected').length;
                 
-                // Calcular e exibir estatísticas por operador
                 operatorStats = calculateOperatorStats();
                 displayOperatorStats(operatorStats);
                 
-                // Ordenar por data (mais recentes primeiro)
                 const sortedOrders = [...orders].sort((a, b) => 
                     b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()
                 );
                 
-                // Pegar as últimas 5
                 const last5Orders = sortedOrders.slice(0, 5);
-                
-                // Atualizar tabela de últimas ordens
                 ordersTableBody.innerHTML = '';
                 
                 if (last5Orders.length === 0) {
@@ -1463,7 +1487,6 @@
                         ordersTableBody.appendChild(row);
                     });
                     
-                    // Adicionar eventos aos botões de exclusão
                     document.querySelectorAll('.delete-btn').forEach(btn => {
                         btn.addEventListener('click', function() {
                             const orderId = this.getAttribute('data-id');
@@ -1477,7 +1500,7 @@
             }
         }
         
-        // Excluir uma ordem
+        // EXCLUIR UMA ORDEM
         async function deleteOrder(orderId) {
             if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTA ORDEM? ESTA ACAO NAO PODE SER DESFEITA.')) {
                 return;
@@ -1493,31 +1516,26 @@
             }
         }
         
-        // Verificar conexão com Firebase
+        // VERIFICAR CONEXAO COM FIREBASE
         function checkFirebaseConnection() {
-            // Tentar inicializar o Firebase
             try {
                 firebase.initializeApp(firebaseConfig);
                 console.log("FIREBASE INICIALIZADO COM SUCESSO!");
                 db = firebase.firestore();
                 analytics = firebase.analytics();
                 
-                // Testar conexão com Firestore
                 const testDocRef = db.collection('connectionTest').doc('status');
                 
                 testDocRef.get()
                     .then(() => {
                         updateFirebaseStatus(true, "FIREBASE CONECTADO COM SUCESSO!");
                         console.log("CONEXAO COM FIREBASE ESTABELECIDA!");
-                        
-                        // Carregar dados
                         loadStatisticsAndOrders();
                     })
                     .catch(error => {
                         console.error("ERRO AO CONECTAR COM FIREBASE:", error);
                         updateFirebaseStatus(false, "ERRO AO ACESSAR FIRESTORE: " + error.message);
                         
-                        // Tentar criar o documento de teste
                         testDocRef.set({
                             status: "active",
                             timestamp: new Date()
@@ -1525,8 +1543,6 @@
                         .then(() => {
                             updateFirebaseStatus(true, "FIRESTORE FUNCIONANDO APOS CRIACAO DE DOCUMENTO");
                             console.log("DOCUMENTO DE TESTE CRIADO COM SUCESSO!");
-                            
-                            // Carregar dados
                             loadStatisticsAndOrders();
                         })
                         .catch(createError => {
@@ -1540,16 +1556,15 @@
             }
         }
         
-        // Atualizar barra de progresso das perguntas
+        // ATUALIZAR BARRA DE PROGRESSO
         function updateProgressBar() {
             const progress = (answeredQuestions / 8) * 100;
             progressBar.style.width = `${progress}%`;
             questionsCounter.textContent = `${answeredQuestions}/8 PERGUNTAS RESPONDIDAS`;
         }
         
-        // Gerenciar sequência de perguntas
+        // CONFIGURAR SEQUENCIA DE PERGUNTAS
         function setupQuestionSequence() {
-            // Iniciar apenas com a primeira pergunta ativa
             questions.forEach((question, index) => {
                 if (index === 0) {
                     question.classList.add('active');
@@ -1558,23 +1573,17 @@
                 }
             });
             
-            // Adicionar eventos de mudança para cada pergunta
             questions.forEach((question, index) => {
                 const radios = question.querySelectorAll('input[type="radio"]');
                 
                 radios.forEach(radio => {
                     radio.addEventListener('change', () => {
-                        // Marcar pergunta como respondida
                         question.classList.add('completed');
-                        
-                        // Atualizar contagem
                         answeredQuestions++;
                         updateProgressBar();
                         
-                        // Ativar próxima pergunta
                         if (index < questions.length - 1) {
                             questions[index + 1].classList.add('active');
-                            // Rolar para a próxima pergunta
                             questions[index + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     });
@@ -1582,7 +1591,7 @@
             });
         }
         
-        // Verificar se reprovado e mostrar campo de motivo
+        // VERIFICAR REPROVACAO
         function checkRejectionStatus() {
             const rejectedRadio = document.getElementById('rejected');
             if (rejectedRadio.checked) {
@@ -1594,9 +1603,8 @@
             }
         }
         
-        // Enviar dados por WhatsApp
+        // ENVIAR DADOS POR WHATSAPP
         function sendViaWhatsApp() {
-            // Coletar dados básicos
             const operator = document.getElementById('operator').value || 'NAO INFORMADO';
             const technician = document.getElementById('technician').value || 'NAO INFORMADO';
             const client = document.getElementById('client').value || 'NAO INFORMADO';
@@ -1604,7 +1612,6 @@
             const result = document.querySelector('input[name="validation"]:checked') ? 
                 (document.querySelector('input[name="validation"]:checked').value === 'approved' ? 'APROVADA' : 'REPROVADA') : 'NAO DEFINIDO';
             
-            // Montar mensagem
             let message = `*VALIDACAO DE OS - AGE FIBRA*\n\n`;
             message += `*OPERADOR:* ${operator}\n`;
             message += `*TECNICO:* ${technician}\n`;
@@ -1612,10 +1619,6 @@
             message += `*TIPO DE OS:* ${serviceType}\n`;
             message += `*RESULTADO:* ${result}\n\n`;
             
-            // Adicionar respostas às perguntas
-            message += `*RESPOSTAS:*\n`;
-            
-            // Lista de perguntas
             const questionTitles = [
                 "FOTOS OBRIGATORIAS INSERIDAS NO VTASKS?",
                 "VIDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?",
@@ -1627,7 +1630,6 @@
                 "TODAS AS DUVIDAS DO CLIENTE FORAM SANADAS?"
             ];
             
-            // Coletar respostas
             questionTitles.forEach((title, index) => {
                 const questionId = `question-${index + 1}`;
                 const questionElement = document.getElementById(questionId);
@@ -1646,25 +1648,20 @@
                 message += `\n`;
             });
             
-            // Adicionar observações
             const observations = document.getElementById('observations').value;
             if (observations) {
                 message += `\n*OBSERVACOES:* ${observations}\n`;
             }
             
-            // Se reprovado, adicionar motivo
             if (result === 'REPROVADA' && rejectionDetails.value) {
                 message += `\n*MOTIVO DA REPROVACAO:* ${rejectionDetails.value}\n`;
             }
             
-            // Codificar mensagem para URL
             const encodedMessage = encodeURIComponent(message);
-            
-            // Abrir WhatsApp
             window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
         }
         
-        // Alternar visibilidade das estatísticas
+        // ALTERNAR VISIBILIDADE DAS ESTATISTICAS
         function toggleStatsVisibility() {
             statsExpanded = !statsExpanded;
             
@@ -1679,17 +1676,14 @@
             }
         }
         
-        // Exportar estatísticas para Excel
+        // EXPORTAR ESTATISTICAS
         function exportStatsToExcel() {
             if (Object.keys(operatorStats).length === 0) {
                 showNotification('NENHUMA ESTATISTICA PARA EXPORTAR', 'info');
                 return;
             }
             
-            // Preparar dados para exportação
             const dataForExport = [];
-            
-            // Ordenar operadores por quantidade de OS (do maior para o menor)
             const sortedOperators = Object.entries(operatorStats)
                 .sort((a, b) => b[1].total - a[1].total);
             
@@ -1707,31 +1701,33 @@
                 });
             });
             
-            // Criar planilha
             const worksheet = XLSX.utils.json_to_sheet(dataForExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Estatisticas Operadores");
-            
-            // Gerar arquivo XLSX
             XLSX.writeFile(workbook, "estatisticas_operadores_age_fibra.xlsx");
-            
             showNotification('ESTATISTICAS EXPORTADAS COM SUCESSO!', true);
         }
         
+        // INICIALIZAR APLICACAO
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar conexão com Firebase
             checkFirebaseConnection();
             
             const operatorSelect = document.getElementById('operator');
-            const supervisorSelect = document.getElementById('supervisor');
-            const technicianSelect = document.getElementById('technician');
             const clientInput = document.getElementById('client');
             const serviceTypeSelect = document.getElementById('service-type');
             
-            // Configurar sequência de perguntas
-            setupQuestionSequence();
+            // CONFIGURAR EVENTOS
+            supervisorSelect.addEventListener('change', preencherTecnicos);
+            document.getElementById('rejected').addEventListener('change', checkRejectionStatus);
+            document.getElementById('approved').addEventListener('change', checkRejectionStatus);
+            statsToggle.addEventListener('click', toggleStatsVisibility);
+            toggleStatsBtn.addEventListener('click', toggleStatsVisibility);
+            exportStatsBtn.addEventListener('click', exportStatsToExcel);
             
-            // Habilitar campo de tipo de serviço
+            // PREENCHER TECNICOS INICIALMENTE
+            preencherTecnicos();
+            
+            // HABILITAR CAMPO DE TIPO DE SERVICO
             function checkServiceTypeEnable() {
                 if (operatorSelect.value && supervisorSelect.value && technicianSelect.value && clientInput.value) {
                     serviceTypeSelect.disabled = false;
@@ -1746,11 +1742,7 @@
             technicianSelect.addEventListener('change', checkServiceTypeEnable);
             clientInput.addEventListener('input', checkServiceTypeEnable);
             
-            // Monitorar seleção de reprovação
-            document.getElementById('rejected').addEventListener('change', checkRejectionStatus);
-            document.getElementById('approved').addEventListener('change', checkRejectionStatus);
-            
-            // Coletar dados do formulário
+            // COLETAR DADOS DO FORMULARIO
             function collectFormData() {
                 return {
                     operator: normalizeText(operatorSelect.value),
@@ -1783,18 +1775,15 @@
                 };
             }
             
-            // Salvar no Firestore
+            // SALVAR NO FIRESTORE
             async function saveToFirestore(data) {
                 try {
                     await db.collection("ordens_servico").add(data);
-                    
-                    // Registrar evento no Analytics
                     analytics.logEvent('os_validated', {
                         status: data.result,
                         operator: data.operator,
                         service_type: data.serviceType
                     });
-                    
                     return true;
                 } catch (error) {
                     console.error("ERRO AO SALVAR NO FIRESTORE: ", error);
@@ -1802,24 +1791,21 @@
                 }
             }
             
-            // Evento de envio do formulário
+            // EVENTO DE ENVIO DO FORMULARIO
             submitBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
                 
-                // Verificar se Firebase está conectado
                 if (!firebaseConnected) {
                     showNotification('ERRO: SEM CONEXAO COM FIREBASE', false);
                     return;
                 }
                 
-                // Validação básica
                 if (!operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || 
                     !clientInput.value || !serviceTypeSelect.value) {
                     showNotification('PREENCHA TODAS AS INFORMACOES BASICAS DA OS', false);
                     return;
                 }
                 
-                // Verificar se todas as perguntas foram respondidas
                 if (answeredQuestions < 8) {
                     showNotification('RESPONDA TODAS AS PERGUNTAS DE VALIDACAO', false);
                     return;
@@ -1831,52 +1817,40 @@
                     return;
                 }
                 
-                // Se reprovado, verificar motivo
                 if (validationSelected.value === 'rejected' && !rejectionDetails.value) {
                     showNotification('PREENCHA O MOTIVO DA REPROVACAO', false);
                     return;
                 }
                 
-                // Coletar dados
                 const formData = collectFormData();
-                
-                // Mostrar loading no botão
                 const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
                 submitBtn.disabled = true;
                 
-                // Salvar no Firestore
                 const saved = await saveToFirestore(formData);
                 
                 if (saved) {
                     showNotification('OS VALIDADA COM SUCESSO! DADOS SALVOS NO FIREBASE.', true);
-                    
-                    // Atualizar estatísticas e últimas ordens
                     await loadStatisticsAndOrders();
                     
-                    // Resetar formulário (exceto supervisor)
                     operatorSelect.value = '';
                     technicianSelect.value = '';
                     clientInput.value = '';
                     serviceTypeSelect.value = '';
                     serviceTypeSelect.disabled = true;
                     
-                    // Resetar radios
                     document.querySelectorAll('input[type="radio"]').forEach(radio => {
                         radio.checked = false;
                     });
                     
-                    // Resetar comentários
                     document.querySelectorAll('.comment-field input').forEach(input => {
                         input.value = '';
                     });
                     
-                    // Resetar validação e observações
                     document.getElementById('observations').value = '';
                     rejectionDetails.value = '';
                     rejectionReason.classList.remove('active');
                     
-                    // Resetar sequência de perguntas
                     answeredQuestions = 0;
                     updateProgressBar();
                     setupQuestionSequence();
@@ -1884,18 +1858,17 @@
                     showNotification('ERRO AO SALVAR OS DADOS. TENTE NOVAMENTE.', false);
                 }
                 
-                // Restaurar botão
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             });
             
-            // Botão para tentar reconexão
+            // BOTAO DE RECONEXAO
             retryBtn.addEventListener('click', function() {
                 showNotification('TENTANDO RECONECTAR AO FIREBASE...', 'info');
                 checkFirebaseConnection();
             });
             
-            // Botão para exportar para Excel
+            // BOTAO DE EXPORTAR
             exportBtn.addEventListener('click', async function() {
                 if (!firebaseConnected) {
                     showNotification('ERRO: SEM CONEXAO COM FIREBASE', false);
@@ -1907,13 +1880,11 @@
                     return;
                 }
                 
-                // Mostrar loading no botão
                 const originalText = exportBtn.innerHTML;
                 exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> EXPORTANDO...';
                 exportBtn.disabled = true;
                 
                 try {
-                    // Preparar dados para exportação
                     const dataForExport = orders.map(order => {
                         return {
                             'DATA': order.timestamp.toDate().toLocaleString('pt-BR'),
@@ -1944,36 +1915,27 @@
                         };
                     });
                     
-                    // Criar planilha
                     const worksheet = XLSX.utils.json_to_sheet(dataForExport);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, "ORDENS DE SERVICO");
-                    
-                    // Gerar arquivo XLSX
                     XLSX.writeFile(workbook, "ordens_servico_age_fibra.xlsx");
-                    
                     showNotification('EXPORTACAO PARA EXCEL CONCLUIDA COM SUCESSO!', true);
                 } catch (error) {
                     console.error("ERRO AO EXPORTAR PARA EXCEL:", error);
                     showNotification('ERRO AO EXPORTAR PARA EXCEL: ' + error.message, false);
                 }
                 
-                // Restaurar botão
                 exportBtn.innerHTML = originalText;
                 exportBtn.disabled = false;
             });
             
-            // Botão para enviar por WhatsApp
+            // BOTAO WHATSAPP
             whatsappBtn.addEventListener('click', function() {
                 sendViaWhatsApp();
             });
             
-            // Alternar visibilidade das estatísticas
-            statsToggle.addEventListener('click', toggleStatsVisibility);
-            toggleStatsBtn.addEventListener('click', toggleStatsVisibility);
-            
-            // Exportar estatísticas
-            exportStatsBtn.addEventListener('click', exportStatsToExcel);
+            // INICIALIZAR COMPONENTES
+            setupQuestionSequence();
         });
     </script>
 </body>
