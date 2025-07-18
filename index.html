@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE VALIDACAO DE OS - AGE FIBRA</title>
+    <title>SISTEMA DE VALIDAÇÃO DE OS - AGE FIBRA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -26,26 +26,26 @@
             --info: #118ab2;
             --purple: #7209b7;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
             color: var(--dark);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        
+
         header {
             text-align: center;
             margin-bottom: 30px;
@@ -54,10 +54,8 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             border-bottom: 5px solid var(--secondary);
-            position: relative;
-            overflow: hidden;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
@@ -65,7 +63,7 @@
             gap: 15px;
             margin-bottom: 15px;
         }
-        
+
         .logo i {
             font-size: 2.8rem;
             color: var(--secondary);
@@ -73,7 +71,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         h1 {
             color: var(--primary);
             font-size: 2.3rem;
@@ -82,23 +80,22 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .subtitle {
             color: #495057;
             font-size: 1.1rem;
             max-width: 600px;
             margin: 0 auto;
         }
-        
+
         .form-section {
             background: white;
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 25px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            position: relative;
         }
-        
+
         .section-title {
             display: flex;
             align-items: center;
@@ -109,35 +106,34 @@
             padding-bottom: 15px;
             border-bottom: 2px solid var(--gray);
         }
-        
+
         .section-title i {
             font-size: 1.6rem;
             color: var(--secondary);
         }
-        
+
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
         }
-        
+
         .form-group {
             margin-bottom: 25px;
-            position: relative;
         }
-        
+
         label {
             display: block;
             margin-bottom: 10px;
             font-weight: 600;
             color: var(--primary);
         }
-        
+
         .required::after {
             content: " *";
             color: var(--danger);
         }
-        
+
         select, input, textarea {
             width: 100%;
             padding: 13px 16px;
@@ -147,18 +143,18 @@
             background-color: white;
             transition: all 0.3s ease;
         }
-        
+
         select:focus, input:focus, textarea:focus {
             outline: none;
             border-color: var(--secondary);
             box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
         }
-        
+
         select:disabled {
             background-color: #f9f9f9;
             cursor: not-allowed;
         }
-        
+
         .validation-item {
             display: flex;
             align-items: flex-start;
@@ -172,72 +168,59 @@
             max-height: 60px;
             overflow: hidden;
         }
-        
+
         .validation-item.active {
             opacity: 1;
             max-height: 300px;
             background-color: white;
             border-left: 4px solid var(--success);
         }
-        
+
         .validation-item.completed {
             border-left: 4px solid var(--secondary);
         }
-        
+
         .validation-item:hover {
             background-color: var(--light);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-        
+
         .radio-group {
             display: flex;
             gap: 20px;
             margin-top: 8px;
         }
-        
+
         .radio-option {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .radio-option input {
             width: auto;
         }
-        
+
         .validation-text {
             flex: 1;
         }
-        
+
         .validation-title {
             font-weight: 600;
             margin-bottom: 8px;
             color: var(--primary);
         }
-        
+
         .comment-field {
             margin-top: 15px;
         }
-        
+
         .comment-field input {
             padding: 10px 14px;
             font-size: 0.95rem;
         }
-        
-        .status-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            align-items: center;
-            margin-top: 35px;
-        }
-        
-        .status-option {
-            flex: 1;
-            min-width: 220px;
-        }
-        
+
         .btn-submit {
             background: linear-gradient(to right, var(--secondary), var(--purple));
             color: white;
@@ -254,7 +237,7 @@
             margin: 40px auto 20px;
             box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
         }
-        
+
         .btn-whatsapp {
             background: linear-gradient(to right, #25D366, #128C7E);
             color: white;
@@ -271,72 +254,19 @@
             margin: 20px auto;
             box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
         }
-        
+
         .btn-submit:hover, .btn-whatsapp:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(67, 97, 238, 0.5);
         }
-        
-        .btn-submit:active, .btn-whatsapp:active {
-            transform: translateY(0);
-        }
-        
+
         .btn-submit:disabled {
             background: #adb5bd;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #495057;
-            font-size: 0.95rem;
-            padding: 25px;
-        }
-        
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
-            gap: 12px;
-        }
-        
-        .step {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background-color: #dee2e6;
-            transition: all 0.3s ease;
-        }
-        
-        .step.active {
-            background: linear-gradient(to right, var(--secondary), var(--purple));
-            transform: scale(1.4);
-        }
-        
-        .firebase-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: #e7f5ff;
-        }
-        
-        .firebase-status.connected {
-            color: var(--success);
-        }
-        
-        .firebase-status.disconnected {
-            color: var(--danger);
-        }
-        
+
         .notification {
             position: fixed;
             top: 25px;
@@ -354,34 +284,26 @@
             min-width: 320px;
             border-left: 5px solid;
         }
-        
+
         .notification.show {
             transform: translateX(0);
         }
-        
+
         .notification.success {
             border-left-color: var(--success);
         }
-        
+
         .notification.error {
             border-left-color: var(--danger);
         }
-        
-        .notification.warning {
-            border-left-color: var(--warning);
-        }
-        
-        .notification.info {
-            border-left-color: var(--info);
-        }
-        
+
         .statistics {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 12px;
@@ -391,140 +313,28 @@
             border-top: 4px solid var(--secondary);
             transition: transform 0.3s ease;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
         }
-        
+
         .stat-value {
             font-size: 2.1rem;
             font-weight: bold;
             color: var(--secondary);
             margin-bottom: 5px;
         }
-        
+
         .stat-label {
             font-size: 0.95rem;
             color: #6c757d;
             font-weight: 600;
         }
-        
-        .connection-panel {
-            background-color: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-        
-        .connection-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-        
-        .connection-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-        }
-        
-        .status-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        .status-connected {
-            background-color: var(--success);
-        }
-        
-        .status-disconnected {
-            background-color: var(--danger);
-        }
-        
-        .connection-details {
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            padding: 18px;
-            font-family: monospace;
-            font-size: 0.95rem;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        
-        .error-message {
-            color: var(--danger);
-            font-size: 0.95rem;
-            margin-top: 8px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 18px;
-        }
-        
-        .btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(to right, var(--secondary), var(--purple));
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
-            color: white;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .firebase-config {
-            margin-top: 18px;
-            padding: 18px;
-            background: #f1f3f5;
-            border-radius: 12px;
-            font-size: 0.95rem;
-        }
-        
-        .config-key {
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .config-value {
-            font-family: monospace;
-            word-break: break-all;
-            margin-bottom: 10px;
-        }
-        
-        .config-title {
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: var(--secondary);
-        }
-        
+
         .last-orders {
             margin-top: 35px;
         }
-        
+
         .last-orders h3 {
             color: var(--primary);
             margin-bottom: 18px;
@@ -532,12 +342,12 @@
             align-items: center;
             gap: 12px;
         }
-        
+
         .last-orders h3 i {
             font-size: 1.4rem;
             color: var(--secondary);
         }
-        
+
         .orders-table {
             width: 100%;
             border-collapse: collapse;
@@ -546,7 +356,7 @@
             overflow: hidden;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
-        
+
         .orders-table th {
             background: linear-gradient(to right, var(--secondary), var(--purple));
             color: white;
@@ -554,30 +364,30 @@
             padding: 14px 18px;
             font-weight: 600;
         }
-        
+
         .orders-table td {
             padding: 14px 18px;
             border-bottom: 1px solid var(--border);
         }
-        
+
         .orders-table tr:nth-child(even) {
             background-color: var(--light);
         }
-        
+
         .orders-table tr:hover {
             background-color: rgba(67, 97, 238, 0.05);
         }
-        
+
         .status-approved {
             color: var(--success);
             font-weight: bold;
         }
-        
+
         .status-rejected {
             color: var(--danger);
             font-weight: bold;
         }
-        
+
         .export-btn {
             background: linear-gradient(to right, var(--primary), var(--primary-light));
             color: white;
@@ -593,23 +403,12 @@
             gap: 10px;
             margin-top: 18px;
         }
-        
+
         .export-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(44, 62, 80, 0.3);
         }
-        
-        .rejection-reason {
-            display: none;
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 2px dashed var(--gray);
-        }
-        
-        .rejection-reason.active {
-            display: block;
-        }
-        
+
         .delete-btn {
             background-color: var(--danger);
             color: white;
@@ -622,11 +421,11 @@
             align-items: center;
             gap: 6px;
         }
-        
+
         .delete-btn:hover {
             background-color: #d0004b;
         }
-        
+
         .progress-container {
             width: 100%;
             background-color: #e9ecef;
@@ -634,7 +433,7 @@
             margin: 25px 0;
             overflow: hidden;
         }
-        
+
         .progress-bar {
             height: 12px;
             background: linear-gradient(to right, var(--secondary), var(--purple));
@@ -642,7 +441,7 @@
             width: 0%;
             transition: width 0.4s ease;
         }
-        
+
         .questions-counter {
             text-align: right;
             font-size: 0.95rem;
@@ -650,92 +449,7 @@
             margin-top: 8px;
             font-weight: 600;
         }
-        
-        .operator-stats {
-            margin-top: 35px;
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-        
-        .operator-stats h3 {
-            color: var(--primary);
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-        
-        .operator-stats h3 i {
-            font-size: 1.4rem;
-            color: var(--secondary);
-            transition: transform 0.3s ease;
-        }
-        
-        .operator-stats h3 .toggle-icon {
-            margin-left: auto;
-            font-size: 1.2rem;
-        }
-        
-        .operator-stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .operator-stats-table th {
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
-            color: white;
-            text-align: left;
-            padding: 14px 18px;
-            font-weight: 600;
-        }
-        
-        .operator-stats-table td {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .operator-stats-table tr:nth-child(even) {
-            background-color: var(--light);
-        }
-        
-        .operator-stats-table tr:hover {
-            background-color: rgba(44, 62, 80, 0.05);
-        }
-        
-        .stats-collapsed {
-            display: none;
-        }
-        
-        .stats-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 18px;
-        }
-        
-        .toggle-stats-btn {
-            background: none;
-            border: none;
-            color: var(--secondary);
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            font-size: 1rem;
-        }
-        
-        .toggle-stats-btn:hover {
-            text-decoration: underline;
-        }
-        
+
         .daily-chart-container {
             background: white;
             border-radius: 15px;
@@ -743,7 +457,7 @@
             margin-top: 35px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
-        
+
         .daily-chart-container h3 {
             color: var(--primary);
             margin-bottom: 18px;
@@ -751,24 +465,24 @@
             align-items: center;
             gap: 12px;
         }
-        
+
         .daily-chart-container h3 i {
             font-size: 1.4rem;
             color: var(--secondary);
         }
-        
+
         .chart-wrapper {
             position: relative;
             height: 300px;
             margin-top: 20px;
         }
-        
+
         .chart-controls {
             display: flex;
             gap: 15px;
             margin-top: 20px;
         }
-        
+
         .chart-btn {
             background: var(--light);
             border: 1px solid var(--border);
@@ -778,63 +492,44 @@
             font-weight: 600;
             transition: all 0.2s;
         }
-        
+
         .chart-btn.active {
             background: var(--secondary);
             color: white;
             border-color: var(--secondary);
         }
-        
+
         @media (max-width: 992px) {
             .form-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .container {
                 padding: 10px;
             }
-            
+
             .form-section {
                 padding: 20px;
             }
-            
+
             .radio-group {
                 flex-direction: column;
                 gap: 10px;
             }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .firebase-status {
-                position: relative;
-                top: 0;
-                right: 0;
-                justify-content: center;
-                margin-top: 15px;
-            }
-            
-            .orders-table, .operator-stats-table {
+
+            .orders-table {
                 font-size: 0.9rem;
             }
-            
+
             .orders-table th,
-            .orders-table td,
-            .operator-stats-table th,
-            .operator-stats-table td {
+            .orders-table td {
                 padding: 10px 12px;
             }
-            
+
             .btn-submit, .btn-whatsapp {
                 max-width: 100%;
             }
-            
-            .stats-controls {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
+
             .chart-controls {
                 flex-wrap: wrap;
             }
@@ -847,20 +542,17 @@
             <div class="logo">
                 <i class="fas fa-clipboard-check"></i>
                 <div>
-                    <h1>VALIDACAO DE ORDENS DE SERVICO</h1>
-                    <p class="subtitle">SISTEMA PARA VALIDACAO E CONTROLE DE QUALIDADE - AGE FIBRA</p>
+                    <h1>VALIDAÇÃO DE ORDENS DE SERVIÇO</h1>
+                    <p class="subtitle">SISTEMA PARA VALIDAÇÃO E CONTROLE DE QUALIDADE - AGE FIBRA</p>
                 </div>
             </div>
-            <div id="firebaseStatus" class="firebase-status disconnected">
-                <i class="fas fa-circle"></i> <span>FIREBASE: VERIFICANDO CONEXAO...</span>
-            </div>
         </header>
-        
+
         <div class="notification" id="notification">
             <i class="fas fa-check-circle"></i>
-            <div class="notification-content">NOTIFICACAO</div>
+            <div class="notification-content">NOTIFICAÇÃO</div>
         </div>
-        
+
         <div class="statistics" id="statistics">
             <div class="stat-card">
                 <div class="stat-value" id="totalOS">0</div>
@@ -879,7 +571,7 @@
                 <div class="stat-label">NOTAS HOJE</div>
             </div>
         </div>
-        
+
         <div class="daily-chart-container">
             <h3><i class="fas fa-chart-line"></i> QUANTIDADE DE NOTAS POR DIA</h3>
             <div class="chart-controls">
@@ -891,21 +583,13 @@
                 <canvas id="dailyChart"></canvas>
             </div>
         </div>
-        
+
         <main>
-            <div class="step-indicator">
-                <div class="step active"></div>
-                <div class="step"></div>
-                <div class="step"></div>
-                <div class="step"></div>
-            </div>
-            
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-user"></i>
-                    <h2>INFORMACOES DA ORDEM DE SERVICO</h2>
+                    <h2>INFORMAÇÕES DA ORDEM DE SERVIÇO</h2>
                 </div>
-                
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="operator" class="required">OPERADOR</label>
@@ -934,55 +618,51 @@
                             <option>BARBARA SILVA DOS SANTOS</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label for="supervisor" class="required">SUPERVISOR</label>
                         <select id="supervisor" required>
                             <option value="">SELECIONE UM SUPERVISOR</option>
                             <option>WASHINGTON MELO</option>
                             <option>PATRICK DE SOUSA BARRETO</option>
+                            <option>MARCOS VINICIUS</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
-                        <label for="technician" class="required">TECNICO</label>
+                        <label for="technician" class="required">TÉCNICO</label>
                         <select id="technician" required>
-                            <option value="">SELECIONE UM TECNICO</option>
+                            <option value="">SELECIONE UM TÉCNICO</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label for="client" class="required">NOME COMPLETO DO CLIENTE</label>
                         <input type="text" id="client" placeholder="DIGITE O NOME COMPLETO DO CLIENTE" required>
                     </div>
-                    
                     <div class="form-group">
-                        <label for="service-type" class="required">TIPO DE ORDEM DE SERVICO</label>
+                        <label for="service-type" class="required">TIPO DE ORDEM DE SERVIÇO</label>
                         <select id="service-type" required disabled>
-                            <option value="">SELECIONE O TIPO DE SERVICO</option>
-                            <option>ATIVACAO</option>
-                            <option>MUDANCA DE ENDERECO</option>
-                            <option>VISITA TECNICA</option>
+                            <option value="">SELECIONE O TIPO DE SERVIÇO</option>
+                            <option>ATIVAÇÃO</option>
+                            <option>MUDANÇA DE ENDEREÇO</option>
+                            <option>VISITA TÉCNICA</option>
                             <option>UPGRADE MESH</option>
                         </select>
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-tasks"></i>
-                    <h2>VALIDACAO TECNICA</h2>
+                    <h2>VALIDAÇÃO TÉCNICA</h2>
                 </div>
-                
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
                 <div class="questions-counter" id="questionsCounter">0/8 PERGUNTAS RESPONDIDAS</div>
-                
+
                 <div class="validation-item active" id="question-1">
                     <div class="validation-text">
-                        <div class="validation-title">1. FOTOS OBRIGATORIAS INSERIDAS NO VTASKS?</div>
+                        <div class="validation-title">1. FOTOS OBRIGATÓRIAS INSERIDAS NO VTASKS?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="photos-yes" name="photos" value="sim" required>
@@ -990,18 +670,18 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="photos-no" name="photos" value="nao" required>
-                                <label for="photos-no">NAO</label>
+                                <label for="photos-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="photos-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="photos-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-2">
                     <div class="validation-text">
-                        <div class="validation-title">2. VIDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?</div>
+                        <div class="validation-title">2. VÍDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="video-yes" name="video" value="sim" required>
@@ -1009,15 +689,15 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="video-no" name="video" value="nao" required>
-                                <label for="video-no">NAO</label>
+                                <label for="video-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="video-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="video-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-3">
                     <div class="validation-text">
                         <div class="validation-title">3. FORAM REALIZADOS TESTES EM SITES?</div>
@@ -1028,15 +708,15 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="sites-no" name="sites" value="nao" required>
-                                <label for="sites-no">NAO</label>
+                                <label for="sites-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="sites-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="sites-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-4">
                     <div class="validation-text">
                         <div class="validation-title">4. FORAM REALIZADOS TESTES EM APLICATIVOS?</div>
@@ -1047,15 +727,15 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="apps-no" name="apps" value="nao" required>
-                                <label for="apps-no">NAO</label>
+                                <label for="apps-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="apps-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="apps-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-5">
                     <div class="validation-text">
                         <div class="validation-title">5. CLIENTE FOI ORIENTADO QUANTO AS REDES 2.4 GHZ E 5 GHZ E CABO?</div>
@@ -1066,15 +746,15 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="orientation-no" name="orientation" value="nao" required>
-                                <label for="orientation-no">NAO</label>
+                                <label for="orientation-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="orientation-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="orientation-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-6">
                     <div class="validation-text">
                         <div class="validation-title">6. AMBIENTE FICOU LIMPO E ORGANIZADO?</div>
@@ -1085,18 +765,18 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="clean-no" name="clean" value="nao" required>
-                                <label for="clean-no">NAO</label>
+                                <label for="clean-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="clean-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="clean-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-7">
                     <div class="validation-text">
-                        <div class="validation-title">7. TECNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?</div>
+                        <div class="validation-title">7. TÉCNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="contact-yes" name="contact" value="sim" required>
@@ -1104,18 +784,18 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="contact-no" name="contact" value="nao" required>
-                                <label for="contact-no">NAO</label>
+                                <label for="contact-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="contact-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="contact-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="validation-item" id="question-8">
                     <div class="validation-text">
-                        <div class="validation-title">8. TODAS AS DUVIDAS DO CLIENTE FORAM SANADAS?</div>
+                        <div class="validation-title">8. TODAS AS DÚVIDAS DO CLIENTE FORAM SANADAS?</div>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="doubts-yes" name="doubts" value="sim" required>
@@ -1123,24 +803,23 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="doubts-no" name="doubts" value="nao" required>
-                                <label for="doubts-no">NAO</label>
+                                <label for="doubts-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="doubts-comment" placeholder="COMENTARIOS (OPCIONAL)">
+                            <input type="text" id="doubts-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-section">
                 <div class="section-title">
                     <i class="fas fa-clipboard-list"></i>
-                    <h2>RESULTADO DA VALIDACAO</h2>
+                    <h2>RESULTADO DA VALIDAÇÃO</h2>
                 </div>
-                
                 <div class="form-group">
-                    <label for="validation" class="required">VALIDACAO</label>
+                    <label for="validation" class="required">VALIDAÇÃO</label>
                     <div class="radio-group">
                         <div class="radio-option">
                             <input type="radio" id="approved" name="validation" value="approved" required>
@@ -1152,40 +831,38 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="form-group">
-                    <label for="observations">OBSERVACOES</label>
-                    <textarea id="observations" rows="4" placeholder="DIGITE OBSERVACOES RELEVANTES SOBRE A VALIDACAO"></textarea>
+                    <label for="observations">OBSERVAÇÕES</label>
+                    <textarea id="observations" rows="4" placeholder="DIGITE OBSERVAÇÕES RELEVANTES SOBRE A VALIDAÇÃO"></textarea>
                 </div>
-                
                 <div class="rejection-reason" id="rejectionReason">
                     <div class="form-group">
-                        <label for="rejection-details" class="required">MOTIVO DA REPROVACAO</label>
-                        <textarea id="rejection-details" rows="3" placeholder="DESCREVA DETALHADAMENTE O MOTIVO DA REPROVACAO" required></textarea>
+                        <label for="rejection-details" class="required">MOTIVO DA REPROVAÇÃO</label>
+                        <textarea id="rejection-details" rows="3" placeholder="DESCREVA DETALHADAMENTE O MOTIVO DA REPROVAÇÃO" required></textarea>
                     </div>
                 </div>
             </div>
-            
+
             <button class="btn-submit" id="submitBtn">
-                <i class="fas fa-check-circle"></i> VALIDAR ORDEM DE SERVICO
+                <i class="fas fa-check-circle"></i> VALIDAR ORDEM DE SERVIÇO
             </button>
-            
+
             <button class="btn-whatsapp" id="whatsappBtn">
                 <i class="fab fa-whatsapp"></i> ENVIAR POR WHATSAPP
             </button>
-            
+
             <div class="last-orders">
-                <h3><i class="fas fa-history"></i> ULTIMAS 5 ORDENS VALIDADAS</h3>
+                <h3><i class="fas fa-history"></i> ÚLTIMAS 5 ORDENS VALIDADAS</h3>
                 <div id="ordersTableContainer">
                     <table class="orders-table">
                         <thead>
                             <tr>
                                 <th>DATA</th>
                                 <th>OPERADOR</th>
-                                <th>TECNICO</th>
+                                <th>TÉCNICO</th>
                                 <th>CLIENTE</th>
                                 <th>STATUS</th>
-                                <th>ACOES</th>
+                                <th>AÇÕES</th>
                             </tr>
                         </thead>
                         <tbody id="ordersTableBody">
@@ -1199,95 +876,16 @@
                     <i class="fas fa-file-excel"></i> EXPORTAR PARA EXCEL
                 </button>
             </div>
-            
-            <div class="operator-stats">
-                <h3 id="statsToggle">
-                    <i class="fas fa-chart-bar"></i> ESTATISTICAS POR OPERADOR 
-                    <i class="fas fa-chevron-down toggle-icon"></i>
-                </h3>
-                
-                <div id="statsContainer" class="stats-collapsed">
-                    <div id="operatorStatsContainer">
-                        <table class="operator-stats-table">
-                            <thead>
-                                <tr>
-                                    <th>OPERADOR</th>
-                                    <th>TOTAL DE OS</th>
-                                    <th>APROVADAS</th>
-                                    <th>REPROVADAS</th>
-                                    <th>TAXA DE APROVACAO</th>
-                                </tr>
-                            </thead>
-                            <tbody id="operatorStatsBody">
-                                <tr>
-                                    <td colspan="5" style="text-align: center;">CARREGANDO ESTATISTICAS...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="stats-controls">
-                        <button class="toggle-stats-btn" id="toggleStatsBtn">
-                            <i class="fas fa-eye-slash"></i> OCULTAR ESTATISTICAS
-                        </button>
-                        <button class="export-btn" id="exportStatsBtn">
-                            <i class="fas fa-file-excel"></i> EXPORTAR ESTATISTICAS
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="connection-panel">
-                <div class="connection-header">
-                    <h3>CONFIGURACAO DO FIREBASE</h3>
-                    <div class="connection-status">
-                        <span class="status-dot" id="statusDot"></span>
-                        <span id="connectionStatusText">VERIFICANDO...</span>
-                    </div>
-                </div>
-                
-                <div class="firebase-config">
-                    <div class="config-title">CONFIGURACAO ATUAL:</div>
-                    <div class="config-key">APIKEY:</div>
-                    <div class="config-value">AIZASYBWTVJKBFP3AIYEHLIHSF7VDTAFJXAVM24</div>
-                    
-                    <div class="config-key">AUTHDOMAIN:</div>
-                    <div class="config-value">VALIDAGE.FIREBASEAPP.COM</div>
-                    
-                    <div class="config-key">PROJECTID:</div>
-                    <div class="config-value">VALIDAGE</div>
-                    
-                    <div class="config-key">STORAGEBUCKET:</div>
-                    <div class="config-value">VALIDAGE.APPSPOT.COM</div>
-                    
-                    <div class="config-key">MESSAGINGSENDERID:</div>
-                    <div class="config-value">654383800536</div>
-                    
-                    <div class="config-key">APPID:</div>
-                    <div class="config-value">1:654383800536:WEB:1D247BB420B1F91DEA77AD</div>
-                    
-                    <div class="config-key">MEASUREMENTID:</div>
-                    <div class="config-value">G-CWSFTXQ3T2</div>
-                </div>
-                
-                <div class="error-message" id="firebaseError"></div>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="retryBtn">
-                        <i class="fas fa-sync-alt"></i> TENTAR RECONEXAO
-                    </button>
-                </div>
-            </div>
         </main>
-        
+
         <footer>
-            <p>SISTEMA DE VALIDACAO DE OS - AGE FIBRA | DESENVOLVIDO COM <i class="fas fa-heart" style="color: var(--secondary);"></i> PARA QUALIDADE DO ATENDIMENTO</p>
-            <p>© 2023 TODOS OS DIREITOS RESERVADOS</p>
+            <p>SISTEMA DE VALIDAÇÃO DE OS - AGE FIBRA | DESENVOLVIDO COM <i class="fas fa-heart" style="color: var(--secondary);"></i> PARA QUALIDADE DO ATENDIMENTO</p>
+            <p>© 2025 TODOS OS DIREITOS RESERVADOS</p>
         </footer>
     </div>
-    
+
     <script>
-        // CONFIGURACOES
+        // CONFIGURAÇÕES DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBwTvjKbFP3AIyEhlihsf7VDtafjxAvM24",
             authDomain: "validaage.firebaseapp.com",
@@ -1299,42 +897,28 @@
         };
 
         // ELEMENTOS DA INTERFACE
-        const firebaseStatus = document.getElementById('firebaseStatus');
-        const statusDot = document.getElementById('statusDot');
-        const connectionStatusText = document.getElementById('connectionStatusText');
-        const firebaseError = document.getElementById('firebaseError');
         const notification = document.getElementById('notification');
         const notificationContent = document.querySelector('.notification-content');
         const submitBtn = document.getElementById('submitBtn');
-        const retryBtn = document.getElementById('retryBtn');
         const exportBtn = document.getElementById('exportBtn');
         const whatsappBtn = document.getElementById('whatsappBtn');
         const progressBar = document.getElementById('progressBar');
         const questionsCounter = document.getElementById('questionsCounter');
-        const statsToggle = document.getElementById('statsToggle');
-        const statsContainer = document.getElementById('statsContainer');
-        const toggleStatsBtn = document.getElementById('toggleStatsBtn');
-        const exportStatsBtn = document.getElementById('exportStatsBtn');
-        const toggleIcon = document.querySelector('.toggle-icon');
-        
-        // ELEMENTOS DE ESTATISTICAS
         const totalOS = document.getElementById('totalOS');
         const approvedOS = document.getElementById('approvedOS');
         const rejectedOS = document.getElementById('rejectedOS');
         const todayOS = document.getElementById('todayOS');
-        
-        // ELEMENTOS DA TABELA
         const ordersTableBody = document.getElementById('ordersTableBody');
-        const operatorStatsBody = document.getElementById('operatorStatsBody');
+        const operatorSelect = document.getElementById('operator');
+        const supervisorSelect = document.getElementById('supervisor');
+        const technicianSelect = document.getElementById('technician');
+        const clientInput = document.getElementById('client');
+        const serviceTypeSelect = document.getElementById('service-type');
         const questions = document.querySelectorAll('.validation-item');
         const rejectionReason = document.getElementById('rejectionReason');
         const rejectionDetails = document.getElementById('rejection-details');
-        
-        // ELEMENTOS DO FORMULARIO
-        const supervisorSelect = document.getElementById('supervisor');
-        const technicianSelect = document.getElementById('technician');
-        
-        // LISTA DE TECNICOS POR SUPERVISOR
+
+        // LISTA DE TÉCNICOS POR SUPERVISOR
         const tecnicosPorSupervisor = {
             "WASHINGTON MELO": [
                 { nome: "BRUNO HENRIQUE SANTOS DE LIMA", codigo: "V19001" },
@@ -1361,76 +945,58 @@
                 { nome: "MAURILIO AMARO DA SILVA", codigo: "V20009" },
                 { nome: "MARCOS HENRIQUE PUSSENTE COUTO", codigo: "V20010" },
                 { nome: "MAYCOM MEDEIROS DA SILVA DO CARMO", codigo: "V20011" }
+            ],
+            "MARCOS VINICIUS": [
+                { nome: "EDNALDO LOPES RIBEIRO", codigo: "V21001" },
+                { nome: "FILIPE CASTRO DE OLIVEIRA", codigo: "V21002" },
+                { nome: "GILVAN ALVES FELISBERTO", codigo: "V21003" },
+                { nome: "MAGNO MIRANDA RODRIGUES", codigo: "V21004" },
+                { nome: "MARCELO MARTINS FERREIRA", codigo: "V21005" },
+                { nome: "MARLLON ANDREY FREITAS DIAS", codigo: "V21006" },
+                { nome: "MATEUS PEREIRA DA SILVA", codigo: "V21007" },
+                { nome: "MICHAEL ANDERSON SILVA LIMA", codigo: "V21008" },
+                { nome: "PAULO ROBERTO FERREIRA CAVALCANTE", codigo: "V21009" },
+                { nome: "PAULO VICTOR DA SILVA", codigo: "V21010" },
+                { nome: "THIAGO DA SILVA SIQUEIRA", codigo: "V21011" },
+                { nome: "WANDERSON BARBOSA DOS ANJOS", codigo: "V21012" },
+                { nome: "WELINTON PEREIRA FREIRE", codigo: "V21013" },
+                { nome: "WILCKSON DIAS DA SILVA", codigo: "V21014" },
+                { nome: "PAULO HENRIQUE SOUSA DA SILVA", codigo: "V21015" },
+                { nome: "SAMUEL BATISTA DA SILVA", codigo: "V21016" },
+                { nome: "LUIZ PHELIPE RODRIGUES DOS SANTOS", codigo: "V21017" }
             ]
         };
-        
-        // VARIAVEIS GLOBAIS
+
+        // VARIÁVEIS GLOBAIS
         let db;
         let analytics;
         let firebaseConnected = false;
         let orders = [];
         let answeredQuestions = 0;
-        let operatorStats = {};
-        let statsExpanded = false;
         let dailyChart;
         let chartDays = 7;
-        
-        // FUNCAO PARA REMOVER ACENTOS E CONVERTER PARA MAIUSCULAS
+
+        // FUNÇÃO PARA NORMALIZAR TEXTO
         function normalizeText(text) {
             return text
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .toUpperCase();
         }
-        
-        // ATUALIZAR STATUS DO FIREBASE
-        function updateFirebaseStatus(connected, message = "") {
-            firebaseConnected = connected;
-            
-            if (connected) {
-                firebaseStatus.innerHTML = '<i class="fas fa-circle"></i> <span>FIREBASE: CONECTADO</span>';
-                firebaseStatus.classList.remove('disconnected');
-                firebaseStatus.classList.add('connected');
-                
-                statusDot.className = 'status-dot status-connected';
-                connectionStatusText.textContent = 'CONECTADO';
-                firebaseError.textContent = '';
-                
-                showNotification('CONEXAO COM FIREBASE ESTABELECIDA COM SUCESSO!', true);
-            } else {
-                firebaseStatus.innerHTML = '<i class="fas fa-circle"></i> <span>FIREBASE: DESCONECTADO</span>';
-                firebaseStatus.classList.remove('connected');
-                firebaseStatus.classList.add('disconnected');
-                
-                statusDot.className = 'status-dot status-disconnected';
-                connectionStatusText.textContent = 'DESCONECTADO';
-                firebaseError.textContent = message || 'ERRO NA CONEXAO COM FIREBASE';
-                
-                showNotification(message || 'ERRO NA CONEXAO COM FIREBASE', false);
-            }
-        }
-        
-        // MOSTRAR NOTIFICACAO
+
+        // MOSTRAR NOTIFICAÇÃO
         function showNotification(message, isSuccess = true) {
             notificationContent.textContent = message;
-            
-            if (isSuccess) {
-                notification.innerHTML = '<i class="fas fa-check-circle"></i> ' + notificationContent.outerHTML;
-                notification.className = 'notification success show';
-            } else {
-                notification.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + notificationContent.outerHTML;
-                notification.className = 'notification error show';
-            }
-            
+            notification.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${notificationContent.outerHTML}`;
+            notification.className = `notification ${isSuccess ? 'success' : 'error'} show`;
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 5000);
         }
-        
-        // PREENCHER TECNICOS COM BASE NO SUPERVISOR SELECIONADO
+
+        // PREENCHER TÉCNICOS
         function preencherTecnicos() {
             const supervisor = supervisorSelect.value;
-            technicianSelect.innerHTML = '<option value="">SELECIONE UM TECNICO</option>';
-            
+            technicianSelect.innerHTML = '<option value="">SELECIONE UM TÉCNICO</option>';
             if (supervisor && tecnicosPorSupervisor[supervisor]) {
                 tecnicosPorSupervisor[supervisor].forEach(tecnico => {
                     const option = document.createElement('option');
@@ -1440,76 +1006,50 @@
                 });
             }
         }
-        
-        // CALCULAR ESTATISTICAS POR OPERADOR
-        function calculateOperatorStats() {
-            operatorStats = {};
-            
-            const operatorSelect = document.getElementById('operator');
-            for (let i = 0; i < operatorSelect.options.length; i++) {
-                if (operatorSelect.options[i].value) {
-                    const operator = operatorSelect.options[i].text;
-                    operatorStats[operator] = {
-                        total: 0,
-                        approved: 0,
-                        rejected: 0
-                    };
-                }
-            }
-            
-            orders.forEach(order => {
-                if (operatorStats[order.operator]) {
-                    operatorStats[order.operator].total++;
-                    if (order.result === 'approved') {
-                        operatorStats[order.operator].approved++;
-                    } else {
-                        operatorStats[order.operator].rejected++;
-                    }
-                }
-            });
-            
-            return operatorStats;
+
+        // ATUALIZAR BARRA DE PROGRESSO
+        function updateProgressBar() {
+            const progress = (answeredQuestions / 8) * 100;
+            progressBar.style.width = `${progress}%`;
+            questionsCounter.textContent = `${answeredQuestions}/8 PERGUNTAS RESPONDIDAS`;
         }
-        
-        // EXIBIR ESTATISTICAS POR OPERADOR
-        function displayOperatorStats(stats) {
-            operatorStatsBody.innerHTML = '';
-            
-            const sortedOperators = Object.entries(stats)
-                .sort((a, b) => b[1].total - a[1].total);
-            
-            if (sortedOperators.length === 0) {
-                operatorStatsBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            sortedOperators.forEach(([operator, stat]) => {
-                const row = document.createElement('tr');
-                const approvalRate = stat.total > 0 
-                    ? ((stat.approved / stat.total) * 100).toFixed(1) + '%' 
-                    : '0%';
-                
-                row.innerHTML = `
-                    <td>${operator}</td>
-                    <td>${stat.total}</td>
-                    <td>${stat.approved}</td>
-                    <td>${stat.rejected}</td>
-                    <td>${approvalRate}</td>
-                `;
-                operatorStatsBody.appendChild(row);
+
+        // CONFIGURAR SEQUENCIA DE PERGUNTAS
+        function setupQuestionSequence() {
+            questions.forEach((question, index) => {
+                if (index === 0) {
+                    question.classList.add('active');
+                } else {
+                    question.classList.remove('active');
+                }
+                const radios = question.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        question.classList.add('completed');
+                        answeredQuestions++;
+                        updateProgressBar();
+                        if (index < questions.length - 1) {
+                            questions[index + 1].classList.add('active');
+                            questions[index + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    });
+                });
             });
         }
-        
-        // CARREGAR ESTATISTICAS E ULTIMAS ORDENS
-        async function loadStatisticsAndOrders() {
+
+        // VERIFICAR STATUS DE REPROVAÇÃO
+        function checkRejectionStatus() {
+            const rejectedRadio = document.getElementById('rejected');
+            rejectionReason.style.display = rejectedRadio.checked ? 'block' : 'none';
+            rejectionDetails.required = rejectedRadio.checked;
+        }
+
+        // CARREGAR DADOS
+        async function loadOrders() {
             try {
-                const allOrdersSnapshot = await db.collection("ordens_servico").get();
+                const snapshot = await db.collection("ordens_servico").get();
                 orders = [];
-                allOrdersSnapshot.forEach(doc => {
+                snapshot.forEach(doc => {
                     const data = doc.data();
                     orders.push({
                         id: doc.id,
@@ -1525,89 +1065,62 @@
                         timestamp: data.timestamp
                     });
                 });
-                
+
                 // Atualizar estatísticas
                 totalOS.textContent = orders.length;
                 approvedOS.textContent = orders.filter(order => order.result === 'approved').length;
                 rejectedOS.textContent = orders.filter(order => order.result === 'rejected').length;
-                
-                // Calcular notas de hoje
+
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                const todayOrders = orders.filter(order => {
+                todayOS.textContent = orders.filter(order => {
                     const orderDate = order.timestamp.toDate();
                     orderDate.setHours(0, 0, 0, 0);
                     return orderDate.getTime() === today.getTime();
-                });
-                todayOS.textContent = todayOrders.length;
-                
-                // Atualizar estatísticas por operador
-                operatorStats = calculateOperatorStats();
-                displayOperatorStats(operatorStats);
-                
-                // Atualizar gráfico de notas por dia
-                updateDailyChart();
-                
-                // Atualizar lista de últimas ordens
-                const sortedOrders = [...orders].sort((a, b) => 
-                    b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()
-                );
-                
-                const last5Orders = sortedOrders.slice(0, 5);
-                ordersTableBody.innerHTML = '';
-                
-                if (last5Orders.length === 0) {
-                    ordersTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td>
-                        </tr>
-                    `;
-                } else {
-                    last5Orders.forEach(order => {
+                }).length;
+
+                // Atualizar tabela
+                const sortedOrders = [...orders].sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime());
+                ordersTableBody.innerHTML = sortedOrders.length === 0
+                    ? '<tr><td colspan="6" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td></tr>'
+                    : sortedOrders.slice(0, 5).map(order => {
                         const date = order.timestamp.toDate();
                         const formattedDate = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
-                        
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${formattedDate}</td>
-                            <td>${order.operator}</td>
-                            <td>${order.technician}</td>
-                            <td>${order.client}</td>
-                            <td class="${order.result === 'approved' ? 'status-approved' : 'status-rejected'}">
-                                ${order.result === 'approved' ? 'APROVADA' : 'REPROVADA'}
-                            </td>
-                            <td>
-                                <button class="delete-btn" data-id="${order.id}">
-                                    <i class="fas fa-trash"></i> EXCLUIR
-                                </button>
-                            </td>
+                        return `
+                            <tr>
+                                <td>${formattedDate}</td>
+                                <td>${order.operator}</td>
+                                <td>${order.technician}</td>
+                                <td>${order.client}</td>
+                                <td class="${order.result === 'approved' ? 'status-approved' : 'status-rejected'}">
+                                    ${order.result === 'approved' ? 'APROVADA' : 'REPROVADA'}
+                                </td>
+                                <td>
+                                    <button class="delete-btn" data-id="${order.id}">
+                                        <i class="fas fa-trash"></i> EXCLUIR
+                                    </button>
+                                </td>
+                            </tr>
                         `;
-                        ordersTableBody.appendChild(row);
-                    });
-                    
-                    document.querySelectorAll('.delete-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const orderId = this.getAttribute('data-id');
-                            deleteOrder(orderId);
-                        });
-                    });
-                }
+                    }).join('');
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', () => deleteOrder(btn.getAttribute('data-id')));
+                });
+
+                // Atualizar gráfico
+                updateDailyChart();
             } catch (error) {
                 console.error("ERRO AO CARREGAR DADOS:", error);
                 showNotification('ERRO AO CARREGAR DADOS: ' + error.message, false);
             }
         }
-        
-        // ATUALIZAR GRAFICO DE NOTAS POR DIA
+
+        // ATUALIZAR GRÁFICO
         function updateDailyChart() {
-            if (!orders.length) return;
-            
-            // Agrupar ordens por dia
             const ordersByDay = {};
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
-            // Criar array de dias
             const dates = [];
             for (let i = chartDays - 1; i >= 0; i--) {
                 const date = new Date();
@@ -1617,30 +1130,20 @@
                 dates.push(dateStr);
                 ordersByDay[dateStr] = 0;
             }
-            
-            // Contar ordens por dia
+
             orders.forEach(order => {
                 const orderDate = order.timestamp.toDate();
                 orderDate.setHours(0, 0, 0, 0);
                 const orderDateStr = orderDate.toLocaleDateString('pt-BR');
-                
                 if (ordersByDay.hasOwnProperty(orderDateStr)) {
                     ordersByDay[orderDateStr]++;
                 }
             });
-            
-            // Preparar dados para o gráfico
+
             const chartData = dates.map(date => ordersByDay[date] || 0);
-            
-            // Configurar o gráfico
             const ctx = document.getElementById('dailyChart').getContext('2d');
-            
-            // Destruir gráfico anterior se existir
-            if (dailyChart) {
-                dailyChart.destroy();
-            }
-            
-            // Criar novo gráfico
+
+            if (dailyChart) dailyChart.destroy();
             dailyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1651,41 +1154,22 @@
                         backgroundColor: 'rgba(67, 97, 238, 0.7)',
                         borderColor: 'rgba(67, 97, 238, 1)',
                         borderWidth: 1,
-                        borderRadius: 5,
-                        hoverBackgroundColor: 'rgba(114, 9, 183, 0.8)'
+                        borderRadius: 5
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
                     },
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(44, 62, 80, 0.9)',
-                            titleFont: {
-                                size: 14
-                            },
-                            bodyFont: {
-                                size: 13
-                            },
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
                             padding: 10,
                             displayColors: false
                         }
@@ -1693,460 +1177,259 @@
                 }
             });
         }
-        
-        // EXCLUIR UMA ORDEM
+
+        // EXCLUIR ORDEM
         async function deleteOrder(orderId) {
-            if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTA ORDEM? ESTA ACAO NAO PODE SER DESFEITA.')) {
-                return;
-            }
-            
+            if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTA ORDEM?')) return;
             try {
                 await db.collection("ordens_servico").doc(orderId).delete();
-                showNotification('ORDEM EXCLUIDA COM SUCESSO!', true);
-                loadStatisticsAndOrders();
+                showNotification('ORDEM EXCLUÍDA COM SUCESSO!', true);
+                loadOrders();
             } catch (error) {
                 console.error("ERRO AO EXCLUIR ORDEM:", error);
                 showNotification('ERRO AO EXCLUIR ORDEM: ' + error.message, false);
             }
         }
-        
-        // VERIFICAR CONEXAO COM FIREBASE
-        function checkFirebaseConnection() {
-            try {
-                firebase.initializeApp(firebaseConfig);
-                console.log("FIREBASE INICIALIZADO COM SUCESSO!");
-                db = firebase.firestore();
-                analytics = firebase.analytics();
-                
-                const testDocRef = db.collection('connectionTest').doc('status');
-                
-                testDocRef.get()
-                    .then(() => {
-                        updateFirebaseStatus(true, "FIREBASE CONECTADO COM SUCESSO!");
-                        console.log("CONEXAO COM FIREBASE ESTABELECIDA!");
-                        loadStatisticsAndOrders();
-                    })
-                    .catch(error => {
-                        console.error("ERRO AO CONECTAR COM FIREBASE:", error);
-                        updateFirebaseStatus(false, "ERRO AO ACESSAR FIRESTORE: " + error.message);
-                        
-                        testDocRef.set({
-                            status: "active",
-                            timestamp: new Date()
-                        })
-                        .then(() => {
-                            updateFirebaseStatus(true, "FIRESTORE FUNCIONANDO APOS CRIACAO DE DOCUMENTO");
-                            console.log("DOCUMENTO DE TESTE CRIADO COM SUCESSO!");
-                            loadStatisticsAndOrders();
-                        })
-                        .catch(createError => {
-                            console.error("ERRO AO CRIAR DOCUMENTO DE TESTE:", createError);
-                            updateFirebaseStatus(false, "ERRO AO GRAVAR NO FIRESTORE: " + createError.message);
-                        });
-                    });
-            } catch (error) {
-                console.error("ERRO AO INICIALIZAR FIREBASE:", error);
-                updateFirebaseStatus(false, "ERRO NA INICIALIZACAO: " + error.message);
-            }
-        }
-        
-        // ATUALIZAR BARRA DE PROGRESSO
-        function updateProgressBar() {
-            const progress = (answeredQuestions / 8) * 100;
-            progressBar.style.width = `${progress}%`;
-            questionsCounter.textContent = `${answeredQuestions}/8 PERGUNTAS RESPONDIDAS`;
-        }
-        
-        // CONFIGURAR SEQUENCIA DE PERGUNTAS
-        function setupQuestionSequence() {
-            questions.forEach((question, index) => {
-                if (index === 0) {
-                    question.classList.add('active');
-                } else {
-                    question.classList.remove('active');
-                }
-            });
-            
-            questions.forEach((question, index) => {
-                const radios = question.querySelectorAll('input[type="radio"]');
-                
-                radios.forEach(radio => {
-                    radio.addEventListener('change', () => {
-                        question.classList.add('completed');
-                        answeredQuestions++;
-                        updateProgressBar();
-                        
-                        if (index < questions.length - 1) {
-                            questions[index + 1].classList.add('active');
-                            questions[index + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    });
-                });
-            });
-        }
-        
-        // VERIFICAR REPROVACAO
-        function checkRejectionStatus() {
-            const rejectedRadio = document.getElementById('rejected');
-            if (rejectedRadio.checked) {
-                rejectionReason.classList.add('active');
-                rejectionDetails.required = true;
-            } else {
-                rejectionReason.classList.remove('active');
-                rejectionDetails.required = false;
-            }
-        }
-        
-        // ENVIAR DADOS POR WHATSAPP
+
+        // ENVIAR POR WHATSAPP
         function sendViaWhatsApp() {
-            const operator = document.getElementById('operator').value || 'NAO INFORMADO';
-            const technician = document.getElementById('technician').value || 'NAO INFORMADO';
-            const client = document.getElementById('client').value || 'NAO INFORMADO';
-            const serviceType = document.getElementById('service-type').value || 'NAO INFORMADO';
-            const result = document.querySelector('input[name="validation"]:checked') ? 
-                (document.querySelector('input[name="validation"]:checked').value === 'approved' ? 'APROVADA' : 'REPROVADA') : 'NAO DEFINIDO';
-            
-            let message = `*VALIDACAO DE OS - AGE FIBRA*\n\n`;
+            const operator = operatorSelect.value || 'NÃO INFORMADO';
+            const technician = technicianSelect.value || 'NÃO INFORMADO';
+            const client = clientInput.value || 'NÃO INFORMADO';
+            const serviceType = serviceTypeSelect.value || 'NÃO INFORMADO';
+            const result = document.querySelector('input[name="validation"]:checked')?.value === 'approved' ? 'APROVADA' : 'REPROVADA';
+
+            let message = `*VALIDAÇÃO DE OS - AGE FIBRA*\n\n`;
             message += `*OPERADOR:* ${operator}\n`;
-            message += `*TECNICO:* ${technician}\n`;
+            message += `*TÉCNICO:* ${technician}\n`;
             message += `*CLIENTE:* ${client}\n`;
             message += `*TIPO DE OS:* ${serviceType}\n`;
             message += `*RESULTADO:* ${result}\n\n`;
-            
+
             const questionTitles = [
-                "FOTOS OBRIGATORIAS INSERIDAS NO VTASKS?",
-                "VIDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?",
+                "FOTOS OBRIGATÓRIAS INSERIDAS NO VTASKS?",
+                "VÍDEO AVALIADO E DE ACORDO COM A QUALIDADE AGE FIBRA?",
                 "FORAM REALIZADOS TESTES EM SITES?",
                 "FORAM REALIZADOS TESTES EM APLICATIVOS?",
                 "CLIENTE FOI ORIENTADO QUANTO AS REDES 2.4 GHZ E 5 GHZ E CABO?",
                 "AMBIENTE FICOU LIMPO E ORGANIZADO?",
-                "TECNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?",
-                "TODAS AS DUVIDAS DO CLIENTE FORAM SANADAS?"
+                "TÉCNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?",
+                "TODAS AS DÚVIDAS DO CLIENTE FORAM SANADAS?"
             ];
-            
+
             questionTitles.forEach((title, index) => {
                 const questionId = `question-${index + 1}`;
                 const questionElement = document.getElementById(questionId);
                 const radios = questionElement.querySelectorAll('input[type="radio"]');
                 const comment = document.getElementById(`${title.split(' ')[0].toLowerCase()}-comment`)?.value || '';
-                
-                let response = 'NAO RESPONDIDO';
+                let response = 'NÃO RESPONDIDO';
                 radios.forEach(radio => {
-                    if (radio.checked) {
-                        response = radio.value === 'sim' ? 'SIM' : 'NAO';
-                    }
+                    if (radio.checked) response = radio.value.toUpperCase();
                 });
-                
-                message += `- *${title}*: ${response}`;
-                if (comment) message += ` (${comment})`;
-                message += `\n`;
+                message += `- *${title}*: ${response}${comment ? ` (${comment})` : ''}\n`;
             });
-            
+
             const observations = document.getElementById('observations').value;
-            if (observations) {
-                message += `\n*OBSERVACOES:* ${observations}\n`;
-            }
-            
+            if (observations) message += `\n*OBSERVAÇÕES:* ${observations}\n`;
             if (result === 'REPROVADA' && rejectionDetails.value) {
-                message += `\n*MOTIVO DA REPROVACAO:* ${rejectionDetails.value}\n`;
+                message += `\n*MOTIVO DA REPROVAÇÃO:* ${rejectionDetails.value}\n`;
             }
-            
+
             const encodedMessage = encodeURIComponent(message);
             window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
         }
-        
-        // ALTERNAR VISIBILIDADE DAS ESTATISTICAS
-        function toggleStatsVisibility() {
-            statsExpanded = !statsExpanded;
-            
-            if (statsExpanded) {
-                statsContainer.classList.remove('stats-collapsed');
-                toggleStatsBtn.innerHTML = '<i class="fas fa-eye-slash"></i> OCULTAR ESTATISTICAS';
-                toggleIcon.className = 'fas fa-chevron-up toggle-icon';
-            } else {
-                statsContainer.classList.add('stats-collapsed');
-                toggleStatsBtn.innerHTML = '<i class="fas fa-eye"></i> VER ESTATISTICAS';
-                toggleIcon.className = 'fas fa-chevron-down toggle-icon';
-            }
-        }
-        
-        // EXPORTAR ESTATISTICAS
-        function exportStatsToExcel() {
-            if (Object.keys(operatorStats).length === 0) {
-                showNotification('NENHUMA ESTATISTICA PARA EXPORTAR', 'info');
+
+        // EXPORTAR PARA EXCEL
+        function exportToExcel() {
+            if (!orders.length) {
+                showNotification('NENHUMA ORDEM PARA EXPORTAR', false);
                 return;
             }
-            
-            const dataForExport = [];
-            const sortedOperators = Object.entries(operatorStats)
-                .sort((a, b) => b[1].total - a[1].total);
-            
-            sortedOperators.forEach(([operator, stat]) => {
-                const approvalRate = stat.total > 0 
-                    ? ((stat.approved / stat.total) * 100).toFixed(1) + '%' 
-                    : '0%';
-                
-                dataForExport.push({
-                    'OPERADOR': operator,
-                    'TOTAL DE OS': stat.total,
-                    'APROVADAS': stat.approved,
-                    'REPROVADAS': stat.rejected,
-                    'TAXA DE APROVACAO': approvalRate
-                });
+
+            const dataForExport = orders.map(order => {
+                const date = order.timestamp.toDate();
+                return {
+                    'DATA': date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR'),
+                    'OPERADOR': order.operator,
+                    'SUPERVISOR': order.supervisor,
+                    'TÉCNICO': order.technician,
+                    'CLIENTE': order.client,
+                    'TIPO DE OS': order.serviceType,
+                    'FOTOS': order.validation.photos || 'NÃO RESPONDIDO',
+                    'VÍDEO': order.validation.video || 'NÃO RESPONDIDO',
+                    'SITES': order.validation.sites || 'NÃO RESPONDIDO',
+                    'APLICATIVOS': order.validation.apps || 'NÃO RESPONDIDO',
+                    'ORIENTAÇÃO': order.validation.orientation || 'NÃO RESPONDIDO',
+                    'LIMPEZA': order.validation.clean || 'NÃO RESPONDIDO',
+                    'CONTATO': order.validation.contact || 'NÃO RESPONDIDO',
+                    'DÚVIDAS': order.validation.doubts || 'NÃO RESPONDIDO',
+                    'COMENTÁRIO FOTOS': order.validation.photosComment || '',
+                    'COMENTÁRIO VÍDEO': order.validation.videoComment || '',
+                    'COMENTÁRIO SITES': order.validation.sitesComment || '',
+                    'COMENTÁRIO APLICATIVOS': order.validation.appsComment || '',
+                    'COMENTÁRIO ORIENTAÇÃO': order.validation.orientationComment || '',
+                    'COMENTÁRIO LIMPEZA': order.validation.cleanComment || '',
+                    'COMENTÁRIO CONTATO': order.validation.contactComment || '',
+                    'COMENTÁRIO DÚVIDAS': order.validation.doubtsComment || '',
+                    'RESULTADO': order.result === 'approved' ? 'APROVADA' : 'REPROVADA',
+                    'OBSERVAÇÕES': order.observations || '',
+                    'MOTIVO REPROVAÇÃO': order.rejectionReason || ''
+                };
             });
-            
+
             const worksheet = XLSX.utils.json_to_sheet(dataForExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Estatisticas Operadores");
-            XLSX.writeFile(workbook, "estatisticas_operadores_age_fibra.xlsx");
-            showNotification('ESTATISTICAS EXPORTADAS COM SUCESSO!', true);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Ordens de Serviço");
+            XLSX.writeFile(workbook, "ordens_servico_age_fibra.xlsx");
+            showNotification('DADOS EXPORTADOS COM SUCESSO!', true);
         }
-        
-        // INICIALIZAR APLICACAO
-        document.addEventListener('DOMContentLoaded', function() {
-            checkFirebaseConnection();
-            
-            const operatorSelect = document.getElementById('operator');
-            const clientInput = document.getElementById('client');
-            const serviceTypeSelect = document.getElementById('service-type');
-            
-            // Configurar botões do gráfico
-            document.querySelectorAll('.chart-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Remover classe active de todos os botões
-                    document.querySelectorAll('.chart-btn').forEach(b => {
-                        b.classList.remove('active');
-                    });
-                    
-                    // Adicionar classe active ao botão clicado
-                    this.classList.add('active');
-                    
-                    // Atualizar o gráfico com o novo intervalo de dias
-                    chartDays = parseInt(this.getAttribute('data-days'));
-                    updateDailyChart();
-                });
-            });
-            
-            // CONFIGURAR EVENTOS
-            supervisorSelect.addEventListener('change', preencherTecnicos);
-            document.getElementById('rejected').addEventListener('change', checkRejectionStatus);
-            document.getElementById('approved').addEventListener('change', checkRejectionStatus);
-            statsToggle.addEventListener('click', toggleStatsVisibility);
-            toggleStatsBtn.addEventListener('click', toggleStatsVisibility);
-            exportStatsBtn.addEventListener('click', exportStatsToExcel);
-            
-            // PREENCHER TECNICOS INICIALMENTE
-            preencherTecnicos();
-            
-            // HABILITAR CAMPO DE TIPO DE SERVICO
-            function checkServiceTypeEnable() {
-                if (operatorSelect.value && supervisorSelect.value && technicianSelect.value && clientInput.value) {
-                    serviceTypeSelect.disabled = false;
-                } else {
-                    serviceTypeSelect.disabled = true;
-                    serviceTypeSelect.value = '';
-                }
+
+        // INICIALIZAR FIREBASE
+        function initFirebase() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                analytics = firebase.analytics();
+                firebaseConnected = true;
+                showNotification('CONEXÃO COM FIREBASE ESTABELECIDA!', true);
+                loadOrders();
+            } catch (error) {
+                console.error("ERRO AO INICIALIZAR FIREBASE:", error);
+                firebaseConnected = false;
+                showNotification('ERRO NA CONEXÃO COM FIREBASE: ' + error.message, false);
             }
-            
-            operatorSelect.addEventListener('change', checkServiceTypeEnable);
-            supervisorSelect.addEventListener('change', checkServiceTypeEnable);
-            technicianSelect.addEventListener('change', checkServiceTypeEnable);
-            clientInput.addEventListener('input', checkServiceTypeEnable);
-            
-            // COLETAR DADOS DO FORMULARIO
-            function collectFormData() {
-                return {
-                    operator: normalizeText(operatorSelect.value),
-                    supervisor: normalizeText(supervisorSelect.value),
-                    technician: normalizeText(technicianSelect.value),
-                    client: normalizeText(clientInput.value),
-                    serviceType: normalizeText(serviceTypeSelect.value),
+        }
+
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            setupQuestionSequence();
+
+            supervisorSelect.addEventListener('change', () => {
+                preencherTecnicos();
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+            });
+
+            technicianSelect.addEventListener('change', () => {
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+            });
+
+            operatorSelect.addEventListener('change', () => {
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+            });
+
+            clientInput.addEventListener('input', () => {
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+            });
+
+            document.querySelectorAll('input[name="validation"]').forEach(radio => {
+                radio.addEventListener('change', checkRejectionStatus);
+            });
+
+            submitBtn.addEventListener('click', async () => {
+                if (!firebaseConnected) {
+                    showNotification('SEM CONEXÃO COM FIREBASE.', false);
+                    return;
+                }
+
+                const operator = operatorSelect.value;
+                const supervisor = supervisorSelect.value;
+                const technician = technicianSelect.value;
+                const client = clientInput.value;
+                const serviceType = serviceTypeSelect.value;
+                const result = document.querySelector('input[name="validation"]:checked')?.value;
+                const observations = document.getElementById('observations').value;
+                const rejectionDetailsValue = rejectionDetails.value;
+
+                if (!operator || !supervisor || !technician || !client || !serviceType || !result) {
+                    showNotification('PREENCHA TODOS OS CAMPOS OBRIGATÓRIOS.', false);
+                    return;
+                }
+
+                if (result === 'rejected' && !rejectionDetailsValue) {
+                    showNotification('ESPECIFIQUE O MOTIVO DA REPROVAÇÃO.', false);
+                    return;
+                }
+
+                if (answeredQuestions < 8) {
+                    showNotification('RESPONDA TODAS AS PERGUNTAS DE VALIDAÇÃO.', false);
+                    return;
+                }
+
+                const validationData = {
+                    operator: normalizeText(operator),
+                    supervisor: normalizeText(supervisor),
+                    technician: normalizeText(technician),
+                    client: normalizeText(client),
+                    serviceType: normalizeText(serviceType),
                     validation: {
-                        photos: document.querySelector('input[name="photos"]:checked')?.value || '',
+                        photos: document.querySelector('input[name="photos"]:checked')?.value,
+                        video: document.querySelector('input[name="video"]:checked')?.value,
+                        sites: document.querySelector('input[name="sites"]:checked')?.value,
+                        apps: document.querySelector('input[name="apps"]:checked')?.value,
+                        orientation: document.querySelector('input[name="orientation"]:checked')?.value,
+                        clean: document.querySelector('input[name="clean"]:checked')?.value,
+                        contact: document.querySelector('input[name="contact"]:checked')?.value,
+                        doubts: document.querySelector('input[name="doubts"]:checked')?.value,
                         photosComment: document.getElementById('photos-comment').value,
-                        video: document.querySelector('input[name="video"]:checked')?.value || '',
                         videoComment: document.getElementById('video-comment').value,
-                        sites: document.querySelector('input[name="sites"]:checked')?.value || '',
                         sitesComment: document.getElementById('sites-comment').value,
-                        apps: document.querySelector('input[name="apps"]:checked')?.value || '',
                         appsComment: document.getElementById('apps-comment').value,
-                        orientation: document.querySelector('input[name="orientation"]:checked')?.value || '',
                         orientationComment: document.getElementById('orientation-comment').value,
-                        clean: document.querySelector('input[name="clean"]:checked')?.value || '',
                         cleanComment: document.getElementById('clean-comment').value,
-                        contact: document.querySelector('input[name="contact"]:checked')?.value || '',
                         contactComment: document.getElementById('contact-comment').value,
-                        doubts: document.querySelector('input[name="doubts"]:checked')?.value || '',
                         doubtsComment: document.getElementById('doubts-comment').value
                     },
-                    result: document.querySelector('input[name="validation"]:checked')?.value || '',
-                    observations: document.getElementById('observations').value,
-                    rejectionReason: document.querySelector('input[name="validation"]:checked')?.value === 'rejected' ? rejectionDetails.value : '',
-                    timestamp: new Date()
+                    result: result,
+                    observations: observations,
+                    rejectionReason: result === 'rejected' ? rejectionDetailsValue : '',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 };
-            }
-            
-            // SALVAR NO FIRESTORE
-            async function saveToFirestore(data) {
+
                 try {
-                    await db.collection("ordens_servico").add(data);
-                    analytics.logEvent('os_validated', {
-                        status: data.result,
-                        operator: data.operator,
-                        service_type: data.serviceType
-                    });
-                    return true;
-                } catch (error) {
-                    console.error("ERRO AO SALVAR NO FIRESTORE: ", error);
-                    return false;
-                }
-            }
-            
-            // EVENTO DE ENVIO DO FORMULARIO
-            submitBtn.addEventListener('click', async function(e) {
-                e.preventDefault();
-                
-                if (!firebaseConnected) {
-                    showNotification('ERRO: SEM CONEXAO COM FIREBASE', false);
-                    return;
-                }
-                
-                if (!operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || 
-                    !clientInput.value || !serviceTypeSelect.value) {
-                    showNotification('PREENCHA TODAS AS INFORMACOES BASICAS DA OS', false);
-                    return;
-                }
-                
-                if (answeredQuestions < 8) {
-                    showNotification('RESPONDA TODAS AS PERGUNTAS DE VALIDACAO', false);
-                    return;
-                }
-                
-                const validationSelected = document.querySelector('input[name="validation"]:checked');
-                if (!validationSelected) {
-                    showNotification('SELECIONE O RESULTADO DA VALIDACAO', false);
-                    return;
-                }
-                
-                if (validationSelected.value === 'rejected' && !rejectionDetails.value) {
-                    showNotification('PREENCHA O MOTIVO DA REPROVACAO', false);
-                    return;
-                }
-                
-                const formData = collectFormData();
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
-                submitBtn.disabled = true;
-                
-                const saved = await saveToFirestore(formData);
-                
-                if (saved) {
-                    showNotification('OS VALIDADA COM SUCESSO! DADOS SALVOS NO FIREBASE.', true);
-                    await loadStatisticsAndOrders();
-                    
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ENVIANDO...';
+                    await db.collection("ordens_servico").add(validationData);
+                    showNotification('ORDEM VALIDADA COM SUCESSO!', true);
+
+                    // Resetar formulário
                     operatorSelect.value = '';
-                    technicianSelect.value = '';
+                    supervisorSelect.value = '';
+                    technicianSelect.innerHTML = '<option value="">SELECIONE UM TÉCNICO</option>';
                     clientInput.value = '';
                     serviceTypeSelect.value = '';
                     serviceTypeSelect.disabled = true;
-                    
-                    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                        radio.checked = false;
+                    document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+                    document.querySelectorAll('.validation-item').forEach(item => {
+                        item.classList.remove('completed');
+                        item.classList.toggle('active', item.id === 'question-1');
                     });
-                    
-                    document.querySelectorAll('.comment-field input').forEach(input => {
-                        input.value = '';
-                    });
-                    
                     document.getElementById('observations').value = '';
+                    rejectionReason.style.display = 'none';
                     rejectionDetails.value = '';
-                    rejectionReason.classList.remove('active');
-                    
                     answeredQuestions = 0;
                     updateProgressBar();
-                    setupQuestionSequence();
-                } else {
-                    showNotification('ERRO AO SALVAR OS DADOS. TENTE NOVAMENTE.', false);
-                }
-                
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
-            
-            // BOTAO DE RECONEXAO
-            retryBtn.addEventListener('click', function() {
-                showNotification('TENTANDO RECONECTAR AO FIREBASE...', 'info');
-                checkFirebaseConnection();
-            });
-            
-            // BOTAO DE EXPORTAR
-            exportBtn.addEventListener('click', async function() {
-                if (!firebaseConnected) {
-                    showNotification('ERRO: SEM CONEXAO COM FIREBASE', false);
-                    return;
-                }
-                
-                if (orders.length === 0) {
-                    showNotification('NENHUMA ORDEM PARA EXPORTAR', 'info');
-                    return;
-                }
-                
-                const originalText = exportBtn.innerHTML;
-                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> EXPORTANDO...';
-                exportBtn.disabled = true;
-                
-                try {
-                    const dataForExport = orders.map(order => {
-                        return {
-                            'DATA': order.timestamp.toDate().toLocaleString('pt-BR'),
-                            'OPERADOR': order.operator,
-                            'SUPERVISOR': order.supervisor,
-                            'TECNICO': order.technician,
-                            'CLIENTE': order.client,
-                            'TIPO DE OS': order.serviceType,
-                            'FOTOS': order.validation.photos,
-                            'COMENTARIO FOTOS': order.validation.photosComment,
-                            'VIDEO': order.validation.video,
-                            'COMENTARIO VIDEO': order.validation.videoComment,
-                            'TESTES EM SITES': order.validation.sites,
-                            'COMENTARIO SITES': order.validation.sitesComment,
-                            'TESTES EM APPS': order.validation.apps,
-                            'COMENTARIO APPS': order.validation.appsComment,
-                            'ORIENTACAO REDES': order.validation.orientation,
-                            'COMENTARIO ORIENTACAO': order.validation.orientationComment,
-                            'AMBIENTE LIMPO': order.validation.clean,
-                            'COMENTARIO LIMPEZA': order.validation.cleanComment,
-                            'CONTATO DEIXADO': order.validation.contact,
-                            'COMENTARIO CONTATO': order.validation.contactComment,
-                            'DUVIDAS SANADAS': order.validation.doubts,
-                            'COMENTARIO DUVIDAS': order.validation.doubtsComment,
-                            'RESULTADO': order.result === 'approved' ? 'APROVADA' : 'REPROVADA',
-                            'OBSERVACOES': order.observations,
-                            'MOTIVO REPROVACAO': order.rejectionReason || 'N/A'
-                        };
-                    });
-                    
-                    const worksheet = XLSX.utils.json_to_sheet(dataForExport);
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "ORDENS DE SERVICO");
-                    XLSX.writeFile(workbook, "ordens_servico_age_fibra.xlsx");
-                    showNotification('EXPORTACAO PARA EXCEL CONCLUIDA COM SUCESSO!', true);
+                    loadOrders();
                 } catch (error) {
-                    console.error("ERRO AO EXPORTAR PARA EXCEL:", error);
-                    showNotification('ERRO AO EXPORTAR PARA EXCEL: ' + error.message, false);
+                    console.error("ERRO AO ENVIAR DADOS:", error);
+                    showNotification('ERRO AO ENVIAR DADOS: ' + error.message, false);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> VALIDAR ORDEM DE SERVIÇO';
                 }
-                
-                exportBtn.innerHTML = originalText;
-                exportBtn.disabled = false;
             });
-            
-            // BOTAO WHATSAPP
-            whatsappBtn.addEventListener('click', function() {
-                sendViaWhatsApp();
+
+            exportBtn.addEventListener('click', exportToExcel);
+            whatsappBtn.addEventListener('click', sendViaWhatsApp);
+
+            document.querySelectorAll('.chart-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    chartDays = parseInt(btn.getAttribute('data-days'));
+                    updateDailyChart();
+                });
             });
-            
-            // INICIALIZAR COMPONENTES
-            setupQuestionSequence();
         });
     </script>
 </body>
