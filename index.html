@@ -25,6 +25,7 @@
             --border: #ced4da;
             --info: #118ab2;
             --purple: #7209b7;
+            --today-highlight: #fff3cd; /* Cor para destacar ordens de hoje */
         }
 
         * {
@@ -386,6 +387,14 @@
         .status-rejected {
             color: var(--danger);
             font-weight: bold;
+            background-color: rgba(239, 71, 111, 0.1); /* Fundo leve para destacar reprovadas */
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+
+        .today-order {
+            background-color: var(--today-highlight); /* Destaque para ordens de hoje */
+            border-left: 4px solid var(--warning);
         }
 
         .export-btn {
@@ -626,6 +635,7 @@
                             <option>PATRICK DE SOUSA BARRETO</option>
                             <option>MARCOS VINICIUS</option>
                             <option>JOÃO PAULO</option>
+                            <option>GUILHERME</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -647,6 +657,13 @@
                             <option>VISITA TÉCNICA</option>
                             <option>UPGRADE MESH</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-type">TIPO DE ORDEM</label>
+                        <div class="radio-option">
+                            <input type="checkbox" id="order-type" name="order-type" value="B2B">
+                            <label for="order-type">B2B (Marcar se for B2B, deixar desmarcado para B2C)</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -777,19 +794,19 @@
 
                 <div class="validation-item" id="question-7">
                     <div class="validation-text">
-                        <div class="validation-title">7. TÉCNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?</div>
+                        <div class="validation-title">7. NÚMERO DO SUPORTE TÉCNICO AGE FIBRA?</div>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="contact-yes" name="contact" value="sim" required>
-                                <label for="contact-yes">SIM</label>
+                                <input type="radio" id="support-yes" name="support" value="sim" required>
+                                <label for="support-yes">SIM</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="contact-no" name="contact" value="nao" required>
-                                <label for="contact-no">NÃO</label>
+                                <input type="radio" id="support-no" name="support" value="nao" required>
+                                <label for="support-no">NÃO</label>
                             </div>
                         </div>
                         <div class="comment-field">
-                            <input type="text" id="contact-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
+                            <input type="text" id="support-comment" placeholder="COMENTÁRIOS (OPCIONAL)">
                         </div>
                     </div>
                 </div>
@@ -862,13 +879,14 @@
                                 <th>OPERADOR</th>
                                 <th>TÉCNICO</th>
                                 <th>CLIENTE</th>
+                                <th>TIPO ORDEM</th>
                                 <th>STATUS</th>
                                 <th>AÇÕES</th>
                             </tr>
                         </thead>
                         <tbody id="ordersTableBody">
                             <tr>
-                                <td colspan="6" style="text-align: center;">CARREGANDO DADOS...</td>
+                                <td colspan="7" style="text-align: center;">CARREGANDO DADOS...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -915,6 +933,7 @@
         const technicianSelect = document.getElementById('technician');
         const clientInput = document.getElementById('client');
         const serviceTypeSelect = document.getElementById('service-type');
+        const orderTypeCheckbox = document.getElementById('order-type');
         const questions = document.querySelectorAll('.validation-item');
         const rejectionReason = document.getElementById('rejectionReason');
         const rejectionDetails = document.getElementById('rejection-details');
@@ -986,6 +1005,16 @@
                 { nome: "THYAGO CARDOSO SOBRINHO", codigo: "V22017" },
                 { nome: "UEDER PEREIRA DE MORAIS", codigo: "V22018" },
                 { nome: "WAGNER GOMES PEIXOTO JUNIOR", codigo: "V22019" }
+            ],
+            "GUILHERME": [
+                { nome: "DANIEL NASCIMENTO SOARES", codigo: "V23001" },
+                { nome: "FELIPE MORAIS DE LUCENA", codigo: "V23002" },
+                { nome: "GABRIEL MULLER MARTINS DE MEDEIROS", codigo: "V23003" },
+                { nome: "LUCAS NASCIMENTO DOS SANTOS", codigo: "V23004" },
+                { nome: "MATEUS VIEIRA DE SOUSA", codigo: "V23005" },
+                { nome: "BRUNO DA SILVA BARBOSA", codigo: "V23006" },
+                { nome: "JOSÉ WANDDERSON SOUSA DO NASCIMENTO", codigo: "V23007" },
+                { nome: "WILKER RODRIGUES PINTO", codigo: "V23008" }
             ]
         };
 
@@ -1071,6 +1100,8 @@
             try {
                 const snapshot = await db.collection("ordens_servico").get();
                 orders = [];
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     orders.push({
@@ -1080,6 +1111,7 @@
                         technician: normalizeText(data.technician),
                         client: normalizeText(data.client),
                         serviceType: normalizeText(data.serviceType),
+                        orderType: data.orderType || 'B2C',
                         validation: data.validation,
                         result: data.result,
                         observations: data.observations,
@@ -1092,9 +1124,6 @@
                 totalOS.textContent = orders.length;
                 approvedOS.textContent = orders.filter(order => order.result === 'approved').length;
                 rejectedOS.textContent = orders.filter(order => order.result === 'rejected').length;
-
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
                 todayOS.textContent = orders.filter(order => {
                     const orderDate = order.timestamp.toDate();
                     orderDate.setHours(0, 0, 0, 0);
@@ -1104,16 +1133,20 @@
                 // Atualizar tabela
                 const sortedOrders = [...orders].sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime());
                 ordersTableBody.innerHTML = sortedOrders.length === 0
-                    ? '<tr><td colspan="6" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td></tr>'
+                    ? '<tr><td colspan="7" style="text-align: center;">NENHUMA ORDEM VALIDADA AINDA</td></tr>'
                     : sortedOrders.slice(0, 5).map(order => {
                         const date = order.timestamp.toDate();
                         const formattedDate = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+                        const orderDate = new Date(date);
+                        orderDate.setHours(0, 0, 0, 0);
+                        const isToday = orderDate.getTime() === today.getTime();
                         return `
-                            <tr>
+                            <tr class="${isToday ? 'today-order' : ''}">
                                 <td>${formattedDate}</td>
                                 <td>${order.operator}</td>
                                 <td>${order.technician}</td>
                                 <td>${order.client}</td>
+                                <td>${order.orderType}</td>
                                 <td class="${order.result === 'approved' ? 'status-approved' : 'status-rejected'}">
                                     ${order.result === 'approved' ? 'APROVADA' : 'REPROVADA'}
                                 </td>
@@ -1219,6 +1252,7 @@
             const technician = technicianSelect.value || 'NÃO INFORMADO';
             const client = clientInput.value || 'NÃO INFORMADO';
             const serviceType = serviceTypeSelect.value || 'NÃO INFORMADO';
+            const orderType = orderTypeCheckbox.checked ? 'B2B' : 'B2C';
             const result = document.querySelector('input[name="validation"]:checked')?.value === 'approved' ? 'APROVADA' : 'REPROVADA';
 
             let message = `*VALIDAÇÃO DE OS - AGE FIBRA*\n\n`;
@@ -1226,6 +1260,7 @@
             message += `*TÉCNICO:* ${technician}\n`;
             message += `*CLIENTE:* ${client}\n`;
             message += `*TIPO DE OS:* ${serviceType}\n`;
+            message += `*TIPO DE ORDEM:* ${orderType}\n`;
             message += `*RESULTADO:* ${result}\n\n`;
 
             const questionTitles = [
@@ -1235,7 +1270,7 @@
                 "FORAM REALIZADOS TESTES EM APLICATIVOS?",
                 "CLIENTE FOI ORIENTADO QUANTO AS REDES 2.4 GHZ E 5 GHZ E CABO?",
                 "AMBIENTE FICOU LIMPO E ORGANIZADO?",
-                "TÉCNICO DEIXOU CONTATO CORPORATIVO DO CLIENTE?",
+                "NÚMERO DO SUPORTE TÉCNICO AGE FIBRA?",
                 "TODAS AS DÚVIDAS DO CLIENTE FORAM SANADAS?"
             ];
 
@@ -1277,13 +1312,14 @@
                     'TÉCNICO': order.technician,
                     'CLIENTE': order.client,
                     'TIPO DE OS': order.serviceType,
+                    'TIPO DE ORDEM': order.orderType,
                     'FOTOS': order.validation.photos || 'NÃO RESPONDIDO',
                     'VÍDEO': order.validation.video || 'NÃO RESPONDIDO',
                     'SITES': order.validation.sites || 'NÃO RESPONDIDO',
                     'APLICATIVOS': order.validation.apps || 'NÃO RESPONDIDO',
                     'ORIENTAÇÃO': order.validation.orientation || 'NÃO RESPONDIDO',
                     'LIMPEZA': order.validation.clean || 'NÃO RESPONDIDO',
-                    'CONTATO': order.validation.contact || 'NÃO RESPONDIDO',
+                    'SUPORTE': order.validation.support || 'NÃO RESPONDIDO',
                     'DÚVIDAS': order.validation.doubts || 'NÃO RESPONDIDO',
                     'COMENTÁRIO FOTOS': order.validation.photosComment || '',
                     'COMENTÁRIO VÍDEO': order.validation.videoComment || '',
@@ -1291,7 +1327,7 @@
                     'COMENTÁRIO APLICATIVOS': order.validation.appsComment || '',
                     'COMENTÁRIO ORIENTAÇÃO': order.validation.orientationComment || '',
                     'COMENTÁRIO LIMPEZA': order.validation.cleanComment || '',
-                    'COMENTÁRIO CONTATO': order.validation.contactComment || '',
+                    'COMENTÁRIO SUPORTE': order.validation.supportComment || '',
                     'COMENTÁRIO DÚVIDAS': order.validation.doubtsComment || '',
                     'RESULTADO': order.result === 'approved' ? 'APROVADA' : 'REPROVADA',
                     'OBSERVAÇÕES': order.observations || '',
@@ -1359,6 +1395,7 @@
                 const technician = technicianSelect.value;
                 const client = clientInput.value;
                 const serviceType = serviceTypeSelect.value;
+                const orderType = orderTypeCheckbox.checked ? 'B2B' : 'B2C';
                 const result = document.querySelector('input[name="validation"]:checked')?.value;
                 const observations = document.getElementById('observations').value;
                 const rejectionDetailsValue = rejectionDetails.value;
@@ -1384,6 +1421,7 @@
                     technician: normalizeText(technician),
                     client: normalizeText(client),
                     serviceType: normalizeText(serviceType),
+                    orderType: orderType,
                     validation: {
                         photos: document.querySelector('input[name="photos"]:checked')?.value,
                         video: document.querySelector('input[name="video"]:checked')?.value,
@@ -1391,7 +1429,7 @@
                         apps: document.querySelector('input[name="apps"]:checked')?.value,
                         orientation: document.querySelector('input[name="orientation"]:checked')?.value,
                         clean: document.querySelector('input[name="clean"]:checked')?.value,
-                        contact: document.querySelector('input[name="contact"]:checked')?.value,
+                        support: document.querySelector('input[name="support"]:checked')?.value,
                         doubts: document.querySelector('input[name="doubts"]:checked')?.value,
                         photosComment: document.getElementById('photos-comment').value,
                         videoComment: document.getElementById('video-comment').value,
@@ -1399,7 +1437,7 @@
                         appsComment: document.getElementById('apps-comment').value,
                         orientationComment: document.getElementById('orientation-comment').value,
                         cleanComment: document.getElementById('clean-comment').value,
-                        contactComment: document.getElementById('contact-comment').value,
+                        supportComment: document.getElementById('support-comment').value,
                         doubtsComment: document.getElementById('doubts-comment').value
                     },
                     result: result,
@@ -1420,6 +1458,7 @@
                     technicianSelect.innerHTML = '<option value="">SELECIONE UM TÉCNICO</option>';
                     clientInput.value = '';
                     serviceTypeSelect.value = '';
+                    orderTypeCheckbox.checked = false;
                     serviceTypeSelect.disabled = true;
                     document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
                     document.querySelectorAll('.validation-item').forEach(item => {
