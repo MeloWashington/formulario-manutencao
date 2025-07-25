@@ -138,7 +138,7 @@
         select, input, textarea {
             width: 100%;
             padding: 13px 16px;
-            border: 10px solid var(--border);
+            border: 1px solid var(--border);
             border-radius: 10px;
             font-size: 1.05rem;
             background-color: white;
@@ -290,7 +290,7 @@
             transform: translateX(0);
         }
 
-        .notification.success {
+        .notification success {
             border-left-color: var(--success);
         }
 
@@ -1177,6 +1177,10 @@
         }
 
         async function loadOrders() {
+            if (!firebaseConnected) {
+                showNotification('SEM CONEXAO COM FIREBASE. VERIFIQUE A CONFIGURACAO.', false);
+                return;
+            }
             try {
                 const snapshot = await db.collection("ordens_servico").get();
                 orders = [];
@@ -1245,8 +1249,8 @@
 
                 updateDailyChart();
             } catch (error) {
-                console.error("ERRO AO CARREGAR DADOS:", error);
-                showNotification('ERRO AO CARREGAR DADOS: ' + error.message, false);
+                console.error("ERRO AO CARREGAR DADOS:", error.code, error.message);
+                showNotification('ERRO AO CARREGAR DADOS: ' + error.message + ' (' + error.code + ')', false);
             }
         }
 
@@ -1269,7 +1273,7 @@
                 orderDate.setHours(0, 0, 0, 0);
                 const orderDateStr = orderDate.toLocaleDateString('pt-BR');
                 if (ordersByDay.hasOwnProperty(orderDateStr)) {
-                    ordersByDay[dateStr]++;
+                    ordersByDay[orderDateStr]++;
                 }
             });
 
@@ -1429,9 +1433,9 @@
                 showNotification('CONEXAO COM FIREBASE ESTABELECIDA!', true);
                 loadOrders();
             } catch (error) {
-                console.error("ERRO AO INICIALIZAR FIREBASE:", error);
+                console.error("ERRO AO INICIALIZAR FIREBASE:", error.code, error.message);
                 firebaseConnected = false;
-                showNotification('ERRO NA CONEXAO COM FIREBASE: ' + error.message, false);
+                showNotification('ERRO NA CONEXAO COM FIREBASE: ' + error.message + ' (' + error.code + ')', false);
             }
         }
 
