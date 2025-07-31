@@ -290,7 +290,7 @@
             transform: translateX(0);
         }
 
-        .notification success {
+        .notification.success {
             border-left-color: var(--success);
         }
 
@@ -620,6 +620,10 @@
                 <div class="stat-value" id="todayOS">0</div>
                 <div class="stat-label">NOTAS HOJE</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-value" id="todayRejectedOS">0</div>
+                <div class="stat-label">OS REPROVADAS HOJE</div>
+            </div>
         </div>
 
         <div class="daily-chart-container">
@@ -666,6 +670,11 @@
                             <option>THAYENE DOS SANTOS FERREIRA</option>
                             <option>FELIPE JUNIOR</option>
                             <option>BARBARA SILVA DOS SANTOS</option>
+                            <option>MICHELLY SUPERVISAO</option>
+                            <option>RALMARLEY SUPERVISAO</option>
+                            <option>MAIARA SILVA LIMA</option>
+                            <option>THALITA VITORIA BORGES SOUSA</option>
+                            <option>ELISANGELA DE JESUS FERNANDES</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -983,6 +992,7 @@
         const approvedOS = document.getElementById('approvedOS');
         const rejectedOS = document.getElementById('rejectedOS');
         const todayOS = document.getElementById('todayOS');
+        const todayRejectedOS = document.getElementById('todayRejectedOS');
         const ordersTableBody = document.getElementById('ordersTableBody');
         const operatorSelect = document.getElementById('operator');
         const supervisorSelect = document.getElementById('supervisor');
@@ -1212,6 +1222,11 @@
                     const orderDate = order.timestamp.toDate();
                     orderDate.setHours(0, 0, 0, 0);
                     return orderDate.getTime() === today.getTime();
+                }).length;
+                todayRejectedOS.textContent = orders.filter(order => {
+                    const orderDate = order.timestamp.toDate();
+                    orderDate.setHours(0, 0, 0, 0);
+                    return orderDate.getTime() === today.getTime() && order.result === 'rejected';
                 }).length;
 
                 const sortedOrders = [...orders].sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime());
