@@ -700,6 +700,10 @@
                         <input type="text" id="client" placeholder="DIGITE O NOME COMPLETO DO CLIENTE" required>
                     </div>
                     <div class="form-group">
+                        <label for="order-number" class="required">NUMERO DA ORDEM DE SERVICO</label>
+                        <input type="text" id="order-number" placeholder="DIGITE O NUMERO DA OS (ATE 8 DIGITOS)" pattern="[0-9]{1,8}" maxlength="8" required>
+                    </div>
+                    <div class="form-group">
                         <label for="service-type" class="required">TIPO DE ORDEM DE SERVICO</label>
                         <select id="service-type" required disabled>
                             <option value="">SELECIONE O TIPO DE SERVICO</option>
@@ -899,10 +903,6 @@
                             <label for="rejected">REPROVADA</label>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="order-number" class="required">NUMERO DA ORDEM DE SERVICO</label>
-                    <input type="text" id="order-number" placeholder="DIGITE O NUMERO DA ORDEM DE SERVICO" required>
                 </div>
                 <div class="form-group">
                     <label for="observations">OBSERVACOES</label>
@@ -1355,9 +1355,9 @@
             message += `*OPERADOR:* ${operator}\n`;
             message += `*TECNICO:* ${technician}\n`;
             message += `*CLIENTE:* ${client}\n`;
+            message += `*NUMERO DA OS:* ${orderNumber}\n`;
             message += `*TIPO DE OS:* ${serviceType}\n`;
             message += `*TIPO DE ORDEM:* ${orderType}\n`;
-            message += `*NUMERO DA OS:* ${orderNumber}\n`;
             message += `*RESULTADO:* ${result}\n\n`;
 
             const questionTitles = [
@@ -1407,9 +1407,9 @@
                     'SUPERVISOR': order.supervisor,
                     'TECNICO': order.technician,
                     'CLIENTE': order.client,
+                    'NUMERO DA OS': order.orderNumber || '',
                     'TIPO DE OS': order.serviceType,
                     'TIPO DE ORDEM': order.orderType,
-                    'NUMERO DA OS': order.orderNumber || '',
                     'FOTOS': order.validation.photos || 'NAO RESPONDIDO',
                     'VIDEO': order.validation.video || 'NAO RESPONDIDO',
                     'SITES': order.validation.sites || 'NAO RESPONDIDO',
@@ -1460,19 +1460,24 @@
 
             supervisorSelect.addEventListener('change', () => {
                 preencherTecnicos();
-                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value || !orderNumberInput.value;
             });
 
             technicianSelect.addEventListener('change', () => {
-                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value || !orderNumberInput.value;
             });
 
             operatorSelect.addEventListener('change', () => {
-                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value || !orderNumberInput.value;
             });
 
             clientInput.addEventListener('input', () => {
-                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value;
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value || !orderNumberInput.value;
+            });
+
+            orderNumberInput.addEventListener('input', () => {
+                orderNumberInput.value = orderNumberInput.value.replace(/[^0-9]/g, '').slice(0, 8);
+                serviceTypeSelect.disabled = !operatorSelect.value || !supervisorSelect.value || !technicianSelect.value || !clientInput.value || !orderNumberInput.value;
             });
 
             document.querySelectorAll('input[name="validation"]').forEach(radio => {
@@ -1501,6 +1506,11 @@
                     return;
                 }
 
+                if (!/^[0-9]{1,8}$/.test(orderNumber)) {
+                    showNotification('O NUMERO DA ORDEM DE SERVICO DEVE CONTER APENAS NUMEROS E NO MAXIMO 8 DIGITOS.', false);
+                    return;
+                }
+
                 if (result === 'rejected' && !rejectionDetailsValue) {
                     showNotification('ESPECIFIQUE O MOTIVO DA REPROVACAO.', false);
                     return;
@@ -1518,7 +1528,7 @@
                     client: normalizeText(client),
                     serviceType: normalizeText(serviceType),
                     orderType: orderType,
-                    orderNumber: normalizeText(orderNumber),
+                    orderNumber: orderNumber,
                     validation: {
                         photos: document.querySelector('input[name="photos"]:checked')?.value,
                         video: document.querySelector('input[name="video"]:checked')?.value,
