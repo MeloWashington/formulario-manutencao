@@ -901,8 +901,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="closing-type" class="required">TIPO DE FECHAMENTO</label>
-                    <input type="text" id="closing-type" placeholder="DIGITE O TIPO DE FECHAMENTO" required>
+                    <label for="order-number" class="required">NUMERO DA ORDEM DE SERVICO</label>
+                    <input type="text" id="order-number" placeholder="DIGITE O NUMERO DA ORDEM DE SERVICO" required>
                 </div>
                 <div class="form-group">
                     <label for="observations">OBSERVACOES</label>
@@ -936,7 +936,7 @@
                                 <th>CLIENTE</th>
                                 <th>TIPO ORDEM</th>
                                 <th>STATUS</th>
-                                <th>FECHAMENTO</th>
+                                <th>NUMERO OS</th>
                                 <th>ACOES</th>
                             </tr>
                         </thead>
@@ -1000,7 +1000,7 @@
         const clientInput = document.getElementById('client');
         const serviceTypeSelect = document.getElementById('service-type');
         const orderTypeCheckbox = document.getElementById('order-type');
-        const closingTypeInput = document.getElementById('closing-type');
+        const orderNumberInput = document.getElementById('order-number');
         const questions = document.querySelectorAll('.validation-item');
         const rejectionReason = document.getElementById('rejectionReason');
         const rejectionDetails = document.getElementById('rejection-details');
@@ -1206,7 +1206,7 @@
                         client: normalizeText(data.client),
                         serviceType: normalizeText(data.serviceType),
                         orderType: data.orderType || 'B2C',
-                        closingType: normalizeText(data.closingType || ''),
+                        orderNumber: normalizeText(data.orderNumber || ''),
                         validation: data.validation,
                         result: data.result,
                         observations: data.observations,
@@ -1248,7 +1248,7 @@
                                 <td class="${order.result === 'approved' ? 'status-approved' : 'status-rejected'}">
                                     ${order.result === 'approved' ? 'APROVADA' : 'REPROVADA'}
                                 </td>
-                                <td>${order.closingType || 'NAO INFORMADO'}</td>
+                                <td>${order.orderNumber || 'NAO INFORMADO'}</td>
                                 <td>
                                     <button class="delete-btn" data-id="${order.id}">
                                         <i class="fas fa-trash"></i> EXCLUIR
@@ -1348,7 +1348,7 @@
             const client = clientInput.value || 'NAO INFORMADO';
             const serviceType = serviceTypeSelect.value || 'NAO INFORMADO';
             const orderType = orderTypeCheckbox.checked ? 'B2B' : 'B2C';
-            const closingType = closingTypeInput.value || 'NAO INFORMADO';
+            const orderNumber = orderNumberInput.value || 'NAO INFORMADO';
             const result = document.querySelector('input[name="validation"]:checked')?.value === 'approved' ? 'APROVADA' : 'REPROVADA';
 
             let message = `*VALIDACAO DE OS - AGE FIBRA*\n\n`;
@@ -1357,7 +1357,7 @@
             message += `*CLIENTE:* ${client}\n`;
             message += `*TIPO DE OS:* ${serviceType}\n`;
             message += `*TIPO DE ORDEM:* ${orderType}\n`;
-            message += `*TIPO DE FECHAMENTO:* ${closingType}\n`;
+            message += `*NUMERO DA OS:* ${orderNumber}\n`;
             message += `*RESULTADO:* ${result}\n\n`;
 
             const questionTitles = [
@@ -1409,7 +1409,7 @@
                     'CLIENTE': order.client,
                     'TIPO DE OS': order.serviceType,
                     'TIPO DE ORDEM': order.orderType,
-                    'TIPO DE FECHAMENTO': order.closingType || '',
+                    'NUMERO DA OS': order.orderNumber || '',
                     'FOTOS': order.validation.photos || 'NAO RESPONDIDO',
                     'VIDEO': order.validation.video || 'NAO RESPONDIDO',
                     'SITES': order.validation.sites || 'NAO RESPONDIDO',
@@ -1491,12 +1491,12 @@
                 const client = clientInput.value;
                 const serviceType = serviceTypeSelect.value;
                 const orderType = orderTypeCheckbox.checked ? 'B2B' : 'B2C';
-                const closingType = closingTypeInput.value;
+                const orderNumber = orderNumberInput.value;
                 const result = document.querySelector('input[name="validation"]:checked')?.value;
                 const observations = document.getElementById('observations').value;
                 const rejectionDetailsValue = rejectionDetails.value;
 
-                if (!operator || !supervisor || !technician || !client || !serviceType || !result || !closingType) {
+                if (!operator || !supervisor || !technician || !client || !serviceType || !result || !orderNumber) {
                     showNotification('PREENCHA TODOS OS CAMPOS OBRIGATORIOS.', false);
                     return;
                 }
@@ -1518,7 +1518,7 @@
                     client: normalizeText(client),
                     serviceType: normalizeText(serviceType),
                     orderType: orderType,
-                    closingType: normalizeText(closingType),
+                    orderNumber: normalizeText(orderNumber),
                     validation: {
                         photos: document.querySelector('input[name="photos"]:checked')?.value,
                         video: document.querySelector('input[name="video"]:checked')?.value,
@@ -1556,7 +1556,7 @@
                     clientInput.value = '';
                     serviceTypeSelect.value = '';
                     orderTypeCheckbox.checked = false;
-                    closingTypeInput.value = '';
+                    orderNumberInput.value = '';
                     serviceTypeSelect.disabled = true;
                     document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
                     document.querySelectorAll('.validation-item').forEach(item => {
