@@ -1,0 +1,3068 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard - Ordens de Serviço</title>
+<!-- Libraries -->
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+:root {
+  --primary: #FF6B35;
+  --primary-light: #FF8E53;
+  --primary-dark: #E55A2B;
+  --secondary: #4ECDC4;
+  --secondary-light: #87E5D9;
+  --accent: #FFE66D;
+  --dark: #2A2D34;
+  --light: #F7F9FC;
+  --muted: #6B7280;
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --danger: #F44336;
+  --card-bg: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  --header-bg: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  --sidebar-bg: linear-gradient(180deg, var(--dark) 0%, #3A3F4B 100%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--light);
+  color: var(--dark);
+  line-height: 1.6;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--sidebar-bg);
+  color: white;
+  padding: 20px 0;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 20px;
+}
+
+.sidebar-header h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  list-style: none;
+}
+
+.sidebar-nav li {
+  margin-bottom: 5px;
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 12px 20px;
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  transition: all 0.3s;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border-left-color: var(--primary);
+}
+
+/* Main Content */
+.main-content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.header {
+  background: var(--header-bg);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.file-label {
+  background: var(--primary);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.file-label:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.file-name {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+
+.export-buttons {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-whatsapp { background: var(--success); }
+.btn-print { background: var(--secondary); }
+.btn-wpp { background: var(--success); padding: 6px 10px; font-size: 0.8rem; margin-right: 5px; }
+.btn-email { background: #3498db; padding: 6px 10px; font-size: 0.8rem; }
+
+/* Cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s;
+  border-left: 4px solid var(--primary);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.card-total { border-left-color: var(--primary); }
+.card-prod { border-left-color: var(--success); }
+.card-imp { border-left-color: var(--danger); }
+.card-open { border-left-color: var(--warning); }
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.panel-header h3 {
+  color: var(--dark);
+  font-size: 1.2rem;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* Tables */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.table-header h3 {
+  color: var(--dark);
+  font-size: 1.2rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th, .table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f1f1f1;
+  text-align: left;
+}
+
+.table th {
+  background: rgba(0,0,0,0.02);
+  color: var(--dark);
+  font-weight: 600;
+}
+
+.table tbody tr:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.others-row {
+  background-color: #f9f9f9;
+  font-weight: 600;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.select, input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+}
+
+.small {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Novos estilos para análise de técnicos e exportação */
+.tech-controls {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary);
+}
+
+.tech-inputs {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.tech-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tech-input-group label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--dark);
+}
+
+.tech-input-group input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 120px;
+}
+
+.analysis-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.metric-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-left: 4px solid var(--secondary);
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.status-good { color: var(--success); }
+.status-warning { color: var(--warning); }
+.status-danger { color: var(--danger); }
+
+.export-section {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.export-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-export {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-export:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-excel { background: #217346; }
+.btn-pdf { background: #e74c3c; }
+.btn-csv { background: #3498db; }
+.btn-whatsapp-export { background: #25D366; }
+
+.supervisor-analysis {
+  margin-top: 25px;
+}
+
+.supervisor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.supervisor-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.supervisor-card.good { border-left-color: var(--success); }
+.supervisor-card.warning { border-left-color: var(--warning); }
+.supervisor-card.danger { border-left-color: var(--danger); }
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-good { background: #d4edda; color: #155724; }
+.status-warning { background: #fff3cd; color: #856404; }
+.status-danger { background: #f8d7da; color: #721c24; }
+.status-info { background: #d1ecf1; color: #0c5460; }
+
+.region-analysis {
+  margin: 20px 0;
+}
+
+.region-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.region-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.region-card.good { border-left-color: var(--success); }
+.region-card.warning { border-left-color: var(--warning); }
+.region-card.danger { border-left-color: var(--danger); }
+.region-card.info { border-left-color: var(--secondary); }
+
+/* Estilos para tabela colorida */
+.table-colored tbody tr {
+  transition: all 0.3s;
+}
+
+.table-colored tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.type-ativacao { background-color: rgba(76, 175, 80, 0.1); }
+.type-mudanca { background-color: rgba(33, 150, 243, 0.1); }
+.type-visita { background-color: rgba(255, 152, 0, 0.1); }
+.type-outros { background-color: rgba(158, 158, 158, 0.1); }
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--primary);
+}
+
+.modal-header h3 {
+  color: var(--dark);
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 5px;
+}
+
+.close-modal:hover {
+  color: var(--danger);
+}
+
+/* Supervisor Allocation */
+.supervisor-allocation {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.allocation-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.allocation-table th,
+.allocation-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.allocation-table th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.allocation-table input {
+  width: 80px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Novos estilos para turno e duração */
+.turn-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.turn-manha { background: #FFF3CD; color: #856404; }
+.turn-tarde { background: #D1ECF1; color: #0C5460; }
+
+.duration-cell {
+  font-weight: 600;
+  text-align: center;
+}
+
+.duration-fast { color: var(--success); }
+.duration-normal { color: var(--warning); }
+.duration-slow { color: var(--danger); }
+
+.problem-summary {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border-left: 4px solid var(--primary);
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.problem-card {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.intuitive-controls {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-left: 4px solid var(--secondary);
+}
+
+.control-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.control-item label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--dark);
+}
+
+.enhanced-table {
+  font-size: 0.85rem;
+}
+
+.enhanced-table th {
+  background: var(--primary);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Estilos para aba SLA */
+.sla-highlight {
+  background-color: rgba(255, 107, 53, 0.15) !important;
+  border-left: 4px solid var(--primary) !important;
+}
+
+.sla-summary-row {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  color: white;
+  font-weight: bold;
+}
+
+.sla-summary-row td {
+  padding: 12px !important;
+  border-bottom: 2px solid var(--primary-dark) !important;
+}
+
+/* Ajustes no modal de exportação */
+#exportModal .modal-content {
+  max-width: 500px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .controls, .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .export-buttons {
+    margin-left: 0;
+    justify-content: center;
+  }
+  
+  .tech-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .tech-input-group input {
+    width: 100%;
+  }
+  
+  .export-buttons-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .region-grid,
+  .supervisor-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .allocation-table {
+    font-size: 0.8rem;
+  }
+  
+  .allocation-table input {
+    width: 60px;
+  }
+  
+  .control-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>Dashboard OS</h1>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#overview" class="nav-link active" data-tab="overview">📊 Visão Geral</a></li>
+      <li><a href="#supervisors" class="nav-link" data-tab="supervisors">👨‍💼 Supervisores</a></li>
+      <li><a href="#regions" class="nav-link" data-tab="regions">🗺️ Regiões</a></li>
+      <li><a href="#operators" class="nav-link" data-tab="operators">👥 Operadores</a></li>
+      <li><a href="#addresses" class="nav-link" data-tab="addresses">🏠 Endereços</a></li>
+      <li><a href="#technicians" class="nav-link" data-tab="technicians">🔧 Técnicos</a></li>
+      <li><a href="#problems" class="nav-link" data-tab="problems">📋 Problemas</a></li>
+      <li><a href="#sla" class="nav-link" data-tab="sla">⏱️ SLA</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Dashboard - Ordens de Serviço</h1>
+      <p>Análise completa e em tempo real das ordens de serviço</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div>
+        <input id="fileInput" type="file" accept=".xlsx,.xls" style="display:none">
+        <label for="fileInput" class="file-label">📊 Carregar Planilha</label>
+      </div>
+      <div class="file-name" id="fileName">Nenhum arquivo selecionado</div>
+      <div class="export-buttons">
+        <button id="exportExcel" class="btn" title="Exportar para Excel">📥 Excel</button>
+        <button id="exportPDF" class="btn" title="Exportar para PDF">📥 PDF</button>
+        <button class="btn" onclick="showMetaModal()">📋 Ver Metas</button>
+      </div>
+    </div>
+
+    <!-- Seção de Exportação Completa -->
+    <div class="export-section">
+      <h3>📤 Exportação Completa de Dados</h3>
+      <div class="export-buttons-grid">
+        <button class="btn-export btn-excel" onclick="exportFullData('excel')">
+          📊 Excel Completo
+        </button>
+        <button class="btn-export btn-pdf" onclick="exportFullData('pdf')">
+          📄 PDF Resumido
+        </button>
+        <button class="btn-export btn-csv" onclick="exportFullData('csv')">
+          📋 CSV para Análise
+        </button>
+        <button class="btn-export btn-whatsapp-export" onclick="shareCompleteReport()">
+          💬 WhatsApp Completo
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards-grid">
+      <div class="card card-total">
+        <h3>Total Geral</h3>
+        <p id="totalAll">0</p>
+      </div>
+      <div class="card card-prod">
+        <h3>Produtivas</h3>
+        <p id="totalProd">0</p>
+      </div>
+      <div class="card card-imp">
+        <h3>Improdutivas</h3>
+        <p id="totalImp">0</p>
+      </div>
+      <div class="card card-open">
+        <h3>Abertas</h3>
+        <p id="totalOpen">0</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="overview">📊 Visão Geral</div>
+      <div class="tab" data-tab="supervisors">👨‍💼 Supervisores</div>
+      <div class="tab" data-tab="regions">🗺️ Regiões</div>
+      <div class="tab" data-tab="operators">👥 Operadores</div>
+      <div class="tab" data-tab="addresses">🏠 Endereços</div>
+      <div class="tab" data-tab="technicians">🔧 Técnicos</div>
+      <div class="tab" data-tab="problems">📋 Problemas</div>
+      <div class="tab" data-tab="sla">⏱️ SLA</div>
+    </div>
+
+    <!-- Tab Contents -->
+    <div id="overview" class="tab-content active">
+      <!-- Main Filters -->
+      <div class="intuitive-controls">
+        <h3>🔍 Filtros Avançados</h3>
+        <div class="control-group">
+          <div class="control-item">
+            <label for="filterTechnician">Técnico:</label>
+            <select id="filterTechnician" class="select">
+              <option value="__ALL__">Todos os Técnicos</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <label for="filterTurn">Turno:</label>
+            <select id="filterTurn" class="select">
+              <option value="__ALL__">Todos os Turnos</option>
+              <option value="MANHA">MANHÃ</option>
+              <option value="TARDE">TARDE</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <label for="filterType">Tipo de OS:</label>
+            <select id="filterType" class="select">
+              <option value="__ALL__">Todos os Tipos</option>
+              <option value="Ativacao">Ativações</option>
+              <option value="Mudanca">Mudanças</option>
+              <option value="Visita">Visitas</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <label for="filterStatus">Status:</label>
+            <select id="filterStatus" class="select">
+              <option value="__ALL__">Todos os Status</option>
+              <option value="FINALIZADA">Finalizadas</option>
+              <option value="IMPRODUTIVA">Improdutivas</option>
+              <option value="ABERTA">Abertas</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals Table -->
+      <div class="table-container">
+        <div class="table-header">
+          <h3>📈 Totais por Tipo e Turno (Ordens Ativas)</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('totalsTable', 'Totais por Tipo e Turno')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('totalsTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('overview')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <div class="small" style="margin-bottom:15px">
+          <strong>Nota:</strong> Esta tabela mostra apenas ordens ativas (abertas e improdutivas), excluindo canceladas e finalizadas.
+        </div>
+        <table class="table enhanced-table" id="totalsTable">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Total</th>
+              <th>Manhã</th>
+              <th>Tarde</th>
+              <th>Duração Média</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ativações</td>
+              <td id="totalAtivacoes">0</td>
+              <td id="manhaAtivacoes">0</td>
+              <td id="tardeAtivacoes">0</td>
+              <td id="duracaoAtivacoes">-</td>
+            </tr>
+            <tr>
+              <td>Mudanças</td>
+              <td id="totalMudancas">0</td>
+              <td id="manhaMudancas">0</td>
+              <td id="tardeMudancas">0</td>
+              <td id="duracaoMudancas">-</td>
+            </tr>
+            <tr>
+              <td>Visitas</td>
+              <td id="totalVisitas">0</td>
+              <td id="manhaVisitas">0</td>
+              <td id="tardeVisitas">0</td>
+              <td id="duracaoVisitas">-</td>
+            </tr>
+            <tr class="others-row">
+              <td><strong>Outros</strong></td>
+              <td id="totalOutros">0</td>
+              <td id="manhaOutros">0</td>
+              <td id="tardeOutros">0</td>
+              <td id="duracaoOutros">-</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Total Geral</th>
+              <th id="totalGeral">0</th>
+              <th id="totalManha">0</th>
+              <th id="totalTarde">0</th>
+              <th id="duracaoGeral">-</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Charts and Summary -->
+      <div class="dashboard-grid">
+        <div class="panel">
+          <div class="table-header">
+            <h3>Resumo por Tipo</h3>
+            <div class="panel-actions">
+              <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('typeTable', 'Resumo por Tipo')">WhatsApp</button>
+              <button class="btn btn-print" onclick="printTable('typeTable')">Imprimir</button>
+              <button class="btn" onclick="showExportModal('overview')">📤 Exportar Excel</button>
+            </div>
+          </div>
+          <table class="table table-colored enhanced-table" id="typeTable">
+            <thead><tr><th>Tipo</th><th>Produtivas</th><th>Improdutivas</th><th>Total</th><th>% IMP</th><th>Duração Média</th></tr></thead>
+            <tbody></tbody>
+            <tfoot><tr><th>Total</th><th id="sumProd">0</th><th id="sumImp">0</th><th id="sumTot">0</th><th id="sumPct">0%</th><th id="sumDuracao">-</th></tr></tfoot>
+          </table>
+          <div class="chart-container"><canvas id="chartByType"></canvas></div>
+        </div>
+
+        <div class="panel">
+          <div class="table-header">
+            <h3>Resumo por Turno</h3>
+            <div class="panel-actions">
+              <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('turnTable', 'Resumo por Turno')">WhatsApp</button>
+              <button class="btn btn-print" onclick="printTable('turnTable')">Imprimir</button>
+              <button class="btn" onclick="showExportModal('overview')">📤 Exportar Excel</button>
+            </div>
+          </div>
+          <table class="table enhanced-table" id="turnTable">
+            <thead><tr><th>Turno</th><th>Produtivas</th><th>Improdutivas</th><th>Abertas</th><th>Total</th><th>Duração Média</th></tr></thead>
+            <tbody></tbody>
+            <tfoot><tr><th>Total</th><th id="sumTP">0</th><th id="sumTI">0</th><th id="sumTO">0</th><th id="sumTAll">0</th><th id="sumTDuracao">-</th></tr></tfoot>
+          </table>
+          <div class="chart-container"><canvas id="chartByTypeTurn"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Improdutivo Section -->
+      <div class="table-container" id="improdSection" style="display:none">
+        <div class="table-header">
+          <h3>🚫 Ordens IMPRODUTIVAS</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('improdTable', 'Ordens Improdutivas')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('improdTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('overview')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <div class="small" style="margin-bottom:15px">Filtro por técnico/tipo/problema abaixo atua sobre esta tabela.</div>
+        <div class="intuitive-controls">
+          <div class="control-group">
+            <div class="control-item">
+              <label for="filterImprodTecnico">Técnico:</label>
+              <select id="filterImprodTecnico" class="select"><option value="__ALL__">Todos os técnicos</option></select>
+            </div>
+            <div class="control-item">
+              <label for="filterImprodTipo">Tipo:</label>
+              <select id="filterImprodTipo" class="select"><option value="__ALL__">Todos os tipos</option></select>
+            </div>
+            <div class="control-item">
+              <label for="filterImprodProblema">Problema:</label>
+              <select id="filterImprodProblema" class="select"><option value="__ALL__">Todos os problemas</option></select>
+            </div>
+          </div>
+        </div>
+        <table class="table enhanced-table" id="improdTable">
+          <thead>
+            <tr>
+              <th>Protocolo</th>
+              <th>Cliente</th>
+              <th>Tipo</th>
+              <th>Problema</th>
+              <th>Técnico</th>
+              <th>Data Agenda</th>
+              <th>Turno</th>
+              <th>Duração</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Abertas Section -->
+      <div class="table-container" id="openSection" style="display:none">
+        <div class="table-header">
+          <h3>⏳ Ordens ABERTAS</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('openTable', 'Ordens Abertas')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('openTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('overview')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <div class="small" style="margin-bottom:15px">
+          <strong>Status considerados abertos:</strong> ABERTA, NAO DEFINIDO, NAO ATRIBUIDA, EM ATENDIMENTO, AGUARDANDO ATENDIMENTO, EM DESLOCAMENTO, PENDENTE, AGENDADA, PROGRAMADA
+        </div>
+        <div class="intuitive-controls">
+          <div class="control-group">
+            <div class="control-item">
+              <label for="filterOpenTecnico">Técnico:</label>
+              <select id="filterOpenTecnico" class="select"><option value="__ALL__">Todos os técnicos</option></select>
+            </div>
+            <div class="control-item">
+              <label for="filterOpenTipo">Tipo:</label>
+              <select id="filterOpenTipo" class="select"><option value="__ALL__">Todos os tipos</option></select>
+            </div>
+            <div class="control-item">
+              <label for="filterOpenSituacao">Situação:</label>
+              <select id="filterOpenSituacao" class="select"><option value="__ALL__">Todas situações</option></select>
+            </div>
+          </div>
+        </div>
+        <table class="table enhanced-table" id="openTable">
+          <thead>
+            <tr>
+              <th>Protocolo</th>
+              <th>Cliente</th>
+              <th>Tipo</th>
+              <th>Situação</th>
+              <th>Status</th>
+              <th>Problema</th>
+              <th>Técnico</th>
+              <th>Data Agenda</th>
+              <th>Turno</th>
+              <th>Duração Prevista</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Problems Tab -->
+    <div id="problems" class="tab-content">
+      <div class="problem-summary">
+        <h3>📊 Resumo de Problemas</h3>
+        <div class="problem-grid" id="problemSummary">
+          <!-- Será preenchido via JavaScript -->
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Detalhamento por Problema</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('problemTable', 'Detalhamento por Problema')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('problemTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('problems')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <table class="table enhanced-table" id="problemTable">
+          <thead>
+            <tr>
+              <th>Problema</th>
+              <th>Total</th>
+              <th>Manhã</th>
+              <th>Tarde</th>
+              <th>Produtivas</th>
+              <th>Improdutivas</th>
+              <th>Abertas</th>
+              <th>Duração Média</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Supervisors Tab -->
+    <div id="supervisors" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Resumo por Supervisor</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('supervisorTable', 'Resumo por Supervisor')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('supervisorTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('supervisors')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <table class="table enhanced-table" id="supervisorTable">
+          <thead>
+            <tr>
+              <th>Supervisor</th>
+              <th>Total</th>
+              <th>Manhã</th>
+              <th>Tarde</th>
+              <th>Produtivas</th>
+              <th>Improdutivas</th>
+              <th>Abertas</th>
+              <th>% Produtivo</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Regions Tab -->
+    <div id="regions" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Resumo por Região</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('regiaoTable', 'Resumo por Região')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('regiaoTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('regions')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <table class="table enhanced-table" id="regiaoTable">
+          <thead>
+            <tr>
+              <th>Região</th>
+              <th>Total</th>
+              <th>Manhã</th>
+              <th>Tarde</th>
+              <th>Produtivas</th>
+              <th>Improdutivas</th>
+              <th>Abertas</th>
+              <th>% Produtivo</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Operators Tab -->
+    <div id="operators" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Resumo por Operador</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('operadorTable', 'Resumo por Operador')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('operadorTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('operators')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <table class="table enhanced-table" id="operadorTable">
+          <thead>
+            <tr>
+              <th>Operador</th>
+              <th>Total</th>
+              <th>Manhã</th>
+              <th>Tarde</th>
+              <th>Produtivas</th>
+              <th>Improdutivas</th>
+              <th>Abertas</th>
+              <th>% Produtivo</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Address Analysis Tab -->
+    <div id="addresses" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Análise de Endereços Repetidos</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('addressAnalysisTable', 'Endereços Repetidos')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('addressAnalysisTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('addresses')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <div class="small" style="margin-bottom:15px">
+          <strong>Nota:</strong> Esta análise mostra endereços que aparecem múltiplas vezes na base de dados.
+        </div>
+        <table class="table" id="addressAnalysisTable">
+          <thead>
+            <tr>
+              <th>Endereço</th>
+              <th>Quantidade</th>
+              <th>Protocolos</th>
+              <th>Clientes</th>
+              <th>Técnicos</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Technicians Analysis Tab -->
+    <div id="technicians" class="tab-content">
+      <div class="tech-controls">
+        <h3>⚙️ Configuração da Análise de Técnicos</h3>
+        <div class="tech-inputs">
+          <div class="tech-input-group">
+            <label for="activeTechnicians">Técnicos Ativos (Você informa):</label>
+            <input type="number" id="activeTechnicians" value="10" min="1">
+          </div>
+          <div class="tech-input-group">
+            <label for="maxLossPercent">Perda Máxima (%):</label>
+            <input type="number" id="maxLossPercent" value="15" min="0" max="100">
+          </div>
+          <div class="tech-input-group">
+            <label>Técnicos Necessários (Calculado):</label>
+            <div id="neededTechnicians" style="padding: 8px 12px; background: #f8f9fa; border-radius: 6px; font-weight: bold;">0</div>
+          </div>
+          <button onclick="calculateTechnicianAnalysis()" class="btn">
+            🔄 Calcular Análise
+          </button>
+          <button onclick="showMetaModal()" class="btn" style="background: var(--secondary);">
+            📋 Ver Metas
+          </button>
+        </div>
+        <div class="small" style="margin-top: 10px; color: var(--muted);">
+          <strong>Nota:</strong> O sistema calcula automaticamente a necessidade de técnicos baseado nas atividades por região. Você apenas informa quantos técnicos tem ativos.
+        </div>
+      </div>
+
+      <!-- Alocação de Técnicos por Supervisor -->
+      <div class="supervisor-allocation" id="supervisorAllocationSection" style="display: none;">
+        <h3>👨‍💼 Alocação de Técnicos por Supervisor</h3>
+        <div class="small" style="margin-bottom:15px">
+          Defina a quantidade desejada de técnicos para cada supervisor:
+        </div>
+        <table class="allocation-table" id="supervisorAllocationTable">
+          <thead>
+            <tr>
+              <th>Supervisor</th>
+              <th>Técnicos Necessários</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Será preenchido via JavaScript -->
+          </tbody>
+        </table>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+          <button onclick="saveSupervisorAllocation()" class="btn" style="background: var(--success);">
+            💾 Salvar Alocação
+          </button>
+          <button onclick="calculateTechnicianAnalysis()" class="btn">
+            🔄 Recalcular Análise
+          </button>
+        </div>
+      </div>
+
+      <div class="analysis-metrics" id="techMetrics">
+        <!-- Métricas serão preenchidas via JavaScript -->
+      </div>
+
+      <div class="region-analysis" id="regionAnalysisSection" style="display: none;">
+        <h4>🗺️ Análise por Região</h4>
+        <div class="small" style="margin-bottom:15px">
+          <strong>Metas por região:</strong> PARK WAY e PONTE ALTA: 3 atividades por técnico | Demais regiões: 5 atividades por técnico
+        </div>
+        <div class="region-grid" id="regionAnalysis">
+          <!-- Análise por região será inserida aqui -->
+        </div>
+      </div>
+
+      <div class="supervisor-analysis" id="supervisorAnalysisSection" style="display: none;">
+        <h4>👨‍💼 Análise por Supervisor</h4>
+        <div class="supervisor-grid" id="supervisorAnalysis">
+          <!-- Análise por supervisor será inserida aqui -->
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Detalhamento por Técnico</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('technicianDetailTable', 'Detalhamento por Técnico')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('technicianDetailTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('technicians')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <table class="table" id="technicianDetailTable">
+          <thead>
+            <tr>
+              <th>Técnico</th>
+              <th>Total</th>
+              <th>Produtivas</th>
+              <th>Improdutivas</th>
+              <th>Abertas</th>
+              <th>% Produtivo</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SLA Tab -->
+    <div id="sla" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>⏱️ Análise de SLA por Técnico</h3>
+          <div class="panel-actions">
+            <button class="btn btn-whatsapp" onclick="shareTableByWhatsApp('slaTable', 'Análise de SLA')">WhatsApp</button>
+            <button class="btn btn-print" onclick="printTable('slaTable')">Imprimir</button>
+            <button class="btn" onclick="showExportModal('sla')">📤 Exportar Excel</button>
+          </div>
+        </div>
+        <div class="small" style="margin-bottom:15px">
+          <strong>Nota:</strong> Esta análise mostra apenas ordens com horários de início e fim preenchidos. Ordens com duração superior a 1 hora são destacadas.
+        </div>
+        <table class="table enhanced-table" id="slaTable">
+          <thead>
+            <tr>
+              <th>Técnico</th>
+              <th>Tipo</th>
+              <th>Cliente</th>
+              <th>Duração</th>
+              <th>Status</th>
+              <th>Problema</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="chart-container">
+        <h4>📊 Ordens Concluídas por Horário</h4>
+        <canvas id="slaChart"></canvas>
+      </div>
+    </div>
+
+    <div id="updateInfo" class="small" style="margin-top:20px; text-align: center; padding: 15px; background: white; border-radius: 8px;"></div>
+  </div>
+</div>
+
+<!-- Modal de Metas -->
+<div id="metaModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📊 Metas Propostas</h3>
+      <button class="close-modal" onclick="closeMetaModal()">&times;</button>
+    </div>
+    <div id="metaModalContent">
+      <!-- Conteúdo será preenchido via JavaScript -->
+    </div>
+    <div style="margin-top: 20px; text-align: center;">
+      <button class="btn" onclick="closeMetaModal()" style="background: var(--muted);">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Exportação -->
+<div id="exportModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📤 Exportar Dados</h3>
+      <button class="close-modal" onclick="closeExportModal()">&times;</button>
+    </div>
+    <div id="exportModalContent">
+      <!-- Conteúdo será preenchido via JavaScript -->
+    </div>
+    <div style="margin-top: 20px; text-align: center;">
+      <button class="btn" onclick="closeExportModal()" style="background: var(--muted);">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Variáveis globais
+let RAW_ROWS = [];
+let OBJECTS = [];
+let CURRENT = { technician:'__ALL__', turn:'__ALL__', type:'__ALL__', status:'__ALL__' };
+let charts = { byType:null, byTypeTurn:null };
+let supervisorAllocation = {};
+
+// Helper utils
+function norm(v){ if(v===undefined||v===null) return ''; try{return String(v).normalize('NFD').replace(/\p{Diacritic}/gu,'').trim().toUpperCase()}catch(e){return String(v).toUpperCase().trim()} }
+function excelDateToStr(v){ if(typeof v==='number'&&v>20000){ const d=new Date(Math.round((v-25569)*86400*1000)); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); } return v }
+
+// MELHORIA: Função aprimorada para calcular duração entre horários
+function calcularDuracao(horarioInicio, horarioFim) {
+  if (!horarioInicio || !horarioFim) return null;
+  
+  try {
+    // Remover espaços e converter para formato padrão
+    const inicio = String(horarioInicio).trim().replace(/[^0-9:]/g, '');
+    const fim = String(horarioFim).trim().replace(/[^0-9:]/g, '');
+    
+    if (!inicio || !fim) return null;
+    
+    // Converter para objetos Date (assumindo mesmo dia)
+    const [hIni, mIni] = inicio.split(':').map(Number);
+    const [hFim, mFim] = fim.split(':').map(Number);
+    
+    if (isNaN(hIni) || isNaN(mIni) || isNaN(hFim) || isNaN(mFim)) return null;
+    
+    const inicioMinutos = hIni * 60 + mIni;
+    const fimMinutos = hFim * 60 + mFim;
+    
+    let diffMinutos = fimMinutos - inicioMinutos;
+    
+    // Se a diferença for negativa, assumir que passou da meia-noite
+    if (diffMinutos < 0) {
+      diffMinutos += 24 * 60; // adicionar um dia em minutos
+    }
+    
+    return diffMinutos > 0 ? diffMinutos : null;
+  } catch (e) {
+    console.error('Erro ao calcular duração:', e);
+    return null;
+  }
+}
+
+// Formatar duração para exibição
+function formatarDuracao(minutos) {
+  if (!minutos || minutos <= 0) return '-';
+  
+  const horas = Math.floor(minutos / 60);
+  const mins = minutos % 60;
+  
+  if (horas > 0) {
+    return `${horas}h ${mins}m`;
+  } else {
+    return `${mins}m`;
+  }
+}
+
+// Classificar duração por cores
+function classificarDuracao(minutos, tipo) {
+  if (!minutos) return '';
+  
+  const limites = {
+    'Ativacao': { rapido: 30, normal: 60 },
+    'Mudanca': { rapido: 45, normal: 90 },
+    'Visita': { rapido: 60, normal: 120 },
+    'Outros': { rapido: 45, normal: 90 }
+  };
+  
+  const limite = limites[tipo] || limites.Outros;
+  
+  if (minutos <= limite.rapido) return 'duration-fast';
+  if (minutos <= limite.normal) return 'duration-normal';
+  return 'duration-slow';
+}
+
+// Classificação de duração para SLA
+function classificarDuracaoSLA(minutos) {
+  if (!minutos) return '';
+  if (minutos <= 60) return 'duration-fast';
+  if (minutos <= 120) return 'duration-normal';
+  return 'duration-slow';
+}
+
+// Column fallback map (0-based indexes)
+const FALLBACK = { 
+  protocolo:2, 
+  cliente:3, 
+  tipo:8, 
+  situacao:9, 
+  statusK:10, 
+  problema:11, 
+  tecnico:13, 
+  dt_agenda:14, 
+  turno:18,
+  rua: 6,
+  supervisor: 25,
+  regiao: 26,  
+  operador: 27,
+  horario_inicio: 20,
+  horario_fim: 22
+};
+
+function detectMap(headerRow){ 
+  const h = (headerRow||[]).map(x=>norm(x||'')); 
+  const find=(keys)=>{ 
+    for(let i=0;i<h.length;i++){ 
+      for(const k of keys){ 
+        if(h[i].includes(k)) return i; 
+      } 
+    } 
+    return -1 
+  };
+  
+  const map = { 
+    protocolo:find(['PROTOC','NUM_OS','OS','PROT']),
+    tipo:find(['TIPO','TIPO_SOLICIT']),
+    situacao:find(['SITUACAO','SITUA']),
+    statusK:find(['STATUS']),
+    problema:find(['PROBLEMA']),
+    tecnico:find(['TECNICO']),
+    dt_agenda:find(['DT_AGEND','DT_AGENDA','DATA AGEND']),
+    turno:find(['TURNO']),
+    rua:find(['RUA','ENDERECO','LOGRADOURO']),
+    supervisor:find(['SUPERVISOR']),
+    regiao:find(['REGIAO']),
+    operador:find(['OPERADOR','COP RESPONSAVEL','RESPONSAVEL']),
+    horario_inicio:find(['HORA INICIO', 'INICIO', 'HORAINICIO']),
+    horario_fim:find(['HORA FIM', 'FIM', 'HORAFIM']),
+    cliente_candidates:[]
+  };
+  
+  for(let i=0;i<h.length;i++){ 
+    if(h[i].includes('CLIENTE')||h[i].includes('NOME')||h[i].includes('RAZAO')) 
+      map.cliente_candidates.push(i); 
+  }
+  
+  Object.keys(FALLBACK).forEach(k=>{ 
+    if(map[k]===undefined||map[k]===-1||(Array.isArray(map[k])&&map[k].length===0)) 
+      map[k]=FALLBACK[k]; 
+  }); 
+  
+  if(!Array.isArray(map.cliente_candidates)) map.cliente_candidates=[map.cliente_candidates]; 
+  return map; 
+}
+
+function pickClientCol(rows,cands){ function hasLetters(s){ return /[A-Za-zÀ-ÿ]/.test(String(s||'')); } for(const c of cands){ for(let i=0;i<Math.min(10,rows.length);i++){ if(hasLetters(rows[i][c])) return c; } } return cands[0] }
+
+// Tab navigation function
+function switchTab(tabName) {
+  // Remove active class from all tabs and contents
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+  
+  // Add active class to selected tab and content
+  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+  document.querySelector(`.nav-link[data-tab="${tabName}"]`).classList.add('active');
+  
+  // If technicians tab is opened and we have data, calculate analysis
+  if (tabName === 'technicians' && OBJECTS.length > 0) {
+    setTimeout(() => {
+      calculateTechnicianAnalysis();
+    }, 100);
+  }
+  
+  // If problems tab is opened, render problems
+  if (tabName === 'problems' && OBJECTS.length > 0) {
+    setTimeout(() => {
+      renderProblemsAnalysis();
+    }, 100);
+  }
+
+  // If sla tab is opened and we have data, render SLA
+  if (tabName === 'sla' && OBJECTS.length > 0) {
+    setTimeout(() => {
+      renderSLA();
+    }, 100);
+  }
+}
+
+// Initialize navigation
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab click handlers
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const tabName = this.getAttribute('data-tab');
+      switchTab(tabName);
+    });
+  });
+  
+  // Sidebar navigation click handlers
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      switchTab(tabName);
+    });
+  });
+
+  // Filter event listeners
+  document.getElementById('filterTechnician').addEventListener('change', function() {
+    CURRENT.technician = this.value;
+    renderAll();
+  });
+  
+  document.getElementById('filterTurn').addEventListener('change', function() {
+    CURRENT.turn = this.value;
+    renderAll();
+  });
+  
+  document.getElementById('filterType').addEventListener('change', function() {
+    CURRENT.type = this.value;
+    renderAll();
+  });
+  
+  document.getElementById('filterStatus').addEventListener('change', function() {
+    CURRENT.status = this.value;
+    renderAll();
+  });
+});
+
+document.getElementById('fileInput').addEventListener('change', async function(e){ 
+  const f = e.target.files[0]; 
+  if(!f) return; 
+  document.getElementById('fileName').textContent = f.name; 
+  const data = await f.arrayBuffer(); 
+  const wb = XLSX.read(data,{type:'array'}); 
+  const ws = wb.Sheets[wb.SheetNames[0]]; 
+  const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:''}); 
+  const header = rows[0]; 
+  const hasHeader = header.some(c=>typeof c==='string'&&c.trim()&&/[A-Za-z]/.test(c)); 
+  const dataRows = hasHeader?rows.slice(1):rows; 
+  const map = detectMap(header); 
+  map.cliente = pickClientCol(dataRows,map.cliente_candidates);
+  RAW_ROWS = dataRows; 
+  buildObjects(RAW_ROWS,map); 
+  renderAll(); 
+});
+
+function buildObjects(rows,map){ 
+  OBJECTS = []; 
+  for(const r of rows){ 
+    const cell=(i)=> (r && r[i]!==undefined && r[i]!==null)?r[i]:''; 
+    const protocolo = cell(map.protocolo); 
+    const cliente = cell(map.cliente); 
+    const tipo = cell(map.tipo); 
+    const situacao = cell(map.situacao); 
+    const statusK = cell(map.statusK); 
+    const problema = cell(map.problema); 
+    const tecnico = cell(map.tecnico); 
+    const dt_ag = cell(map.dt_agenda); 
+    const dt_agenda = (typeof dt_ag==='number')?excelDateToStr(dt_ag):dt_ag; 
+    const turno = cell(map.turno);
+    const rua = cell(map.rua);
+    const supervisor = cell(map.supervisor);
+    const regiao = cell(map.regiao);
+    const operador = cell(map.operador);
+    const horario_inicio = cell(map.horario_inicio);
+    const horario_fim = cell(map.horario_fim);
+    
+    // Calcular duração
+    const duracaoMinutos = calcularDuracao(horario_inicio, horario_fim);
+    
+    OBJECTS.push({
+      protocolo,
+      cliente,
+      tipo,
+      situacao,
+      statusK,
+      problema,
+      tecnico,
+      dt_agenda,
+      turno,
+      rua,
+      supervisor,
+      regiao,
+      operador,
+      horario_inicio,
+      horario_fim,
+      duracaoMinutos
+    }); 
+  } 
+}
+
+function computeFiltered(){ 
+  return OBJECTS.filter(o=>{
+    if(CURRENT.technician!=='__ALL__' && String(o.tecnico||'').toUpperCase()!==String(CURRENT.technician||'').toUpperCase()) return false;
+    if(CURRENT.turn!=='__ALL__' && String((o.turno||'').toUpperCase())!==String(CURRENT.turn||'').toUpperCase()) return false;
+    if(CURRENT.type!=='__ALL__'){
+      const t=norm(o.tipo||'');
+      if(CURRENT.type==='Ativacao' && !t.includes('ATIV')) return false; 
+      if(CURRENT.type==='Mudanca' && !t.includes('MUDAN')) return false; 
+      if(CURRENT.type==='Visita' && !(t.includes('VISIT')||t.includes('REPARO'))) return false;
+      if(CURRENT.type==='Outros') {
+        const isAtiv = t.includes('ATIV');
+        const isMud = t.includes('MUDAN');
+        const isVisit = t.includes('VISIT') || t.includes('REPARO');
+        if (isAtiv || isMud || isVisit) return false;
+      }
+    }
+    if(CURRENT.status!=='__ALL__'){
+      const status=norm(o.statusK||o.situacao||'');
+      if(CURRENT.status==='FINALIZADA' && !status.includes('FINALIZADA')) return false;
+      if(CURRENT.status==='IMPRODUTIVA' && !status.includes('IMPRODUTIVA')) return false;
+      if(CURRENT.status==='ABERTA' && !status.includes('ABERTA')) return false;
+    }
+    return true; 
+  }); 
+}
+
+function renderAll(){ 
+  const rows = computeFiltered(); 
+  
+  // Classification sets
+  const productiveSet = new Set(['FINALIZADA','PRODUTIVA','FECHADA','FECHAMENTO','CONCLUIDA','REALIZADA']);
+  const improdSet = new Set(['IMPRODUTIVO','IMPRODUTIVA','NÃO REALIZADA','NAO REALIZADA']);
+  const cancelSet = new Set(['CANCELADO','CANCELAMENTO','CANCELADA']);
+  const explicitOpen = new Set(['ABERTA','NAO DEFINIDO','NAO ATRIBUIDA','EM ATENDIMENTO','AGUARDANDO ATENDIMENTO','EM DESLOCAMENTO','PENDENTE','AGENDADA','PROGRAMADA']);
+  
+  // Counters
+  const totalsByType={Ativacao:0,Mudanca:0,Visita:0,Outros:0}; 
+  const produtivasByType={Ativacao:0,Mudanca:0,Visita:0,Outros:0}; 
+  const improdutivasByType={Ativacao:0,Mudanca:0,Visita:0,Outros:0}; 
+  const turnTotals={},turnProd={},turnImp={},turnOpen={}; 
+  const improdRows=[], openRows=[]; 
+  const dates=new Set();
+  
+  // Arrays para calcular durações médias
+  const duracaoByType = {Ativacao:[], Mudanca:[], Visita:[], Outros:[]};
+  const duracaoByTurn = {};
+  
+  // New counters for supervisor, region, operator
+  const supervisorSummary = {};
+  const regiaoSummary = {};
+  const operadorSummary = {};
+  
+  // Counters for type and shift
+  const totalsByTypeAndShift = {
+    Ativacao: { total: 0, manha: 0, tarde: 0 },
+    Mudanca: { total: 0, manha: 0, tarde: 0 },
+    Visita: { total: 0, manha: 0, tarde: 0 },
+    Outros: { total: 0, manha: 0, tarde: 0 }
+  };
+  
+  rows.forEach(o=>{ 
+    const tipoN=norm(o.tipo||''); 
+    const situ=norm(o.situacao||''); 
+    const statusN=norm(o.statusK||''); 
+    const prob=norm(o.problema||''); 
+    const tecnico=o.tecnico||''; 
+    const turno=(o.turno||'').toString().trim()||'SEM TURNO'; 
+    const dt=o.dt_agenda||''; 
+    const supervisor = o.supervisor || 'NÃO INFORMADO';
+    const regiao = o.regiao || 'NÃO INFORMADO';
+    const operador = o.operador || 'NÃO INFORMADO';
+    const duracao = o.duracaoMinutos;
+    
+    if(dt) dates.add(dt);
+    
+    let tipoKey='Outros'; 
+    if(tipoN.includes('ATIV')) tipoKey='Ativacao'; 
+    else if(tipoN.includes('MUDAN')) tipoKey='Mudanca'; 
+    else if(tipoN.includes('VISIT')||tipoN.includes('REPAR')) tipoKey='Visita'; 
+    
+    const effective = (statusN || situ).toUpperCase().trim();
+    const isProd=productiveSet.has(effective); 
+    const isImp=improdSet.has(effective); 
+    const isCancel=cancelSet.has(effective); 
+    const isOpen = explicitOpen.has(effective) && !isProd && !isImp && !isCancel;
+
+    // Update supervisor summary
+    if(!supervisorSummary[supervisor]) {
+      supervisorSummary[supervisor] = { 
+        total: 0, 
+        prod: 0, 
+        imp: 0, 
+        open: 0,
+        manha: 0,
+        tarde: 0
+      };
+    }
+    supervisorSummary[supervisor].total++;
+    if(isProd) supervisorSummary[supervisor].prod++;
+    if(isImp) supervisorSummary[supervisor].imp++;
+    if(isOpen) supervisorSummary[supervisor].open++;
+    
+    // Contar por turno para supervisor
+    if (norm(turno).includes('MANHA')) {
+      supervisorSummary[supervisor].manha++;
+    } else if (norm(turno).includes('TARDE')) {
+      supervisorSummary[supervisor].tarde++;
+    }
+    
+    // Update region summary
+    if(!regiaoSummary[regiao]) {
+      regiaoSummary[regiao] = { 
+        total: 0, 
+        prod: 0, 
+        imp: 0, 
+        open: 0,
+        manha: 0,
+        tarde: 0
+      };
+    }
+    regiaoSummary[regiao].total++;
+    if(isProd) regiaoSummary[regiao].prod++;
+    if(isImp) regiaoSummary[regiao].imp++;
+    if(isOpen) regiaoSummary[regiao].open++;
+    
+    // Contar por turno para região
+    if (norm(turno).includes('MANHA')) {
+      regiaoSummary[regiao].manha++;
+    } else if (norm(turno).includes('TARDE')) {
+      regiaoSummary[regiao].tarde++;
+    }
+    
+    // Update operator summary
+    if(!operadorSummary[operador]) {
+      operadorSummary[operador] = { 
+        total: 0, 
+        prod: 0, 
+        imp: 0, 
+        open: 0,
+        manha: 0,
+        tarde: 0
+      };
+    }
+    operadorSummary[operador].total++;
+    if(isProd) operadorSummary[operador].prod++;
+    if(isImp) operadorSummary[operador].imp++;
+    if(isOpen) operadorSummary[operador].open++;
+    
+    // Contar por turno para operador
+    if (norm(turno).includes('MANHA')) {
+      operadorSummary[operador].manha++;
+    } else if (norm(turno).includes('TARDE')) {
+      operadorSummary[operador].tarde++;
+    }
+    
+    // Counters for active orders by type and shift
+    if ((isOpen || isImp) && !isProd && !isCancel) {
+      totalsByTypeAndShift[tipoKey].total++;
+      if (norm(turno).includes('MANHA')) {
+        totalsByTypeAndShift[tipoKey].manha++;
+      } else if (norm(turno).includes('TARDE')) {
+        totalsByTypeAndShift[tipoKey].tarde++;
+      }
+    }
+    
+    // Other counters
+    if(!isCancel) totalsByType[tipoKey]++; 
+    if(isProd) produtivasByType[tipoKey]++; 
+    if(isImp) improdutivasByType[tipoKey]++; 
+    
+    if (!isCancel) {
+      turnTotals[turno]=(turnTotals[turno]||0)+1; 
+    }
+    
+    if(isProd) turnProd[turno]=(turnProd[turno]||0)+1; 
+    else if(isImp) turnImp[turno]=(turnImp[turno]||0)+1; 
+    else if(isOpen) turnOpen[turno]=(turnOpen[turno]||0)+1;
+    
+    // Coletar durações para cálculo de médias
+    if (duracao && duracao > 0) {
+      if (!duracaoByTurn[turno]) duracaoByTurn[turno] = [];
+      duracaoByTurn[turno].push(duracao);
+      duracaoByType[tipoKey].push(duracao);
+    }
+    
+    if(isImp) improdRows.push(o);
+    if(isOpen) openRows.push(o);
+  });
+  
+  // Calcular durações médias
+  const calcularMedia = (arr) => {
+    if (!arr || arr.length === 0) return null;
+    return Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+  };
+  
+  const duracaoMediaAtivacao = calcularMedia(duracaoByType.Ativacao);
+  const duracaoMediaMudanca = calcularMedia(duracaoByType.Mudanca);
+  const duracaoMediaVisita = calcularMedia(duracaoByType.Visita);
+  const duracaoMediaOutros = calcularMedia(duracaoByType.Outros);
+  
+  // Update totals by type and shift table with durations
+  document.getElementById('totalAtivacoes').textContent = totalsByTypeAndShift.Ativacao.total;
+  document.getElementById('manhaAtivacoes').textContent = totalsByTypeAndShift.Ativacao.manha;
+  document.getElementById('tardeAtivacoes').textContent = totalsByTypeAndShift.Ativacao.tarde;
+  document.getElementById('duracaoAtivacoes').textContent = formatarDuracao(duracaoMediaAtivacao);
+  
+  document.getElementById('totalMudancas').textContent = totalsByTypeAndShift.Mudanca.total;
+  document.getElementById('manhaMudancas').textContent = totalsByTypeAndShift.Mudanca.manha;
+  document.getElementById('tardeMudancas').textContent = totalsByTypeAndShift.Mudanca.tarde;
+  document.getElementById('duracaoMudancas').textContent = formatarDuracao(duracaoMediaMudanca);
+  
+  document.getElementById('totalVisitas').textContent = totalsByTypeAndShift.Visita.total;
+  document.getElementById('manhaVisitas').textContent = totalsByTypeAndShift.Visita.manha;
+  document.getElementById('tardeVisitas').textContent = totalsByTypeAndShift.Visita.tarde;
+  document.getElementById('duracaoVisitas').textContent = formatarDuracao(duracaoMediaVisita);
+  
+  document.getElementById('totalOutros').textContent = totalsByTypeAndShift.Outros.total;
+  document.getElementById('manhaOutros').textContent = totalsByTypeAndShift.Outros.manha;
+  document.getElementById('tardeOutros').textContent = totalsByTypeAndShift.Outros.tarde;
+  document.getElementById('duracaoOutros').textContent = formatarDuracao(duracaoMediaOutros);
+  
+  const totalGeral = totalsByTypeAndShift.Ativacao.total + totalsByTypeAndShift.Mudanca.total + 
+                    totalsByTypeAndShift.Visita.total + totalsByTypeAndShift.Outros.total;
+  const totalManha = totalsByTypeAndShift.Ativacao.manha + totalsByTypeAndShift.Mudanca.manha + 
+                    totalsByTypeAndShift.Visita.manha + totalsByTypeAndShift.Outros.manha;
+  const totalTarde = totalsByTypeAndShift.Ativacao.tarde + totalsByTypeAndShift.Mudanca.tarde + 
+                    totalsByTypeAndShift.Visita.tarde + totalsByTypeAndShift.Outros.tarde;
+  
+  // Calcular duração média geral
+  const todasDuracao = [...duracaoByType.Ativacao, ...duracaoByType.Mudanca, ...duracaoByType.Visita, ...duracaoByType.Outros];
+  const duracaoMediaGeral = calcularMedia(todasDuracao);
+  
+  document.getElementById('totalGeral').textContent = totalGeral;
+  document.getElementById('totalManha').textContent = totalManha;
+  document.getElementById('totalTarde').textContent = totalTarde;
+  document.getElementById('duracaoGeral').textContent = formatarDuracao(duracaoMediaGeral);
+  
+  // Update main totals
+  const totalProd = Object.values(produtivasByType).reduce((a,b)=>a+b,0); 
+  const totalImp = Object.values(improdutivasByType).reduce((a,b)=>a+b,0); 
+  const totalOpen = openRows.length; 
+  const totalAll=totalProd+totalImp+totalOpen;
+  
+  document.getElementById('totalProd').textContent=totalProd; 
+  document.getElementById('totalImp').textContent=totalImp; 
+  document.getElementById('totalOpen').textContent=totalOpen; 
+  document.getElementById('totalAll').textContent=totalAll;
+  
+  // Render supervisor summary
+  renderSupervisorSummaryTable('supervisorTable', supervisorSummary);
+  
+  // Render region summary
+  renderRegionSummaryTable('regiaoTable', regiaoSummary);
+  
+  // Render operator summary
+  renderOperatorSummaryTable('operadorTable', operadorSummary);
+  
+  // Render address analysis
+  renderAddressAnalysis(rows);
+  
+  // Render type table with colors and durations
+  renderTypeTableWithColors(totalsByType, produtivasByType, improdutivasByType, duracaoByType);
+  
+  // Render turn table with durations
+  renderTurnTableWithDurations(turnTotals, turnProd, turnImp, turnOpen, duracaoByTurn);
+  
+  // Render improdutivo table
+  renderDetailTable('improdTable', improdRows, 'improdSection');
+  
+  // Render open table
+  renderDetailTable('openTable', openRows, 'openSection');
+  
+  // Update filters
+  updateFilters();
+  
+  // Render charts
+  renderCharts(totalsByType, produtivasByType, improdutivasByType, turnTotals, turnProd, turnImp);
+
+  document.getElementById('updateInfo').innerText = `Última atualização: ${new Date().toLocaleString()} • ${rows.length} ordens processadas`;
+  
+  // Calculate technician analysis if on technicians tab
+  if (document.getElementById('technicians').classList.contains('active')) {
+    calculateTechnicianAnalysis();
+  }
+  
+  // Render problems analysis if on problems tab
+  if (document.getElementById('problems').classList.contains('active')) {
+    renderProblemsAnalysis();
+  }
+
+  // Render SLA if on sla tab
+  if (document.getElementById('sla').classList.contains('active')) {
+    renderSLA();
+  }
+}
+
+// Função para renderizar tabela de supervisores
+function renderSupervisorSummaryTable(tableId, summaryData) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = '';
+  
+  Object.keys(summaryData).forEach(key => {
+    const data = summaryData[key];
+    const prodPct = data.total > 0 ? ((data.prod / data.total) * 100).toFixed(1) + '%' : '0%';
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${key}</td>
+      <td>${data.total}</td>
+      <td>${data.manha}</td>
+      <td>${data.tarde}</td>
+      <td>${data.prod}</td>
+      <td>${data.imp}</td>
+      <td>${data.open}</td>
+      <td>${prodPct}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Função para renderizar tabela de regiões
+function renderRegionSummaryTable(tableId, summaryData) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = '';
+  
+  Object.keys(summaryData).forEach(key => {
+    const data = summaryData[key];
+    const prodPct = data.total > 0 ? ((data.prod / data.total) * 100).toFixed(1) + '%' : '0%';
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${key}</td>
+      <td>${data.total}</td>
+      <td>${data.manha}</td>
+      <td>${data.tarde}</td>
+      <td>${data.prod}</td>
+      <td>${data.imp}</td>
+      <td>${data.open}</td>
+      <td>${prodPct}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Função para renderizar tabela de operadores
+function renderOperatorSummaryTable(tableId, summaryData) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = '';
+  
+  Object.keys(summaryData).forEach(key => {
+    const data = summaryData[key];
+    const prodPct = data.total > 0 ? ((data.prod / data.total) * 100).toFixed(1) + '%' : '0%';
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${key}</td>
+      <td>${data.total}</td>
+      <td>${data.manha}</td>
+      <td>${data.tarde}</td>
+      <td>${data.prod}</td>
+      <td>${data.imp}</td>
+      <td>${data.open}</td>
+      <td>${prodPct}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderTypeTableWithColors(totalsByType, prodByType, impByType, duracaoByType) {
+  const tbodyType = document.querySelector('#typeTable tbody'); 
+  tbodyType.innerHTML = ''; 
+  let sumP = 0, sumI = 0, sumT = 0;
+  let totalDuracao = 0, countDuracao = 0;
+  
+  const types = [
+    { key: 'Ativacao', label: 'Ativações', class: 'type-ativacao' },
+    { key: 'Mudanca', label: 'Mudanças', class: 'type-mudanca' },
+    { key: 'Visita', label: 'Visitas', class: 'type-visita' },
+    { key: 'Outros', label: 'Outros', class: 'type-outros' }
+  ];
+  
+  types.forEach(type => { 
+    const p = prodByType[type.key] || 0; 
+    const i = impByType[type.key] || 0; 
+    const t = totalsByType[type.key] || 0; 
+    sumP += p; 
+    sumI += i; 
+    sumT += t; 
+    const pct = (p + i) === 0 ? '0%' : ((i / (p + i)) * 100).toFixed(1) + '%'; 
+    
+    // Calcular duração média
+    const duracaoMedia = duracaoByType[type.key].length > 0 ? 
+      Math.round(duracaoByType[type.key].reduce((a, b) => a + b, 0) / duracaoByType[type.key].length) : 
+      null;
+    
+    if (duracaoMedia) {
+      totalDuracao += duracaoMedia * duracaoByType[type.key].length;
+      countDuracao += duracaoByType[type.key].length;
+    }
+    
+    const row = document.createElement('tr');
+    row.className = type.class;
+    row.innerHTML = `<td>${type.label}</td><td>${p}</td><td>${i}</td><td>${t}</td><td>${pct}</td><td>${formatarDuracao(duracaoMedia)}</td>`;
+    tbodyType.appendChild(row);
+  }); 
+  
+  const duracaoMediaGeral = countDuracao > 0 ? Math.round(totalDuracao / countDuracao) : null;
+  
+  document.getElementById('sumProd').textContent = sumP; 
+  document.getElementById('sumImp').textContent = sumI; 
+  document.getElementById('sumTot').textContent = sumT; 
+  document.getElementById('sumPct').textContent = (sumP + sumI) === 0 ? '0%' : ((sumI / (sumP + sumI)) * 100).toFixed(1) + '%';
+  document.getElementById('sumDuracao').textContent = formatarDuracao(duracaoMediaGeral);
+}
+
+function renderTurnTableWithDurations(turnTotals, turnProd, turnImp, turnOpen, duracaoByTurn) {
+  const tbodyTurn=document.querySelector('#turnTable tbody'); 
+  tbodyTurn.innerHTML=''; 
+  let sTP=0,sTI=0,sTO=0,sTAll=0;
+  let totalDuracao = 0, countDuracao = 0;
+  
+  Object.keys(turnTotals).forEach(t=>{ 
+    const p=turnProd[t]||0; 
+    const i=turnImp[t]||0; 
+    const o=turnOpen[t]||0; 
+    const tot=turnTotals[t]||0; 
+    sTP+=p; 
+    sTI+=i; 
+    sTO+=o; 
+    sTAll+=tot;
+    
+    // Calcular duração média por turno
+    const duracaoMedia = duracaoByTurn[t] && duracaoByTurn[t].length > 0 ? 
+      Math.round(duracaoByTurn[t].reduce((a, b) => a + b, 0) / duracaoByTurn[t].length) : 
+      null;
+    
+    if (duracaoMedia) {
+      totalDuracao += duracaoMedia * duracaoByTurn[t].length;
+      countDuracao += duracaoByTurn[t].length;
+    }
+    
+    tbodyTurn.innerHTML+=`<tr><td>${t}</td><td>${p}</td><td>${i}</td><td>${o}</td><td>${tot}</td><td>${formatarDuracao(duracaoMedia)}</td></tr>` 
+  }); 
+  
+  const duracaoMediaGeral = countDuracao > 0 ? Math.round(totalDuracao / countDuracao) : null;
+  
+  document.getElementById('sumTP').textContent=sTP; 
+  document.getElementById('sumTI').textContent=sTI; 
+  document.getElementById('sumTO').textContent=sTO; 
+  document.getElementById('sumTAll').textContent=sTAll;
+  document.getElementById('sumTDuracao').textContent = formatarDuracao(duracaoMediaGeral);
+}
+
+function renderAddressAnalysis(rows) {
+  const addressMap = {};
+  
+  // Group by address
+  rows.forEach(o => {
+    const address = norm(o.rua || '');
+    if (!addressMap[address]) {
+      addressMap[address] = [];
+    }
+    addressMap[address].push(o);
+  });
+  
+  // Filter addresses that appear multiple times
+  const repeatedAddresses = Object.keys(addressMap).filter(address => 
+    addressMap[address].length > 1 && address !== '' && address !== 'NÃO INFORMADO'
+  );
+  
+  const tbody = document.querySelector('#addressAnalysisTable tbody');
+  tbody.innerHTML = '';
+  
+  repeatedAddresses.forEach(address => {
+    const orders = addressMap[address];
+    const protocols = orders.map(o => o.protocolo).join(', ');
+    const clients = orders.map(o => o.cliente).slice(0, 3).join(', ');
+    const technicians = [...new Set(orders.map(o => o.tecnico))].join(', ');
+    const statuses = [...new Set(orders.map(o => o.situacao))].join(', ');
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${address}</td>
+      <td>${orders.length}</td>
+      <td>${protocols}</td>
+      <td>${clients}</td>
+      <td>${technicians}</td>
+      <td>${statuses}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderDetailTable(tableId, rows, sectionId) {
+  const section = document.getElementById(sectionId);
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = '';
+
+  if (rows.length === 0) {
+    section.style.display = 'none';
+  } else {
+    section.style.display = 'block';
+    
+    rows.forEach(r => {
+      const w = encodeURIComponent(`Cliente:${r.cliente}\nProtocolo:${r.protocolo}\nTipo:${r.tipo}\nSituação:${r.situacao}\nStatus:${r.statusK}\nProblema:${r.problema}\nTécnico:${r.tecnico}\nData:${r.dt_agenda}\nTurno:${r.turno}\nSupervisor:${r.supervisor}\nRegião:${r.regiao}\nOperador:${r.operador}\nDuração:${formatarDuracao(r.duracaoMinutos)}`);
+      
+      // Determinar tipo para classificação de duração
+      let tipoKey = 'Outros';
+      const tipoN = norm(r.tipo || '');
+      if (tipoN.includes('ATIV')) tipoKey = 'Ativacao';
+      else if (tipoN.includes('MUDAN')) tipoKey = 'Mudanca';
+      else if (tipoN.includes('VISIT') || tipoN.includes('REPAR')) tipoKey = 'Visita';
+      
+      const duracaoClass = classificarDuracao(r.duracaoMinutos, tipoKey);
+      
+      const tr = document.createElement('tr');
+      
+      if (tableId === 'openTable') {
+        tr.innerHTML = `
+          <td>${r.protocolo}</td>
+          <td>${r.cliente}</td>
+          <td>${r.tipo}</td>
+          <td>${r.situacao}</td>
+          <td>${r.statusK || '-'}</td>
+          <td>${r.problema}</td>
+          <td>${r.tecnico || '-'}</td>
+          <td>${r.dt_agenda || '-'}</td>
+          <td><span class="turn-badge turn-${norm(r.turno).includes('MANHA') ? 'manha' : 'tarde'}">${r.turno || '-'}</span></td>
+          <td class="duration-cell ${duracaoClass}">${formatarDuracao(r.duracaoMinutos)}</td>
+          <td>
+            <button class='btn btn-wpp' onclick="window.open('https://api.whatsapp.com/send?text=${w}','_blank')">WhatsApp</button>
+            <button class='btn btn-email' onclick="window.location.href='mailto:?subject=Ordem ABERTA ${encodeURIComponent(r.protocolo || '')}&body=${w}'">E-mail</button>
+          </td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td>${r.protocolo}</td>
+          <td>${r.cliente}</td>
+          <td>${r.tipo}</td>
+          <td>${r.problema}</td>
+          <td>${r.tecnico || '-'}</td>
+          <td>${r.dt_agenda || '-'}</td>
+          <td><span class="turn-badge turn-${norm(r.turno).includes('MANHA') ? 'manha' : 'tarde'}">${r.turno || '-'}</span></td>
+          <td class="duration-cell ${duracaoClass}">${formatarDuracao(r.duracaoMinutos)}</td>
+          <td>
+            <button class='btn btn-wpp' onclick="window.open('https://api.whatsapp.com/send?text=${w}','_blank')">WhatsApp</button>
+            <button class='btn btn-email' onclick="window.location.href='mailto:?subject=Ordem IMPRODUTIVA ${encodeURIComponent(r.protocolo || '')}&body=${w}'">E-mail</button>
+          </td>
+        `;
+      }
+      
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+function updateFilters() {
+  const techTop = document.getElementById('filterTechnician'); 
+  techTop.innerHTML='<option value="__ALL__">Todos</option>'; 
+  const techs = Array.from(new Set(OBJECTS.map(o=>o.tecnico||'').filter(x=>x))).sort(); 
+  techs.forEach(t=>techTop.appendChild(new Option(t,t)));
+  
+  const turnTop = document.getElementById('filterTurn'); 
+  turnTop.innerHTML='<option value="__ALL__">Todos</option>'; 
+  const turns = Array.from(new Set(OBJECTS.map(o=> (o.turno||'').toString().trim()||'SEM TURNO'))).sort(); 
+  turns.forEach(t=>turnTop.appendChild(new Option(t,t)));
+}
+
+function renderCharts(totalsByType, prodByType, impByType, turnTotals, turnProd, turnImp) {
+  if (Chart.registry.getPlugin('datalabels') === undefined) {
+    Chart.register(ChartDataLabels);
+  }
+
+  // Chart by type
+  const ctx = document.getElementById('chartByType').getContext('2d');
+  const labels = ['Ativações', 'Mudanças', 'Visitas', 'Outros'];
+  const prodData = [prodByType.Ativacao || 0, prodByType.Mudanca || 0, prodByType.Visita || 0, prodByType.Outros || 0];
+  const impData = [impByType.Ativacao || 0, impByType.Mudanca || 0, impByType.Visita || 0, impByType.Outros || 0];
+  
+  if (charts.byType) charts.byType.destroy();
+  
+  charts.byType = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Produtivas',
+          data: prodData,
+          backgroundColor: '#4CAF50',
+          borderColor: '#388E3C',
+          borderWidth: 1
+        },
+        {
+          label: 'Improdutivas',
+          data: impData,
+          backgroundColor: '#F44336',
+          borderColor: '#D32F2F',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        datalabels: {
+          color: '#fff',
+          font: { weight: 'bold', size: 12 },
+          formatter: function(value, context) {
+            return value > 0 ? value : '';
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false }
+        },
+        y: {
+          grid: { display: false },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Chart by turn
+  const ctx2 = document.getElementById('chartByTypeTurn').getContext('2d');
+  const turnLabels = Object.keys(turnTotals);
+  const datasetProd = turnLabels.map(t => turnProd[t] || 0);
+  const datasetImp = turnLabels.map(t => turnImp[t] || 0);
+  
+  if (charts.byTypeTurn) charts.byTypeTurn.destroy();
+  
+  charts.byTypeTurn = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: turnLabels,
+      datasets: [
+        {
+          label: 'Produtivas',
+          data: datasetProd,
+          backgroundColor: '#4CAF50',
+          borderColor: '#388E3C',
+          borderWidth: 1
+        },
+        {
+          label: 'Improdutivas',
+          data: datasetImp,
+          backgroundColor: '#F44336',
+          borderColor: '#D32F2F',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        datalabels: {
+          color: '#fff',
+          font: { weight: 'bold', size: 12 },
+          formatter: function(value, context) {
+            return value > 0 ? value : '';
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: false,
+          grid: { display: false }
+        },
+        y: {
+          stacked: false,
+          beginAtZero: true,
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// Função para análise de problemas
+function renderProblemsAnalysis() {
+  if (OBJECTS.length === 0) return;
+  
+  const problemSummary = {};
+  const problemByTurn = {};
+  
+  OBJECTS.forEach(order => {
+    const problema = order.problema || 'NÃO INFORMADO';
+    const turno = order.turno || 'NÃO INFORMADO';
+    const status = norm(order.statusK || order.situacao || '');
+    
+    if (!problemSummary[problema]) {
+      problemSummary[problema] = { 
+        total: 0, 
+        manha: 0, 
+        tarde: 0,
+        prod: 0,
+        imp: 0,
+        open: 0,
+        duracoes: []
+      };
+    }
+    
+    problemSummary[problema].total++;
+    
+    if (norm(turno).includes('MANHA')) {
+      problemSummary[problema].manha++;
+    } else if (norm(turno).includes('TARDE')) {
+      problemSummary[problema].tarde++;
+    }
+    
+    // Classificar por status
+    const productiveSet = new Set(['FINALIZADA','PRODUTIVA','FECHADA','FECHAMENTO','CONCLUIDA','REALIZADA']);
+    const improdSet = new Set(['IMPRODUTIVO','IMPRODUTIVA','NÃO REALIZADA','NAO REALIZADA']);
+    const explicitOpen = new Set(['ABERTA','NAO DEFINIDO','NAO ATRIBUIDA','EM ATENDIMENTO','AGUARDANDO ATENDIMENTO','EM DESLOCAMENTO','PENDENTE','AGENDADA','PROGRAMADA']);
+    
+    if (productiveSet.has(status)) {
+      problemSummary[problema].prod++;
+    } else if (improdSet.has(status)) {
+      problemSummary[problema].imp++;
+    } else if (explicitOpen.has(status)) {
+      problemSummary[problema].open++;
+    }
+    
+    // Coletar durações
+    if (order.duracaoMinutos && order.duracaoMinutos > 0) {
+      problemSummary[problema].duracoes.push(order.duracaoMinutos);
+    }
+  });
+  
+  // Render summary cards
+  const problemContainer = document.getElementById('problemSummary');
+  problemContainer.innerHTML = '';
+  
+  // Ordenar problemas por frequência
+  const problemasOrdenados = Object.keys(problemSummary)
+    .sort((a, b) => problemSummary[b].total - problemSummary[a].total)
+    .slice(0, 8); // Top 8 problemas
+  
+  problemasOrdenados.forEach(problema => {
+    const data = problemSummary[problema];
+    const duracaoMedia = data.duracoes.length > 0 ? 
+      Math.round(data.duracoes.reduce((a, b) => a + b, 0) / data.duracoes.length) : 
+      null;
+    
+    problemContainer.innerHTML += `
+      <div class="problem-card">
+        <div style="font-weight: bold; margin-bottom: 5px;">${problema}</div>
+        <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">${data.total}</div>
+        <div style="font-size: 0.8rem; color: var(--muted);">M:${data.manha} T:${data.tarde}</div>
+        <div style="font-size: 0.8rem;">${formatarDuracao(duracaoMedia)}</div>
+      </div>
+    `;
+  });
+  
+  // Render detailed table
+  const tbody = document.querySelector('#problemTable tbody');
+  tbody.innerHTML = '';
+  
+  Object.keys(problemSummary)
+    .sort((a, b) => problemSummary[b].total - problemSummary[a].total)
+    .forEach(problema => {
+      const data = problemSummary[problema];
+      const duracaoMedia = data.duracoes.length > 0 ? 
+        Math.round(data.duracoes.reduce((a, b) => a + b, 0) / data.duracoes.length) : 
+        null;
+      
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${problema}</td>
+        <td>${data.total}</td>
+        <td>${data.manha}</td>
+        <td>${data.tarde}</td>
+        <td>${data.prod}</td>
+        <td>${data.imp}</td>
+        <td>${data.open}</td>
+        <td>${formatarDuracao(duracaoMedia)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+}
+
+// Função para renderizar a análise de SLA
+function renderSLA() {
+  if (OBJECTS.length === 0) return;
+
+  // Filtrar apenas ordens com horários de início e fim
+  const slaOrders = OBJECTS.filter(order => 
+    order.horario_inicio && order.horario_fim && order.duracaoMinutos
+  );
+
+  const tbody = document.querySelector('#slaTable tbody');
+  tbody.innerHTML = '';
+
+  // Agrupar por técnico para estatísticas
+  const techStats = {};
+
+  slaOrders.forEach(order => {
+    const tecnico = order.tecnico || 'NÃO INFORMADO';
+    const duracaoMinutos = order.duracaoMinutos;
+    
+    // Inicializar estatísticas do técnico
+    if (!techStats[tecnico]) {
+      techStats[tecnico] = {
+        total: 0,
+        acimaUmaHora: 0,
+        duracoes: []
+      };
+    }
+
+    techStats[tecnico].total++;
+    techStats[tecnico].duracoes.push(duracaoMinutos);
+    
+    if (duracaoMinutos > 60) {
+      techStats[tecnico].acimaUmaHora++;
+    }
+
+    // Determinar classe de destaque para durações > 1 hora
+    const highlightClass = duracaoMinutos > 60 ? 'sla-highlight' : '';
+    
+    const tr = document.createElement('tr');
+    tr.className = highlightClass;
+    tr.innerHTML = `
+      <td><strong>${tecnico}</strong></td>
+      <td>${order.tipo || '-'}</td>
+      <td>${order.cliente || '-'}</td>
+      <td class="duration-cell ${classificarDuracaoSLA(duracaoMinutos)}">${formatarDuracao(duracaoMinutos)}</td>
+      <td>${order.statusK || order.situacao || '-'}</td>
+      <td>${order.problema || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Adicionar linhas de resumo por técnico
+  Object.keys(techStats).forEach(tecnico => {
+    if (tecnico === 'NÃO INFORMADO') return;
+    
+    const stats = techStats[tecnico];
+    const duracaoMedia = stats.duracoes.length > 0 ? 
+      Math.round(stats.duracoes.reduce((a, b) => a + b, 0) / stats.duracoes.length) : 0;
+    const percentualAcima = stats.total > 0 ? 
+      ((stats.acimaUmaHora / stats.total) * 100).toFixed(1) : 0;
+
+    const tr = document.createElement('tr');
+    tr.className = 'sla-summary-row';
+    tr.innerHTML = `
+      <td colspan="6" style="background: var(--primary-light); color: white; font-weight: bold;">
+        📊 ${tecnico}: ${stats.total} ordens | Média: ${formatarDuracao(duracaoMedia)} | 
+        Acima de 1h: ${stats.acimaUmaHora} (${percentualAcima}%)
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Renderizar gráfico
+  renderSLAChart(slaOrders);
+}
+
+// Função para renderizar o gráfico de SLA
+function renderSLAChart(orders) {
+  const ctx = document.getElementById('slaChart').getContext('2d');
+  
+  // Agrupar por hora de conclusão
+  const hourCounts = {};
+  orders.forEach(order => {
+    if (order.horario_fim) {
+      const hora = order.horario_fim.split(':')[0]; // Pega apenas a hora
+      hourCounts[hora] = (hourCounts[hora] || 0) + 1;
+    }
+  });
+
+  // Ordenar horas
+  const horas = Object.keys(hourCounts).sort((a, b) => a - b);
+  const quantidades = horas.map(hora => hourCounts[hora]);
+
+  // Destruir gráfico anterior se existir
+  if (window.slaChartInstance) {
+    window.slaChartInstance.destroy();
+  }
+
+  window.slaChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: horas.map(h => `${h}h`),
+      datasets: [{
+        label: 'Ordens Concluídas',
+        data: quantidades,
+        backgroundColor: '#FF6B35',
+        borderColor: '#E55A2B',
+        borderWidth: 2,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Distribuição de Ordens Concluídas por Horário'
+        },
+        datalabels: {
+          color: '#fff',
+          font: {
+            weight: 'bold',
+            size: 12
+          },
+          formatter: function(value) {
+            return value > 0 ? value : '';
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Quantidade de Ordens'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Horário de Conclusão'
+          }
+        }
+      }
+    }
+  });
+}
+
+// Modal de exportação
+function showExportModal(tabName) {
+  const modalContent = document.getElementById('exportModalContent');
+  
+  let exportFunction = '';
+  let fileName = '';
+  let description = '';
+
+  switch(tabName) {
+    case 'sla':
+      exportFunction = "exportSLAToExcel()";
+      fileName = "analise_sla.xlsx";
+      description = "Análise de SLA com tempos de duração por técnico";
+      break;
+    case 'overview':
+      exportFunction = "exportFullData('excel')";
+      fileName = "visao_geral.xlsx";
+      description = "Visão geral completa das ordens de serviço";
+      break;
+    case 'technicians':
+      exportFunction = "exportTechnicianAnalysis()";
+      fileName = "analise_tecnicos.xlsx";
+      description = "Análise detalhada de técnicos e produtividade";
+      break;
+    // Adicione outros casos para outras abas conforme necessário
+    default:
+      exportFunction = "exportFullData('excel')";
+      fileName = "dados_completos.xlsx";
+      description = "Exportação completa de todos os dados";
+  }
+
+  modalContent.innerHTML = `
+    <div style="line-height: 1.6;">
+      <h4 style="color: var(--primary); margin-bottom: 15px;">📤 Exportar Dados - ${tabName.toUpperCase()}</h4>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <strong>Configurações da Exportação:</strong>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li>Formato: <strong>Excel (.xlsx)</strong></li>
+          <li>Arquivo: <strong>${fileName}</strong></li>
+          <li>Descrição: <strong>${description}</strong></li>
+        </ul>
+      </div>
+
+      <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <strong>💡 Dica:</strong> O arquivo Excel manterá toda a formatação e será ideal para análises adicionais e relatórios.
+      </div>
+
+      <div style="text-align: center; margin: 20px 0;">
+        <button class="btn-export btn-excel" onclick="${exportFunction}; closeExportModal();" style="padding: 15px 30px; font-size: 1.1rem;">
+          📊 Exportar para Excel
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('exportModal').style.display = 'flex';
+}
+
+function closeExportModal() {
+  document.getElementById('exportModal').style.display = 'none';
+}
+
+// Função específica para exportar análise de SLA
+function exportSLAToExcel() {
+  if (OBJECTS.length === 0) {
+    alert('Por favor, carregue uma planilha primeiro.');
+    return;
+  }
+
+  const slaOrders = OBJECTS.filter(order => 
+    order.horario_inicio && order.horario_fim && order.duracaoMinutos
+  );
+
+  const data = slaOrders.map(order => ({
+    'Técnico': order.tecnico || 'NÃO INFORMADO',
+    'Tipo': order.tipo || '-',
+    'Cliente': order.cliente || '-',
+    'Duração (minutos)': order.duracaoMinutos,
+    'Duração Formatada': formatarDuracao(order.duracaoMinutos),
+    'Status': order.statusK || order.situacao || '-',
+    'Problema': order.problema || '-',
+    'Horário Início': order.horario_inicio,
+    'Horário Fim': order.horario_fim,
+    'Data Agenda': order.dt_agenda,
+    'Turno': order.turno
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Análise_SLA');
+  XLSX.writeFile(wb, 'analise_sla.xlsx');
+}
+
+// NOVA FUNÇÃO: Calcular necessidade automática de técnicos
+function calcularNecessidadeTecnicosAutomatica() {
+  if (OBJECTS.length === 0) return 0;
+  
+  const regionTargets = {
+    'PARK WAY': 3,
+    'PONTE ALTA': 3,
+    'DEFAULT': 5
+  };
+
+  const regionSummary = {};
+  
+  // Processar atividades por região
+  OBJECTS.forEach(order => {
+    const regiao = order.regiao || 'NÃO INFORMADO';
+    const status = norm(order.statusK || order.situacao || '');
+    
+    // Considerar apenas ordens ativas (abertas + improdutivas)
+    const productiveSet = new Set(['FINALIZADA','PRODUTIVA','FECHADA','FECHAMENTO','CONCLUIDA','REALIZADA']);
+    const improdSet = new Set(['IMPRODUTIVO','IMPRODUTIVA','NÃO REALIZADA','NAO REALIZADA']);
+    const explicitOpen = new Set(['ABERTA','NAO DEFINIDO','NAO ATRIBUIDA','EM ATENDIMENTO','AGUARDANDO ATENDIMENTO','EM DESLOCAMENTO','PENDENTE','AGENDADA','PROGRAMADA']);
+    
+    const isActive = !productiveSet.has(status) && (improdSet.has(status) || explicitOpen.has(status));
+    
+    if (isActive) {
+      if (!regionSummary[regiao]) {
+        regionSummary[regiao] = {
+          atividades: 0,
+          target: regionTargets[regiao] || regionTargets.DEFAULT
+        };
+      }
+      regionSummary[regiao].atividades++;
+    }
+  });
+
+  // Calcular necessidade total
+  let totalNecessario = 0;
+  Object.keys(regionSummary).forEach(regiao => {
+    if (regiao !== 'NÃO INFORMADO') {
+      const data = regionSummary[regiao];
+      const necessarios = Math.ceil(data.atividades / data.target);
+      totalNecessario += necessarios;
+    }
+  });
+
+  return totalNecessario;
+}
+
+// MODIFICAÇÃO: Função de análise de técnicos atualizada
+function calculateTechnicianAnalysis() {
+  if (OBJECTS.length === 0) {
+    alert('Por favor, carregue uma planilha primeiro.');
+    return;
+  }
+
+  // Obter valores - AGORA SEPARADOS: cálculo automático vs. entrada manual
+  const activeTechnicians = parseInt(document.getElementById('activeTechnicians').value) || 1;
+  const maxLossPercent = parseInt(document.getElementById('maxLossPercent').value) || 15;
+
+  // CALCULAR NECESSIDADE AUTOMÁTICA
+  const neededTechnicians = calcularNecessidadeTecnicosAutomatica();
+  
+  // Atualizar o campo de técnicos necessários na interface
+  document.getElementById('neededTechnicians').textContent = neededTechnicians;
+
+  // Metas por região
+  const regionTargets = {
+    'PARK WAY': 3,
+    'PONTE ALTA': 3,
+    'DEFAULT': 5
+  };
+
+  // Coletar dados
+  const regionSummary = {};
+  let totalActivities = 0;
+  let totalProd = 0;
+  let totalImp = 0;
+  let totalOpen = 0;
+
+  const technicianSummary = {};
+  const supervisorAnalysis = {};
+
+  // Classificação
+  const productiveSet = new Set(['FINALIZADA','PRODUTIVA','FECHADA','FECHAMENTO','CONCLUIDA','REALIZADA']);
+  const improdSet = new Set(['IMPRODUTIVO','IMPRODUTIVA','NÃO REALIZADA','NAO REALIZADA']);
+  const explicitOpen = new Set(['ABERTA','NAO DEFINIDO','NAO ATRIBUIDA','EM ATENDIMENTO','AGUARDANDO ATENDIMENTO','EM DESLOCAMENTO','PENDENTE','AGENDADA','PROGRAMADA']);
+
+  // Processar objetos
+  OBJECTS.forEach(order => {
+    const status = norm(order.statusK || order.situacao || '');
+    const tecnico = order.tecnico || 'NÃO INFORMADO';
+    const supervisor = order.supervisor || 'NÃO INFORMADO';
+    const regiao = order.regiao || 'NÃO INFORMADO';
+
+    // Inicializar estruturas
+    if (!regionSummary[regiao]) {
+      regionSummary[regiao] = { 
+        total: 0, 
+        prod: 0, 
+        imp: 0, 
+        open: 0,
+        technicians: new Set(),
+        targetPerTech: regionTargets[regiao] || regionTargets.DEFAULT
+      };
+    }
+
+    if (!technicianSummary[tecnico]) {
+      technicianSummary[tecnico] = { 
+        total: 0, 
+        prod: 0, 
+        imp: 0, 
+        open: 0,
+        regiao: regiao
+      };
+    }
+
+    if (!supervisorAnalysis[supervisor]) {
+      supervisorAnalysis[supervisor] = { 
+        technicians: new Set(),
+        totalActivities: 0,
+        regions: new Set()
+      };
+    }
+
+    // Contabilizar
+    totalActivities++;
+    regionSummary[regiao].total++;
+    technicianSummary[tecnico].total++;
+    supervisorAnalysis[supervisor].technicians.add(tecnico);
+    supervisorAnalysis[supervisor].totalActivities++;
+    supervisorAnalysis[supervisor].regions.add(regiao);
+    regionSummary[regiao].technicians.add(tecnico);
+
+    // Classificar status
+    if (productiveSet.has(status)) {
+      totalProd++;
+      regionSummary[regiao].prod++;
+      technicianSummary[tecnico].prod++;
+    } else if (improdSet.has(status)) {
+      totalImp++;
+      regionSummary[regiao].imp++;
+      technicianSummary[tecnico].imp++;
+    } else if (explicitOpen.has(status)) {
+      totalOpen++;
+      regionSummary[regiao].open++;
+      technicianSummary[tecnico].open++;
+    }
+  });
+
+  // CALCULAR MÉTRICAS
+  const avgActivities = activeTechnicians > 0 ? (totalActivities / activeTechnicians).toFixed(1) : 0;
+  const realLoss = totalActivities > 0 ? ((totalImp / totalActivities) * 100).toFixed(1) : 0;
+  
+  // DETERMINAR STATUS GERAL - AGORA COMPARA AUTOMÁTICO vs MANUAL
+  let teamStatus = "🟢 ADEQUADA";
+  let teamStatusClass = "status-good";
+
+  if (neededTechnicians > activeTechnicians) {
+    teamStatus = `🔴 FALTAM ${neededTechnicians - activeTechnicians} TÉCNICOS`;
+    teamStatusClass = "status-danger";
+  } else if (parseFloat(realLoss) > maxLossPercent) {
+    teamStatus = "🟡 COM PERDA ALTA";
+    teamStatusClass = "status-warning";
+  } else if (activeTechnicians > neededTechnicians * 1.2) {
+    teamStatus = "🟣 EXCESSO DE TÉCNICOS";
+    teamStatusClass = "status-info";
+  }
+
+  // ATUALIZAR MÉTRICAS NA TELA - AGORA MOSTRA AMBOS
+  const metricsHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Total de Atividades</div>
+      <div class="metric-value">${totalActivities}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Técnicos Ativos (Você)</div>
+      <div class="metric-value">${activeTechnicians}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Técnicos Necessários (Sistema)</div>
+      <div class="metric-value ${neededTechnicians > activeTechnicians ? 'status-danger' : 'status-good'}" id="neededTechniciansValue">${neededTechnicians}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Média por Técnico</div>
+      <div class="metric-value">${avgActivities}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Perda Real</div>
+      <div class="metric-value ${parseFloat(realLoss) > maxLossPercent ? 'status-danger' : 'status-good'}">${realLoss}%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Status da Equipe</div>
+      <div class="metric-value ${teamStatusClass}">${teamStatus}</div>
+    </div>
+  `;
+
+  document.getElementById('techMetrics').innerHTML = metricsHTML;
+
+  // ATUALIZAR ALOCAÇÃO DE TÉCNICOS POR SUPERVISOR
+  renderSupervisorAllocation(supervisorAnalysis);
+
+  // ATUALIZAR ANÁLISE POR REGIÃO - SIMPLIFICADA
+  const regionContainer = document.getElementById('regionAnalysis');
+  regionContainer.innerHTML = '';
+
+  Object.keys(regionSummary).forEach(regiao => {
+    if (regiao === 'NÃO INFORMADO') return;
+    
+    const data = regionSummary[regiao];
+    const atividades = data.total;
+    const target = data.targetPerTech;
+    const necessarios = Math.ceil(atividades / target);
+    const atuais = data.technicians.size;
+    
+    // CLASSIFICAÇÃO SIMPLIFICADA DA CARGA
+    let statusCarga = "";
+    let statusClass = "";
+    
+    if (atividades === 0) {
+      statusCarga = "⚪ SEM CARGA";
+      statusClass = "info";
+    } else if (atividades < target) {
+      statusCarga = "🟢 CARGA BAIXA";
+      statusClass = "good";
+    } else if (atividades <= target * 2) {
+      statusCarga = "🟡 CARGA OK";
+      statusClass = "warning";
+    } else {
+      statusCarga = "🔴 CARGA ALTA";
+      statusClass = "danger";
+    }
+
+    regionContainer.innerHTML += `
+      <div class="region-card ${statusClass}">
+        <strong>${regiao}</strong>
+        <div style="margin-top: 10px; font-size: 0.9rem;">
+          <div>📊 Atividades: <strong>${atividades}</strong></div>
+          <div>🎯 Meta/Técnico: <strong>${target}</strong></div>
+          <div>👥 Técnicos Necessários: <strong>${necessarios}</strong></div>
+          <div>👤 Técnicos Atuais: <strong>${atuais}</strong></div>
+          <div style="margin-top: 8px;"><span class="status-badge status-${statusClass}">${statusCarga}</span></div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Mostrar seções
+  document.getElementById('regionAnalysisSection').style.display = 'block';
+  document.getElementById('supervisorAnalysisSection').style.display = 'block';
+
+  // ATUALIZAR ANÁLISE POR SUPERVISOR
+  const supervisorContainer = document.getElementById('supervisorAnalysis');
+  supervisorContainer.innerHTML = '';
+
+  Object.keys(supervisorAnalysis).forEach(supervisor => {
+    if (supervisor === 'NÃO INFORMADO') return;
+
+    const data = supervisorAnalysis[supervisor];
+    const techCount = data.technicians.size;
+    const activityCount = data.totalActivities;
+    
+    // Usar alocação definida pelo usuário se disponível
+    const desiredTechCount = supervisorAllocation[supervisor] || techCount;
+    
+    let status = "adequada";
+    let statusClass = "good";
+    let statusText = "🟢 Adequada";
+
+    if (techCount < desiredTechCount) {
+      status = "insuficiente";
+      statusClass = "danger";
+      statusText = `🔴 Precisa +${desiredTechCount - techCount}`;
+    } else if (techCount > desiredTechCount) {
+      status = "excesso";
+      statusClass = "warning";
+      statusText = `🟣 Excesso ${techCount - desiredTechCount}`;
+    }
+
+    supervisorContainer.innerHTML += `
+      <div class="supervisor-card ${statusClass}">
+        <strong>${supervisor}</strong>
+        <div style="margin-top: 10px; font-size: 0.9rem;">
+          <div>👥 Técnicos Necessários: <strong>${desiredTechCount}</strong></div>
+          <div>📊 Atividades: <strong>${activityCount}</strong></div>
+          <div>🗺️ Regiões: <strong>${Array.from(data.regions).join(', ')}</strong></div>
+          <div style="margin-top: 8px;"><span class="status-badge status-${statusClass}">${statusText}</span></div>
+        </div>
+      </div>
+    `;
+  });
+
+  // ATUALIZAR TABELA DE TÉCNICOS
+  const tbody = document.querySelector('#technicianDetailTable tbody');
+  tbody.innerHTML = '';
+
+  const technicians = Object.keys(technicianSummary).filter(t => t !== 'NÃO INFORMADO');
+  
+  technicians.forEach(tecnico => {
+    const data = technicianSummary[tecnico];
+    const total = data.total;
+    const prod = data.prod;
+    const imp = data.imp
