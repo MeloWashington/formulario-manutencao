@@ -3,829 +3,570 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analisador de Tempo - Técnicos</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <title>Dashboard de Ordens</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    :root {
-      --primary-color: #2c3e50;
-      --secondary-color: #3498db;
-      --success-color: #2ecc71;
-      --warning-color: #f39c12;
-      --danger-color: #e74c3c;
-      --light-gray: #f8f9fa;
-      --dark-gray: #343a40;
-      --border-color: #dee2e6;
+    body { 
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6); 
+      min-height: 100vh; 
+      font-family: 'Segoe UI', sans-serif; 
+      color: white; 
     }
     
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    .glass-card { 
+      background: rgba(255,255,255,0.15); 
+      backdrop-filter: blur(12px); 
+      border-radius: 20px; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
     }
     
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f5f7fa;
-      padding: 20px;
+    .header { text-align: center; padding: 3rem 1rem; }
+    
+    .faltam-principal { 
+      font-size: 6rem; 
+      font-weight: 900; 
+      text-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+      animation: pulse 2s infinite; 
     }
     
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
+    @keyframes pulse { 
+      0%, 100% { opacity: 1; } 
+      50% { opacity: 0.8; } 
     }
     
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    .btn-filtro { 
+      border-radius: 50px; 
+      padding: 10px 25px; 
+      font-weight: bold; 
+      margin: 0 8px; 
     }
     
-    h1 {
-      color: var(--primary-color);
-      margin-bottom: 10px;
+    .btn-filtro.active { 
+      background: white; 
+      color: #1e40af; 
     }
     
-    .subtitle {
-      color: #666;
-      font-size: 1.1rem;
+    .tipo-card { 
+      background: rgba(255,255,255,0.2); 
+      border-radius: 16px; 
+      padding: 1.5rem; 
+      margin-bottom: 1rem; 
+      cursor: pointer; 
+      transition: 0.3s; 
+      border-left: 6px solid; 
     }
     
-    .card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      margin-bottom: 20px;
+    .tipo-card:hover { 
+      transform: translateX(10px); 
+      background: rgba(255,255,255,0.3); 
     }
     
-    .filters {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
+    .faltam-tipo { 
+      background: #ef4444; 
+      color: white; 
+      padding: 8px 16px; 
+      border-radius: 50px; 
+      font-weight: 800; 
+      font-size: 1.1rem; 
     }
     
-    .filter-group {
-      display: flex;
-      flex-direction: column;
+    .upload-box { 
+      border: 3px dashed rgba(255,255,255,0.5); 
+      border-radius: 20px; 
+      padding: 80px 20px; 
+      text-align: center; 
+      cursor: pointer; 
+      transition: 0.4s; 
+      background: rgba(255,255,255,0.1); 
     }
     
-    label {
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: var(--primary-color);
+    .upload-box:hover { 
+      border-color: white; 
+      background: rgba(255,255,255,0.2); 
+      transform: scale(1.02); 
     }
     
-    select, input {
-      padding: 8px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    
-    select[multiple] {
-      height: 120px;
-      padding: 5px;
-    }
-    
-    select[multiple] option {
-      padding: 5px 8px;
-    }
-    
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      gap: 10px;
-    }
-    
-    .file-upload {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .btn {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .btn-primary {
-      background-color: var(--secondary-color);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background-color: #2980b9;
-    }
-    
-    .btn-success {
-      background-color: var(--success-color);
-      color: white;
-    }
-    
-    .btn-success:hover {
-      background-color: #27ae60;
-    }
-    
-    .btn-warning {
-      background-color: var(--warning-color);
-      color: white;
-    }
-    
-    .btn-warning:hover {
-      background-color: #e67e22;
-    }
-    
-    .btn-info {
-      background-color: #17a2b8;
-      color: white;
-    }
-    
-    .btn-info:hover {
-      background-color: #138496;
-    }
-    
-    .table-container {
-      overflow-x: auto;
-      margin-top: 20px;
-    }
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-    
-    th, td {
-      border: 1px solid var(--border-color);
-      padding: 10px 12px;
-      text-align: left;
-    }
-    
-    th {
-      background-color: var(--primary-color);
-      color: white;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-    }
-    
-    tr:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-    
-    tr:hover {
-      background-color: #e9ecef;
-    }
-    
-    .amarelo { background-color: #fff3cd; }
-    .vermelho { background-color: #f8d7da; }
-    .roxo { background-color: #d6c8ff; }
-    
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    
-    .summary-card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      padding: 15px;
-      text-align: center;
-    }
-    
-    .summary-value {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: var(--primary-color);
-      margin: 10px 0;
-    }
-    
-    .summary-label {
-      color: #666;
-      font-size: 0.9rem;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 20px;
-    }
-    
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: var(--secondary-color);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 15px;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .filter-actions {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-    
-    .filter-actions button {
-      padding: 5px 10px;
-      font-size: 0.8rem;
-    }
-    
-    .filter-info {
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: 5px;
-    }
-    
-    @media (max-width: 768px) {
-      .filters {
-        grid-template-columns: 1fr;
-      }
-      
-      .actions {
-        flex-direction: column;
-      }
-      
-      th, td {
-        padding: 8px 10px;
-      }
+    .upload-box.dragover {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Analisador de Tempo - Técnicos</h1>
-      <p class="subtitle">Analise e exporte dados de tempo de atendimento técnico</p>
-    </header>
-    
-    <div class="card">
-      <div class="actions">
-        <div class="file-upload">
-          <input type="file" id="inputExcel" accept=".xlsx, .xls" class="hidden" />
-          <button id="btnSelectFile" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg>
-            Selecionar Arquivo Excel
-          </button>
-          <span id="fileName">Nenhum arquivo selecionado</span>
-        </div>
-        
-        <div>
-          <button id="btnExport" class="btn btn-success" disabled>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg>
-            Exportar para Excel
-          </button>
-          <button id="btnResetFilters" class="btn btn-warning">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-              <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-            </svg>
-            Limpar Filtros
-          </button>
-        </div>
+<body class="p-4">
+
+  <!-- Upload Section -->
+  <div id="uploadSection" class="container max-w-4xl mx-auto mt-5">
+    <div class="glass-card p-5">
+      <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold mb-3"><i class="fas fa-chart-line me-3"></i>Dashboard de Ordens</h1>
+        <p class="fs-5 opacity-90">Carregue o arquivo Excel para visualizar as ordens do dia</p>
       </div>
       
-      <div class="filters">
-        <div class="filter-group">
-          <label for="filterTecnico">Técnico</label>
-          <select id="filterTecnico" multiple>
-            <option value="">Todos os técnicos</option>
-          </select>
-          <div class="filter-actions">
-            <button id="selectAllTecnicos" class="btn btn-info">Selecionar Todos</button>
-            <button id="clearTecnicos" class="btn btn-warning">Limpar</button>
-          </div>
-          <div class="filter-info">Segure Ctrl para selecionar múltiplos</div>
-        </div>
-        
-        <div class="filter-group">
-          <label for="filterTipo">Tipo de Solicitação</label>
-          <select id="filterTipo" multiple>
-            <option value="">Todos os tipos</option>
-          </select>
-          <div class="filter-actions">
-            <button id="selectAllTipos" class="btn btn-info">Selecionar Todos</button>
-            <button id="clearTipos" class="btn btn-warning">Limpar</button>
-          </div>
-          <div class="filter-info">Segure Ctrl para selecionar múltiplos</div>
-        </div>
-        
-        <div class="filter-group">
-          <label for="filterProblema">Problema</label>
-          <select id="filterProblema" multiple>
-            <option value="">Todos os problemas</option>
-          </select>
-          <div class="filter-actions">
-            <button id="selectAllProblemas" class="btn btn-info">Selecionar Todos</button>
-            <button id="clearProblemas" class="btn btn-warning">Limpar</button>
-          </div>
-          <div class="filter-info">Segure Ctrl para selecionar múltiplos</div>
-        </div>
-        
-        <div class="filter-group">
-          <label for="filterSupervisor">Supervisor</label>
-          <select id="filterSupervisor" multiple>
-            <option value="">Todos os supervisores</option>
-          </select>
-          <div class="filter-actions">
-            <button id="selectAllSupervisores" class="btn btn-info">Selecionar Todos</button>
-            <button id="clearSupervisores" class="btn btn-warning">Limpar</button>
-          </div>
-          <div class="filter-info">Segure Ctrl para selecionar múltiplos</div>
-        </div>
-        
-        <div class="filter-group">
-          <label for="filterRegiao">Região</label>
-          <select id="filterRegiao" multiple>
-            <option value="">Todas as regiões</option>
-          </select>
-          <div class="filter-actions">
-            <button id="selectAllRegioes" class="btn btn-info">Selecionar Todos</button>
-            <button id="clearRegioes" class="btn btn-warning">Limpar</button>
-          </div>
-          <div class="filter-info">Segure Ctrl para selecionar múltiplos</div>
-        </div>
-        
-        <div class="filter-group">
-          <label for="filterOperador">Operador</label>
-          <select id="filterOperador" multiple>
-            <option value="">Todos os operadores</option>
-          </select>
-          <div class="filter-actions">
-            <button id="selectAllOperadores" class="btn btn-info">Selecionar Todos</button>
-            <button id="clearOperadores" class="btn btn-warning">Limpar</button>
-          </div>
-          <div class="filter-info">Segure Ctrl para selecionar múltiplos</div>
-        </div>
-        
-        <div class="filter-group">
-          <label for="filterDuracao">Duração</label>
-          <select id="filterDuracao">
-            <option value="">Todas as durações</option>
-            <option value="0-1">Até 1 hora</option>
-            <option value="1-1.5">1 a 1.5 horas</option>
-            <option value="1.5-2">1.5 a 2 horas</option>
-            <option value="2+">Mais de 2 horas</option>
-          </select>
-        </div>
+      <div class="upload-box" id="dropArea">
+        <i class="fas fa-cloud-arrow-up fa-5x mb-4"></i>
+        <h3 class="fw-bold mb-3">Arraste o arquivo RA ATUALIZADO.xlsx aqui</h3>
+        <p class="opacity-75 mb-3">ou clique para selecionar</p>
+        <small class="opacity-60">Suporte para arquivos .xlsx</small>
+        <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
       </div>
-    </div>
-    
-    <div id="loading" class="loading hidden">
-      <div class="spinner"></div>
-      <p>Processando dados...</p>
-    </div>
-    
-    <div class="card">
-      <div class="table-container">
-        <table id="tabelaResultado">
-          <thead>
-            <tr>
-              <th>Técnico</th>
-              <th>Tipo de Solicitação</th>
-              <th>Problema</th>
-              <th>Supervisor</th>
-              <th>Região</th>
-              <th>Operador</th>
-              <th>Início</th>
-              <th>Fim</th>
-              <th>Duração (h:min)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colspan="9" style="text-align: center;">Nenhum dado carregado</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <div class="summary hidden" id="summary">
-      <div class="summary-card">
-        <div class="summary-label">Total de Registros</div>
-        <div class="summary-value" id="totalRegistros">0</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Tempo Médio</div>
-        <div class="summary-value" id="tempoMedio">0h 0min</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Tempo Total</div>
-        <div class="summary-value" id="tempoTotal">0h 0min</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Técnicos Ativos</div>
-        <div class="summary-value" id="tecnicosAtivos">0</div>
+      
+      <div class="alert alert-info mt-4 glass-card border-0">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Formato esperado:</strong> O arquivo deve conter colunas como "Data Agendamento", "Horário", "Tipo", "Status", etc.
       </div>
     </div>
   </div>
 
-  <script>
-    // Variáveis globais
-    let dadosOriginais = [];
-    let dadosFiltrados = [];
+  <!-- Dashboard -->
+  <div id="dashboard" class="container max-w-5xl mx-auto" style="display:none;">
+    <div class="header">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <button class="btn btn-outline-light" onclick="recarregarArquivo()">
+          <i class="fas fa-arrow-left me-2"></i>Voltar
+        </button>
+        <div class="text-center flex-grow-1">
+          <h1 class="display-4 fw-bold"><i class="fas fa-calendar-day me-3"></i>Ordens do Dia</h1>
+          <h2 id="dataHoje" class="fs-2 mb-3 opacity-90">Carregando...</h2>
+        </div>
+        <div style="width: 100px;"></div> <!-- Espaçador -->
+      </div>
+      
+      <div class="faltam-principal mb-2" id="geralFaltam">0</div>
+      <p class="fs-4 opacity-80">ordens pendentes</p>
+    </div>
+
+    <!-- Filtro por Horário -->
+    <div class="text-center mb-5">
+      <button class="btn btn-light btn-filtro active" data-filtro="todos">
+        <i class="fas fa-layer-group me-2"></i>Todos
+      </button>
+      <button class="btn btn-outline-light btn-filtro" data-filtro="manhã">
+        <i class="fas fa-sun me-2"></i>Manhã (08h–12h)
+      </button>
+      <button class="btn btn-outline-light btn-filtro" data-filtro="tarde">
+        <i class="fas fa-cloud-sun me-2"></i>Tarde (12h–18h)
+      </button>
+      <button class="btn btn-outline-light btn-filtro" data-filtro="noite">
+        <i class="fas fa-moon me-2"></i>Noite (18h–22h)
+      </button>
+    </div>
+
+    <!-- Métricas -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-4 col-12">
+        <div class="glass-card p-4 text-center">
+          <i class="fas fa-list-ol fa-2x mb-2 text-primary"></i>
+          <div class="fs-1 fw-bold" id="totalHoje">0</div>
+          <div>Total de Ordens</div>
+        </div>
+      </div>
+      <div class="col-md-4 col-12">
+        <div class="glass-card p-4 text-center">
+          <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+          <div class="fs-1 fw-bold" id="finalizadas">0</div>
+          <div>Finalizadas</div>
+        </div>
+      </div>
+      <div class="col-md-4 col-12">
+        <div class="glass-card p-4 text-center">
+          <i class="fas fa-clock fa-2x mb-2 text-warning"></i>
+          <div class="fs-1 fw-bold" id="pendentes">0</div>
+          <div>Pendentes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desempenho por Tipo -->
+    <div class="glass-card p-4">
+      <h3 class="mb-4 text-center"><i class="fas fa-tasks me-2"></i>Desempenho por Tipo</h3>
+      <div id="tabelaTipos"></div>
+    </div>
+
+    <div class="text-center mt-4 text-white-50 small">
+      <i class="fas fa-sync-alt me-2"></i>Atualizado agora • 
+      <span id="horaAtual"></span> • 
+      <span id="contagemOrdens">0 ordens processadas</span>
+    </div>
+  </div>
+
+  <!-- Modal Detalhes -->
+  <div class="modal fade" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content glass-card border-0">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" id="modalTitulo">Detalhes</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modalCorpo"></div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Configurações iniciais
+  const hoje = new Date();
+  document.getElementById('dataHoje').textContent = hoje.toLocaleDateString('pt-BR', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  }).replace(/^\w/, c => c.toUpperCase());
+  
+  const hojeISO = hoje.toISOString().split('T')[0];
+  document.getElementById('horaAtual').textContent = new Date().toLocaleTimeString('pt-BR', {
+    hour: '2-digit', 
+    minute: '2-digit'
+  });
+
+  // Variáveis globais
+  const fileInput = document.getElementById('fileInput');
+  const dropArea = document.getElementById('dropArea');
+  let ordensDoDia = [];
+
+  // Configuração do Upload
+  dropArea.addEventListener('click', () => {
+    console.log('Clicou na área de upload');
+    fileInput.click();
+  });
+
+  dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+  });
+
+  dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('dragover');
+  });
+
+  dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
     
-    // Elementos DOM
-    const inputExcel = document.getElementById('inputExcel');
-    const btnSelectFile = document.getElementById('btnSelectFile');
-    const btnExport = document.getElementById('btnExport');
-    const btnResetFilters = document.getElementById('btnResetFilters');
-    const fileName = document.getElementById('fileName');
-    const tabela = document.querySelector("#tabelaResultado tbody");
-    const loading = document.getElementById('loading');
-    const summary = document.getElementById('summary');
-    
-    // Filtros
-    const filterTecnico = document.getElementById('filterTecnico');
-    const filterTipo = document.getElementById('filterTipo');
-    const filterProblema = document.getElementById('filterProblema');
-    const filterSupervisor = document.getElementById('filterSupervisor');
-    const filterRegiao = document.getElementById('filterRegiao');
-    const filterOperador = document.getElementById('filterOperador');
-    const filterDuracao = document.getElementById('filterDuracao');
-    
-    // Botões de seleção múltipla
-    const selectAllTecnicos = document.getElementById('selectAllTecnicos');
-    const clearTecnicos = document.getElementById('clearTecnicos');
-    const selectAllTipos = document.getElementById('selectAllTipos');
-    const clearTipos = document.getElementById('clearTipos');
-    const selectAllProblemas = document.getElementById('selectAllProblemas');
-    const clearProblemas = document.getElementById('clearProblemas');
-    const selectAllSupervisores = document.getElementById('selectAllSupervisores');
-    const clearSupervisores = document.getElementById('clearSupervisores');
-    const selectAllRegioes = document.getElementById('selectAllRegioes');
-    const clearRegioes = document.getElementById('clearRegioes');
-    const selectAllOperadores = document.getElementById('selectAllOperadores');
-    const clearOperadores = document.getElementById('clearOperadores');
-    
-    // Event Listeners
-    btnSelectFile.addEventListener('click', () => inputExcel.click());
-    inputExcel.addEventListener('change', handleFileUpload);
-    btnExport.addEventListener('click', exportToExcel);
-    btnResetFilters.addEventListener('click', resetFilters);
-    
-    // Adicionar listeners para os filtros
-    filterTecnico.addEventListener('change', aplicarFiltros);
-    filterTipo.addEventListener('change', aplicarFiltros);
-    filterProblema.addEventListener('change', aplicarFiltros);
-    filterSupervisor.addEventListener('change', aplicarFiltros);
-    filterRegiao.addEventListener('change', aplicarFiltros);
-    filterOperador.addEventListener('change', aplicarFiltros);
-    filterDuracao.addEventListener('change', aplicarFiltros);
-    
-    // Botões de seleção múltipla
-    selectAllTecnicos.addEventListener('click', () => selectAllOptions(filterTecnico));
-    clearTecnicos.addEventListener('click', () => clearAllOptions(filterTecnico));
-    selectAllTipos.addEventListener('click', () => selectAllOptions(filterTipo));
-    clearTipos.addEventListener('click', () => clearAllOptions(filterTipo));
-    selectAllProblemas.addEventListener('click', () => selectAllOptions(filterProblema));
-    clearProblemas.addEventListener('click', () => clearAllOptions(filterProblema));
-    selectAllSupervisores.addEventListener('click', () => selectAllOptions(filterSupervisor));
-    clearSupervisores.addEventListener('click', () => clearAllOptions(filterSupervisor));
-    selectAllRegioes.addEventListener('click', () => selectAllOptions(filterRegiao));
-    clearRegioes.addEventListener('click', () => clearAllOptions(filterRegiao));
-    selectAllOperadores.addEventListener('click', () => selectAllOptions(filterOperador));
-    clearOperadores.addEventListener('click', () => clearAllOptions(filterOperador));
-    
-    // Função para selecionar todas as opções
-    function selectAllOptions(selectElement) {
-      for (let i = 0; i < selectElement.options.length; i++) {
-        selectElement.options[i].selected = true;
-      }
-      aplicarFiltros();
+    if (e.dataTransfer.files.length > 0) {
+      console.log('Arquivo solto:', e.dataTransfer.files[0].name);
+      processarArquivo(e.dataTransfer.files[0]);
     }
-    
-    // Função para limpar todas as opções
-    function clearAllOptions(selectElement) {
-      for (let i = 0; i < selectElement.options.length; i++) {
-        selectElement.options[i].selected = false;
-      }
-      aplicarFiltros();
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      console.log('Arquivo selecionado:', e.target.files[0].name);
+      processarArquivo(e.target.files[0]);
     }
+  });
+
+  // Função principal de processamento
+  function processarArquivo(file) {
+    console.log('Iniciando processamento do arquivo:', file.name);
     
-    // Função para resetar todos os filtros
-    function resetFilters() {
-      filterTecnico.selectedIndex = -1;
-      filterTipo.selectedIndex = -1;
-      filterProblema.selectedIndex = -1;
-      filterSupervisor.selectedIndex = -1;
-      filterRegiao.selectedIndex = -1;
-      filterOperador.selectedIndex = -1;
-      filterDuracao.selectedIndex = 0;
-      
-      aplicarFiltros();
+    // Verifica se é um arquivo Excel
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      alert('Por favor, selecione um arquivo Excel (.xlsx ou .xls)');
+      return;
     }
+
+    const reader = new FileReader();
     
-    // Função para processar o upload do arquivo
-    function handleFileUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      fileName.textContent = file.name;
-      loading.classList.remove('hidden');
-      
-      const reader = new FileReader();
-      
-      reader.onload = function (event) {
-        try {
-          const data = new Uint8Array(event.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    reader.onload = function(e) {
+      try {
+        console.log('Arquivo lido, processando dados...');
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        
+        console.log('Total de linhas no arquivo:', rows.length);
+        
+        // Limpa dados anteriores
+        ordensDoDia = [];
+        
+        if (rows.length < 2) {
+          alert('O arquivo está vazio ou não contém dados');
+          return;
+        }
+
+        const headers = rows[0].map(h => String(h || '').toLowerCase().trim());
+        console.log('Cabeçalhos encontrados:', headers);
+        
+        const linhas = rows.slice(1);
+        let ordensProcessadas = 0;
+
+        linhas.forEach((row, index) => {
+          if (row.length < 5) return;
           
-          processarDados(rows);
-        } catch (error) {
-          console.error('Erro ao processar o arquivo:', error);
-          alert('Erro ao processar o arquivo. Verifique se é um arquivo Excel válido.');
-        } finally {
-          loading.classList.add('hidden');
-        }
-      };
-      
-      reader.readAsArrayBuffer(file);
-    }
-    
-    // Função para processar os dados do Excel
-    function processarDados(rows) {
-      dadosOriginais = [];
-      
-      rows.forEach((row, i) => {
-        if (i === 0) return; // Pula o cabeçalho
-        
-        const tecnico = row[13]; // Coluna N
-        const tipo = row[8];     // Coluna I
-        const problema = row[11]; // Coluna L
-        const inicio = row[23];   // Coluna X
-        const fim = row[24];      // Coluna Y
-        const supervisor = row[25]; // Coluna Z
-        const regiao = row[26];   // Coluna AA
-        const operador = row[27]; // Coluna AB
-        
-        if (!inicio || !fim) return;
-        
-        const inicioDate = new Date(inicio);
-        const fimDate = new Date(fim);
-        const diffMs = fimDate - inicioDate;
-        
-        if (isNaN(diffMs) || diffMs < 0) return;
-        
-        const diffHrs = diffMs / (1000 * 60 * 60);
-        const horas = Math.floor(diffHrs);
-        const minutos = Math.round((diffHrs - horas) * 60);
-        const duracao = `${horas}h ${minutos}min`;
-        
-        let classe = "";
-        if (diffHrs > 2) classe = "roxo";
-        else if (diffHrs > 1.5) classe = "vermelho";
-        else if (diffHrs > 1) classe = "amarelo";
-        
-        dadosOriginais.push({
-          tecnico: tecnico || "",
-          tipo: tipo || "",
-          problema: problema || "",
-          supervisor: supervisor || "",
-          regiao: regiao || "",
-          operador: operador || "",
-          inicio: inicio,
-          fim: fim,
-          duracao: duracao,
-          diffHrs: diffHrs,
-          classe: classe
+          // Tenta encontrar a data de agendamento
+          const dataAgendamento = encontrarValor(row, headers, ['data', 'data agendamento', 'dt_agendamento', 'agendamento']);
+          const dataFormatada = formatarData(dataAgendamento);
+          
+          // Filtra apenas ordens de hoje
+          if (dataFormatada !== hojeISO) return;
+          
+          // Extrai outros dados
+          const horarioRaw = encontrarValor(row, headers, ['hora', 'horario', 'horário', 'hora agendamento']);
+          const tipoRaw = encontrarValor(row, headers, ['tipo', 'tipo solicitacao', 'tipo_solicitacao', 'servico']);
+          const status = encontrarValor(row, headers, ['status', 'situacao', 'situação', 'status_os']);
+          const os = encontrarValor(row, headers, ['os', 'num_os', 'numero os', 'ordem']) || "S/N";
+          const cliente = encontrarValor(row, headers, ['cliente', 'nome cliente', 'cliente_nome']) || "-";
+          const tecnico = encontrarValor(row, headers, ['tecnico', 'técnico', 'responsavel', 'responsável']) || "-";
+
+          const hora = extrairHora(horarioRaw);
+          const periodo = definirPeriodo(hora);
+          const tipo = categorizarTipo(tipoRaw);
+          const finalizada = /finalizada|encerrada|concluída|ok|fechada|concluida/i.test(status);
+
+          ordensDoDia.push({ 
+            tipo, 
+            finalizada, 
+            os, 
+            cliente, 
+            tecnico, 
+            horario: hora, 
+            periodo 
+          });
+          
+          ordensProcessadas++;
         });
-      });
-      
-      // Atualizar filtros
-      atualizarFiltros();
-      
-      // Aplicar filtros iniciais
-      aplicarFiltros();
-      
-      // Habilitar botão de exportação
-      btnExport.disabled = false;
-    }
-    
-    // Função para atualizar as opções dos filtros
-    function atualizarFiltros() {
-      // Obter valores únicos para cada filtro
-      const tecnicos = [...new Set(dadosOriginais.map(item => item.tecnico).filter(Boolean))].sort();
-      const tipos = [...new Set(dadosOriginais.map(item => item.tipo).filter(Boolean))].sort();
-      const problemas = [...new Set(dadosOriginais.map(item => item.problema).filter(Boolean))].sort();
-      const supervisores = [...new Set(dadosOriginais.map(item => item.supervisor).filter(Boolean))].sort();
-      const regioes = [...new Set(dadosOriginais.map(item => item.regiao).filter(Boolean))].sort();
-      const operadores = [...new Set(dadosOriginais.map(item => item.operador).filter(Boolean))].sort();
-      
-      // Atualizar filtro de técnicos
-      filterTecnico.innerHTML = '';
-      tecnicos.forEach(tecnico => {
-        filterTecnico.innerHTML += `<option value="${tecnico}">${tecnico}</option>`;
-      });
-      
-      // Atualizar filtro de tipos
-      filterTipo.innerHTML = '';
-      tipos.forEach(tipo => {
-        filterTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
-      });
-      
-      // Atualizar filtro de problemas
-      filterProblema.innerHTML = '';
-      problemas.forEach(problema => {
-        filterProblema.innerHTML += `<option value="${problema}">${problema}</option>`;
-      });
-      
-      // Atualizar filtro de supervisores
-      filterSupervisor.innerHTML = '';
-      supervisores.forEach(supervisor => {
-        filterSupervisor.innerHTML += `<option value="${supervisor}">${supervisor}</option>`;
-      });
-      
-      // Atualizar filtro de regiões
-      filterRegiao.innerHTML = '';
-      regioes.forEach(regiao => {
-        filterRegiao.innerHTML += `<option value="${regiao}">${regiao}</option>`;
-      });
-      
-      // Atualizar filtro de operadores
-      filterOperador.innerHTML = '';
-      operadores.forEach(operador => {
-        filterOperador.innerHTML += `<option value="${operador}">${operador}</option>`;
-      });
-    }
-    
-    // Função para aplicar os filtros
-    function aplicarFiltros() {
-      const tecnicosFiltro = Array.from(filterTecnico.selectedOptions).map(opt => opt.value);
-      const tiposFiltro = Array.from(filterTipo.selectedOptions).map(opt => opt.value);
-      const problemasFiltro = Array.from(filterProblema.selectedOptions).map(opt => opt.value);
-      const supervisoresFiltro = Array.from(filterSupervisor.selectedOptions).map(opt => opt.value);
-      const regioesFiltro = Array.from(filterRegiao.selectedOptions).map(opt => opt.value);
-      const operadoresFiltro = Array.from(filterOperador.selectedOptions).map(opt => opt.value);
-      const duracaoFiltro = filterDuracao.value;
-      
-      dadosFiltrados = dadosOriginais.filter(item => {
-        // Filtro por técnico (seleção múltipla)
-        if (tecnicosFiltro.length > 0 && !tecnicosFiltro.includes(item.tecnico)) return false;
+
+        console.log('Ordens processadas para hoje:', ordensProcessadas);
         
-        // Filtro por tipo (seleção múltipla)
-        if (tiposFiltro.length > 0 && !tiposFiltro.includes(item.tipo)) return false;
-        
-        // Filtro por problema (seleção múltipla)
-        if (problemasFiltro.length > 0 && !problemasFiltro.includes(item.problema)) return false;
-        
-        // Filtro por supervisor (seleção múltipla)
-        if (supervisoresFiltro.length > 0 && !supervisoresFiltro.includes(item.supervisor)) return false;
-        
-        // Filtro por região (seleção múltipla)
-        if (regioesFiltro.length > 0 && !regioesFiltro.includes(item.regiao)) return false;
-        
-        // Filtro por operador (seleção múltipla)
-        if (operadoresFiltro.length > 0 && !operadoresFiltro.includes(item.operador)) return false;
-        
-        // Filtro por duração
-        if (duracaoFiltro) {
-          switch(duracaoFiltro) {
-            case '0-1':
-              if (item.diffHrs > 1) return false;
-              break;
-            case '1-1.5':
-              if (item.diffHrs <= 1 || item.diffHrs > 1.5) return false;
-              break;
-            case '1.5-2':
-              if (item.diffHrs <= 1.5 || item.diffHrs > 2) return false;
-              break;
-            case '2+':
-              if (item.diffHrs <= 2) return false;
-              break;
-          }
+        if (ordensProcessadas === 0) {
+          alert('Nenhuma ordem encontrada para a data de hoje no arquivo selecionado.');
+          return;
         }
+
+        // Mostra o dashboard
+        mostrarDashboard('todos');
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('contagemOrdens').textContent = ordensProcessadas + ' ordens processadas';
         
-        return true;
+      } catch (error) {
+        console.error('Erro ao processar arquivo:', error);
+        alert('Erro ao processar o arquivo. Verifique se é um Excel válido.');
+      }
+    };
+    
+    reader.onerror = function() {
+      alert('Erro ao ler o arquivo.');
+    };
+    
+    reader.readAsArrayBuffer(file);
+  }
+
+  // Funções auxiliares
+  function encontrarValor(row, headers, possiveisNomes) {
+    for (let nome of possiveisNomes) {
+      const idx = headers.findIndex(h => h.includes(nome.toLowerCase()));
+      if (idx !== -1 && row[idx] !== undefined && row[idx] !== null && row[idx] !== "") {
+        return String(row[idx]).trim();
+      }
+    }
+    return "";
+  }
+
+  function formatarData(data) {
+    if (!data) return "";
+    
+    // Tenta converter de várias formas
+    if (data instanceof Date) {
+      return data.toISOString().split('T')[0];
+    }
+    
+    const dataStr = String(data);
+    
+    // Formato DD/MM/YYYY
+    const match1 = dataStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (match1) {
+      const [_, dia, mes, ano] = match1;
+      return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+    }
+    
+    // Formato YYYY-MM-DD
+    const match2 = dataStr.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (match2) {
+      const [_, ano, mes, dia] = match2;
+      return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+    }
+    
+    return "";
+  }
+
+  function extrairHora(horario) {
+    if (!horario) return null;
+    
+    const str = String(horario);
+    
+    // Tenta extrair hora de vários formatos
+    const match1 = str.match(/(\d{1,2})h/);
+    if (match1) return parseInt(match1[1]);
+    
+    const match2 = str.match(/(\d{1,2}):/);
+    if (match2) return parseInt(match2[1]);
+    
+    const match3 = str.match(/(\d{1,2})/);
+    if (match3) return parseInt(match3[1]);
+    
+    return null;
+  }
+
+  function definirPeriodo(hora) {
+    if (!hora) return "sem horário";
+    if (hora >= 8 && hora < 12) return "manhã";
+    if (hora >= 12 && hora < 18) return "tarde";
+    if (hora >= 18) return "noite";
+    return "outros";
+  }
+
+  function categorizarTipo(tipo) {
+    if (!tipo) return "OUTROS";
+    
+    const t = tipo.toUpperCase();
+    if (t.includes('ATIVA') || t.includes('INSTAL') || t.includes('PLANO')) return "ATIVAÇÃO";
+    if (t.includes('VISITA') || t.includes('SUPORTE') || t.includes('MESH') || t.includes('TÉCNIC')) return "VISITA TÉCNICA";
+    if (t.includes('MUDANÇA') || t.includes('ENDEREÇO') || t.includes('MUDANCA')) return "MUDANÇA DE ENDEREÇO";
+    if (t.includes('RECOLHIMENTO') || t.includes('CANCELAMENTO') || t.includes('RETIRADA')) return "RECOLHIMENTO";
+    return "OUTROS";
+  }
+
+  function filtrarPorPeriodo(periodo) {
+    if (periodo === 'todos') return ordensDoDia;
+    return ordensDoDia.filter(o => o.periodo === periodo);
+  }
+
+  function mostrarDashboard(filtro) {
+    const dados = filtrarPorPeriodo(filtro);
+    const total = dados.length;
+    const finalizadas = dados.filter(o => o.finalizada).length;
+    const faltam = total - finalizadas;
+
+    // Atualiza métricas principais
+    document.getElementById('geralFaltam').textContent = faltam;
+    document.getElementById('geralFaltam').style.color = faltam === 0 ? '#10b981' : '#ef4444';
+    document.getElementById('totalHoje').textContent = total;
+    document.getElementById('finalizadas').textContent = finalizadas;
+    document.getElementById('pendentes').textContent = faltam;
+
+    // Agrupa por tipo
+    const porTipo = {};
+    dados.forEach(o => {
+      if (!porTipo[o.tipo]) porTipo[o.tipo] = { total: 0, finalizadas: 0 };
+      porTipo[o.tipo].total++;
+      if (o.finalizada) porTipo[o.tipo].finalizadas++;
+    });
+
+    // Cores para cada tipo
+    const cores = { 
+      "ATIVAÇÃO": "#3b82f6", 
+      "VISITA TÉCNICA": "#10b981", 
+      "MUDANÇA DE ENDEREÇO": "#f59e0b", 
+      "RECOLHIMENTO": "#8b5cf6", 
+      "OUTROS": "#6b7280" 
+    };
+
+    // Atualiza a tabela de tipos
+    const container = document.getElementById('tabelaTipos');
+    container.innerHTML = Object.keys(porTipo).map(tipo => {
+      const d = porTipo[tipo];
+      const faltamTipo = d.total - d.finalizadas;
+      const taxa = Math.round((d.finalizadas / d.total) * 100);
+
+      return `
+        <div class="tipo-card" style="border-left-color: ${cores[tipo] || '#6b7280'};" 
+             onclick="abrirDetalhes('${tipo}', ${d.total}, ${d.finalizadas}, '${filtro}')">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 fw-bold">${tipo}</h4>
+            ${faltamTipo > 0 
+              ? `<span class="faltam-tipo">Faltam ${faltamTipo}</span>`
+              : `<span class="badge bg-success fs-6">100% FINALIZADO</span>`
+            }
+          </div>
+          <div class="row text-center">
+            <div class="col-4"><h3>${d.finalizadas}</h3><small>Finalizadas</small></div>
+            <div class="col-4"><h3>${d.total}</h3><small>Total</small></div>
+            <div class="col-4"><h3>${taxa}%</h3><small>Taxa</small></div>
+          </div>
+          <div class="progress mt-3" style="height:12px;">
+            <div class="progress-bar" style="width:${taxa}%; background:${taxa >= 90 ? '#10b981' : taxa >= 60 ? '#f59e0b' : '#ef4444'};"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function abrirDetalhes(tipo, total, finalizadas, filtro) {
+    let lista = ordensDoDia.filter(o => o.tipo === tipo);
+    if (filtro !== 'todos') {
+      lista = lista.filter(o => o.periodo === filtro);
+    }
+    
+    const html = lista.map(o => `
+      <tr>
+        <td><strong>${o.os}</strong></td>
+        <td>${o.cliente}</td>
+        <td>${o.tecnico}</td>
+        <td>${o.horario ? o.horario + 'h' : '-'}</td>
+        <td><span class="badge ${o.finalizada ? 'bg-success' : 'bg-danger'}">${o.finalizada ? 'FINALIZADA' : 'PENDENTE'}</span></td>
+      </tr>
+    `).join('');
+
+    const tituloPeriodo = filtro === 'todos' ? 'Todos' : filtro.charAt(0).toUpperCase() + filtro.slice(1);
+    document.getElementById('modalTitulo').textContent = `${tipo} • ${finalizadas}/${total} (${tituloPeriodo})`;
+    document.getElementById('modalCorpo').innerHTML = `
+      <div class="table-responsive">
+        <table class="table table-dark table-hover">
+          <thead>
+            <tr>
+              <th>OS</th>
+              <th>Cliente</th>
+              <th>Técnico</th>
+              <th>Horário</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>${html}</tbody>
+        </table>
+      </div>
+    `;
+    
+    new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
+  }
+
+  function recarregarArquivo() {
+    // Limpa tudo
+    ordensDoDia = [];
+    fileInput.value = '';
+    
+    // Reseta filtros
+    document.querySelectorAll('.btn-filtro').forEach(b => {
+      b.classList.remove('active', 'btn-light');
+      b.classList.add('btn-outline-light');
+    });
+    document.querySelector('[data-filtro="todos"]').classList.add('active', 'btn-light');
+    
+    // Mostra upload novamente
+    document.getElementById('uploadSection').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+
+  // Configura filtros
+  document.querySelectorAll('.btn-filtro').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.btn-filtro').forEach(b => {
+        b.classList.remove('active', 'btn-light');
+        b.classList.add('btn-outline-light');
       });
-      
-      atualizarTabela();
-      atualizarResumo();
-    }
-    
-    // Função para atualizar a tabela com os dados filtrados
-    function atualizarTabela() {
-      tabela.innerHTML = "";
-      
-      if (dadosFiltrados.length === 0) {
-        tabela.innerHTML = `
-          <tr>
-            <td colspan="9" style="text-align: center;">Nenhum dado encontrado com os filtros aplicados</td>
-          </tr>
-        `;
-        return;
-      }
-      
-      dadosFiltrados.forEach(item => {
-        const linha = `
-          <tr class="${item.classe}">
-            <td>${item.tecnico}</td>
-            <td>${item.tipo}</td>
-            <td>${item.problema}</td>
-            <td>${item.supervisor}</td>
-            <td>${item.regiao}</td>
-            <td>${item.operador}</td>
-            <td>${item.inicio}</td>
-            <td>${item.fim}</td>
-            <td>${item.duracao}</td>
-          </tr>`;
-        tabela.insertAdjacentHTML("beforeend", linha);
-      });
-    }
-    
-    // Função para atualizar o resumo
-    function atualizarResumo() {
-      if (dadosFiltrados.length === 0) {
-        summary.classList.add('hidden');
-        return;
-      }
-      
-      summary.classList.remove('hidden');
-      
-      // Total de registros
-      document.getElementById('totalRegistros').textContent = dadosFiltrados.length;
-      
-      // Tempo médio
-      const tempoTotalHoras = dadosFiltrados.reduce((acc, item) => acc + item.diffHrs, 0);
-      const tempoMedioHoras = tempoTotalHoras / dadosFiltrados.length;
-      const horasMedias = Math.floor(tempoMedioHoras);
-      const minutosMedios = Math.round((tempoMedioHoras - horasMedias) * 60);
-      document.getElementById('tempoMedio').textContent = `${horasMedias}h ${minutosMedios}min`;
-      
-      // Tempo total
-      const horasTotais = Math.floor(tempoTotalHoras);
-      const minutosTotais = Math.round((tempoTotalHoras - horasTotais) * 60);
-      document.getElementById('tempoTotal').textContent = `${horasTotais}h ${minutosTotais}min`;
-      
-      // Técnicos ativos
-      const tecnicosAtivos = [...new Set(dadosFiltrados.map(item => item.tecnico).filter(Boolean))].length;
-      document.getElementById('tecnicosAtivos').textContent = tecnicosAtivos;
-    }
-    
-    // Função para exportar para Excel
-    function exportToExcel() {
-      if (dadosFiltrados.length === 0) {
-        alert('Não há dados para exportar.');
-        return;
-      }
-      
-      // Preparar dados para exportação
-      const dadosExportacao = dadosFiltrados.map(item => ({
-        'Técnico': item.tecnico,
-        'Tipo de Solicitação': item.tipo,
-        'Problema': item.problema,
-        'Supervisor': item.supervisor,
-        'Região': item.regiao,
-        'Operador': item.operador,
-        'Início': item.inicio,
-        'Fim': item.fim,
-        'Duração (h:min)': item.duracao
-      }));
-      
-      // Criar planilha
-      const ws = XLSX.utils.json_to_sheet(dadosExportacao);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Dados Filtrados");
-      
-      // Exportar arquivo
-      const nomeArquivo = `Analise_Tecnicos_${new Date().toISOString().slice(0, 10)}.xlsx`;
-      XLSX.writeFile(wb, nomeArquivo);
-    }
-  </script>
+      this.classList.add('active', 'btn-light');
+      this.classList.remove('btn-outline-light');
+      mostrarDashboard(this.dataset.filtro);
+    });
+  });
+
+  console.log('Sistema inicializado. Aguardando upload de arquivo...');
+</script>
 </body>
 </html>
