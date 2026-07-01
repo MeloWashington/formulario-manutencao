@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Backlog - SIP</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.4;
+  min-height: 100vh;
+}
+
+/* === HEADER === */
+.header {
+  background: linear-gradient(135deg, #1a3c5e 0%, #2d5f8a 100%);
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.header-left { display: flex; flex-direction: column; }
+.header-title { font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+.header-subtitle { font-size: 11px; opacity: 0.8; margin-top: 3px; }
+.header-right { text-align: right; }
+.header-datetime {
+  font-size: 16px; font-weight: 700;
+  background: rgba(255,255,255,0.15);
+  padding: 6px 14px; border-radius: 20px;
+  display: inline-block;
+}
+
+/* === TOOLBAR === */
+.toolbar {
+  background: #fff;
+  padding: 10px 24px;
+  display: flex; gap: 10px;
+  border-bottom: 1px solid #e0e6ed;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.btn {
+  padding: 8px 18px; border: none; border-radius: 6px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+.btn:active { transform: translateY(0); }
+.btn-save { background: #1e8449; color: #fff; }
+.btn-save:hover { background: #1a7a42; }
+.btn-export { background: #2874a6; color: #fff; }
+.btn-export:hover { background: #21618c; }
+.btn-clear { background: #c0392b; color: #fff; }
+.btn-clear:hover { background: #a93226; }
+
+/* === TABLE === */
+.table-container { padding: 16px 24px; overflow-x: auto; }
+
+table {
+  width: 100%; border-collapse: collapse;
+  background: #fff; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+
+thead th {
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  color: #fff; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 8px 6px; text-align: center;
+  white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.1);
+  vertical-align: middle;
+}
+thead th:last-child { border-right: none; }
+thead th.th-sistema { width: 100px; }
+thead th.th-atividade { width: 130px; }
+thead th.th-enc-mes { background: linear-gradient(180deg, #c0392b 0%, #e74c3c 100%); width: 75px; }
+thead th.th-d1 { background: linear-gradient(180deg, #d35400 0%, #e67e22 100%); width: 75px; }
+thead th.th-abertos { background: linear-gradient(180deg, #27ae60 0%, #2ecc71 100%); }
+thead th.th-total { width: 95px; }
+thead th.th-status { width: 80px; }
+thead th.th-evolucao { width: 90px; }
+thead th.th-dia-ant { width: 95px; }
+thead th.th-percent { width: 65px; }
+
+td {
+  padding: 0; text-align: center; font-size: 12.5px;
+  border-right: 1px solid #e8ecf0; border-bottom: 1px solid #e8ecf0;
+  vertical-align: middle; height: 34px;
+}
+td:last-child { border-right: none; }
+
+td.sistema-cell {
+  font-weight: 800; font-size: 12px;
+  letter-spacing: 0.3px; text-align: center; vertical-align: middle;
+}
+td.sistema-voalle { background-color: #fff4e6; color: #a86424; }
+td.sistema-hubsoft { background-color: #e6f0fa; color: #1a5276; }
+
+td.atividade-cell {
+  font-weight: 600; text-align: left; padding-left: 12px;
+  color: #2c3e50; white-space: nowrap;
+}
+
+td input {
+  width: 100%; height: 100%; border: none; outline: none;
+  text-align: center; font-size: 12.5px; font-family: inherit;
+  background: transparent; color: #333; padding: 0;
+  -moz-appearance: textfield;
+}
+td input::-webkit-outer-spin-button,
+td input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+td input:focus {
+  background: rgba(41,128,185,0.06);
+  box-shadow: inset 0 0 0 2px #3498db;
+}
+td input:hover:not(:focus) { background: rgba(41,128,185,0.03); }
+td input.input-info { color: #888; font-style: italic; }
+
+/* === STATUS === */
+td.status-maior {
+  background-color: #fce4e4 !important; color: #c0392b !important;
+  font-weight: 800; text-transform: uppercase; font-size: 11px;
+}
+td.status-menor {
+  background-color: #d5f0e0 !important; color: #1e8449 !important;
+  font-weight: 800; text-transform: uppercase; font-size: 11px;
+}
+td.status-igual {
+  background-color: #d6e8f5 !important; color: #2471a3 !important;
+  font-weight: 800; text-transform: uppercase; font-size: 11px;
+}
+
+td.auto-field { font-weight: 700; color: #2c3e50; }
+td.total-abertos { font-weight: 800; color: #2c3e50; }
+td.evolucao-cell { font-weight: 700; }
+td.evolucao-positive { color: #27ae60; }
+td.evolucao-negative { color: #c0392b; }
+td.evolucao-zero { color: #2980b9; }
+td.percent-cell { font-weight: 700; color: #2c3e50; font-size: 12px; }
+
+/* === TOTAL ROW === */
+tr.total-row td {
+  font-weight: 800; border-top: 2px solid #2c3e50;
+  background: #e8edf2; color: #1a3c5e;
+}
+tr.grand-total-row td {
+  font-weight: 900; border-top: 3px solid #1a3c5e;
+  background: #1a3c5e; color: #fff; font-size: 12.5px;
+}
+
+/* === FOOTER === */
+.footer-note {
+  text-align: center; padding: 12px;
+  font-size: 11px; color: #666; font-style: italic; line-height: 1.6;
+}
+
+/* === CHART === */
+.chart-section { padding: 0 24px 24px; }
+.chart-card {
+  background: #fff; border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  padding: 20px; margin-top: 16px;
+}
+.chart-title {
+  font-size: 14px; font-weight: 700; color: #1a3c5e;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 16px; text-align: center;
+}
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 768px) {
+  .header { flex-direction: column; text-align: center; gap: 8px; padding: 10px 16px; }
+  .header-right { text-align: center; }
+  .toolbar { padding: 8px 16px; flex-wrap: wrap; }
+  .table-container { padding: 8px 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-title">Painel de Backlog - SIP</div>
+    <div class="header-subtitle">ENC MÊS e D-1 não entram nos totais | VT: QUALIDADE e OFFLINE</div>
+  </div>
+  <div class="header-right">
+    <div class="header-datetime" id="headerDateTime"></div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button class="btn btn-save" id="btnSave" title="Salvar dados">💾 Salvar Dados</button>
+  <button class="btn btn-export" id="btnExport" title="Exportar Excel">📊 Exportar Excel</button>
+  <button class="btn btn-clear" id="btnClear" title="Limpar tudo">🗑️ Limpar Tudo</button>
+</div>
+
+<!-- TABLE -->
+<div class="table-container">
+  <table id="backlogTable">
+    <thead>
+      <!-- Linha 1: Cabeçalhos principais -->
+      <tr>
+        <th class="th-sistema" rowspan="2">Sistema</th>
+        <th class="th-atividade" rowspan="2">Atividade</th>
+        <th class="th-enc-mes" rowspan="2" id="thEncMes">Enc Mês</th>
+        <th class="th-d1" rowspan="2" id="thD1">D-1</th>
+        <th class="th-abertos" colspan="4">Abertos (entram nos totais)</th>
+        <th class="th-total" rowspan="2">Total Abertos</th>
+        <th class="th-status" rowspan="2">Status</th>
+        <th class="th-evolucao" rowspan="2">Evolução</th>
+        <th class="th-dia-ant" rowspan="2" id="thDiaAnt">Dia Anterior</th>
+        <th class="th-percent" rowspan="2">%</th>
+      </tr>
+      <!-- Linha 2: Sub-colunas do grupo Abertos -->
+      <tr>
+        <th id="thD0">D0</th>
+        <th id="thDp1">D+1</th>
+        <th id="thDp2">D+2</th>
+        <th id="thDg3">D≥3</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-note">
+  ENC MÊS e D-1 não entram no TOTAL ABERTOS — são informativos.<br>
+  TOTAL ABERTOS = D0 + D+1 + D+2 + D≥3 | Clique para editar.
+</div>
+
+<!-- CHART SECTION -->
+<div class="chart-section">
+  <div class="chart-card">
+    <div class="chart-title">📈 Histórico dos Últimos 7 Dias — VT Qualidade e VT Offline</div>
+    <div class="chart-grid">
+      <div><canvas id="chartVoalle"></canvas></div>
+      <div><canvas id="chartHubsoft"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO
+// ============================================================
+const DATA_CONFIG = {
+  sistemas: [
+    {
+      nome: 'VOALLE',
+      atividades: [
+        { id: 'voalle_instalacao', nome: 'Instalação', tipo: 'NORMAL' },
+        { id: 'voalle_me', nome: 'ME', tipo: 'NORMAL' },
+        { id: 'voalle_vt_qualidade', nome: 'VT Qualidade', tipo: 'VT' },
+        { id: 'voalle_vt_offline', nome: 'VT Offline', tipo: 'VT' }
+      ]
+    },
+    {
+      nome: 'HUBSOFT',
+      atividades: [
+        { id: 'hubsoft_instalacao', nome: 'Instalação', tipo: 'NORMAL' },
+        { id: 'hubsoft_me', nome: 'ME', tipo: 'NORMAL' },
+        { id: 'hubsoft_vt_qualidade', nome: 'VT Qualidade', tipo: 'VT' },
+        { id: 'hubsoft_vt_offline', nome: 'VT Offline', tipo: 'VT' }
+      ]
+    }
+  ]
+};
+
+// ============================================================
+// ESTADO
+// ============================================================
+let appData = {};
+let dailyHistory = {};
+
+function getToday() {
+  const n = new Date();
+  return n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0');
+}
+
+function initAppData() {
+  appData = {};
+  DATA_CONFIG.sistemas.forEach(s => {
+    s.atividades.forEach(a => {
+      appData[a.id] = { encMes:'', d1:'', d0:'', dp1:'', dp2:'', dg3:'', diaAnterior:'' };
+    });
+  });
+}
+
+// ============================================================
+// DATAS
+// ============================================================
+function updateDates() {
+  const n = new Date();
+  const day = String(n.getDate()).padStart(2,'0');
+  const month = String(n.getMonth()+1).padStart(2,'0');
+  const year = n.getFullYear();
+  const h = String(n.getHours()).padStart(2,'0');
+  const m = String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('headerDateTime').textContent = day+'/'+month+'/'+year+' '+h+':'+m;
+
+  const dp1 = String(n.getDate()+1).padStart(2,'0');
+  const dp2 = String(n.getDate()+2).padStart(2,'0');
+
+  document.getElementById('thD0').textContent = 'D0 ('+day+'/'+month+')';
+  document.getElementById('thDp1').textContent = 'D+1 ('+dp1+'/'+month+')';
+  document.getElementById('thDp2').textContent = 'D+2 ('+dp2+'/'+month+')';
+  document.getElementById('thDg3').textContent = 'D≥3 (+3)';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  DATA_CONFIG.sistemas.forEach(sistema => {
+    const cls = sistema.nome.toLowerCase();
+    const numAtiv = sistema.atividades.length;
+
+    sistema.atividades.forEach((atividade, idx) => {
+      const tr = document.createElement('tr');
+      tr.dataset.id = atividade.id;
+
+      // SISTEMA (rowspan = atividades + 1 para linha TOTAL)
+      if (idx === 0) {
+        const td = document.createElement('td');
+        td.rowSpan = numAtiv + 1;
+        td.className = 'sistema-cell sistema-' + cls;
+        td.textContent = sistema.nome;
+        tr.appendChild(td);
+      }
+
+      // ATIVIDADE
+      const tdAtt = document.createElement('td');
+      tdAtt.className = 'atividade-cell';
+      tdAtt.textContent = atividade.nome;
+      tr.appendChild(tdAtt);
+
+      const isVT = atividade.nome.includes('VT');
+      const data = appData[atividade.id] || {};
+
+      // ENC MÊS: mesclado entre VT Qualidade e VT Offline
+      if (isVT && idx === 3) {
+        // VT Offline: não renderiza Enc Mês (será rowspan da VT Qualidade)
+      } else {
+        const td = document.createElement('td');
+        if (isVT && idx === 2) td.rowSpan = 2; // VT Qualidade mescla com VT Offline
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.inputMode = 'numeric';
+        inp.placeholder = '0';
+        inp.dataset.atividade = atividade.id;
+        inp.dataset.field = 'encMes';
+        inp.value = (data.encMes !== undefined && data.encMes !== '') ? data.encMes : '';
+        inp.classList.add('input-info');
+        inp.addEventListener('input', handleVTSharedInput);
+        inp.addEventListener('focus', handleFocus);
+        inp.addEventListener('keydown', handleKeydown);
+        td.appendChild(inp);
+        tr.appendChild(td);
+      }
+
+      // D-1: mesclado entre VT Qualidade e VT Offline
+      if (isVT && idx === 3) {
+        // VT Offline: não renderiza D-1 (será rowspan da VT Qualidade)
+      } else {
+        const td = document.createElement('td');
+        if (isVT && idx === 2) td.rowSpan = 2; // VT Qualidade mescla com VT Offline
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.inputMode = 'numeric';
+        inp.placeholder = '0';
+        inp.dataset.atividade = atividade.id;
+        inp.dataset.field = 'd1';
+        inp.value = (data.d1 !== undefined && data.d1 !== '') ? data.d1 : '';
+        inp.classList.add('input-info');
+        inp.addEventListener('input', handleVTSharedInput);
+        inp.addEventListener('focus', handleFocus);
+        inp.addEventListener('keydown', handleKeydown);
+        td.appendChild(inp);
+        tr.appendChild(td);
+      }
+
+      // D0 (independente)
+      const tdD0 = document.createElement('td');
+      const inpD0 = document.createElement('input');
+      inpD0.type = 'text'; inpD0.inputMode = 'numeric'; inpD0.placeholder = '0';
+      inpD0.dataset.atividade = atividade.id; inpD0.dataset.field = 'd0';
+      inpD0.value = (data.d0||'');
+      inpD0.addEventListener('input', handleInput);
+      inpD0.addEventListener('focus', handleFocus);
+      inpD0.addEventListener('keydown', handleKeydown);
+      tdD0.appendChild(inpD0); tr.appendChild(tdD0);
+
+      // D+1 (independente)
+      const tdDp1 = document.createElement('td');
+      const inpDp1 = document.createElement('input');
+      inpDp1.type = 'text'; inpDp1.inputMode = 'numeric'; inpDp1.placeholder = '0';
+      inpDp1.dataset.atividade = atividade.id; inpDp1.dataset.field = 'dp1';
+      inpDp1.value = (data.dp1||'');
+      inpDp1.addEventListener('input', handleInput);
+      inpDp1.addEventListener('focus', handleFocus);
+      inpDp1.addEventListener('keydown', handleKeydown);
+      tdDp1.appendChild(inpDp1); tr.appendChild(tdDp1);
+
+      // D+2 (independente)
+      const tdDp2 = document.createElement('td');
+      const inpDp2 = document.createElement('input');
+      inpDp2.type = 'text'; inpDp2.inputMode = 'numeric'; inpDp2.placeholder = '0';
+      inpDp2.dataset.atividade = atividade.id; inpDp2.dataset.field = 'dp2';
+      inpDp2.value = (data.dp2||'');
+      inpDp2.addEventListener('input', handleInput);
+      inpDp2.addEventListener('focus', handleFocus);
+      inpDp2.addEventListener('keydown', handleKeydown);
+      tdDp2.appendChild(inpDp2); tr.appendChild(tdDp2);
+
+      // D>=3 (independente)
+      const tdDg3 = document.createElement('td');
+      const inpDg3 = document.createElement('input');
+      inpDg3.type = 'text'; inpDg3.inputMode = 'numeric'; inpDg3.placeholder = '0';
+      inpDg3.dataset.atividade = atividade.id; inpDg3.dataset.field = 'dg3';
+      inpDg3.value = (data.dg3||'');
+      inpDg3.addEventListener('input', handleInput);
+      inpDg3.addEventListener('focus', handleFocus);
+      inpDg3.addEventListener('keydown', handleKeydown);
+      tdDg3.appendChild(inpDg3); tr.appendChild(tdDg3);
+
+      // TOTAL ABERTOS (automático)
+      const tdTA = document.createElement('td');
+      tdTA.className = 'auto-field total-abertos';
+      tdTA.dataset.id = atividade.id;
+      tdTA.dataset.field = 'totalAbertos';
+      tdTA.textContent = '0';
+      tr.appendChild(tdTA);
+
+      // STATUS (automático)
+      const tdSt = document.createElement('td');
+      tdSt.className = 'auto-field';
+      tdSt.dataset.id = atividade.id;
+      tdSt.dataset.field = 'status';
+      tdSt.textContent = 'IGUAL';
+      tr.appendChild(tdSt);
+
+      // EVOLUÇÃO (automático)
+      const tdEv = document.createElement('td');
+      tdEv.className = 'auto-field evolucao-cell';
+      tdEv.dataset.id = atividade.id;
+      tdEv.dataset.field = 'evolucao';
+      tdEv.textContent = '0';
+      tr.appendChild(tdEv);
+
+      // DIA ANTERIOR (editável - independente)
+      const tdDA = document.createElement('td');
+      const inpDA = document.createElement('input');
+      inpDA.type = 'text'; inpDA.inputMode = 'numeric'; inpDA.placeholder = '0';
+      inpDA.dataset.atividade = atividade.id;
+      inpDA.dataset.field = 'diaAnterior';
+      inpDA.value = (data.diaAnterior||'');
+      inpDA.addEventListener('input', handleInput);
+      inpDA.addEventListener('focus', handleFocus);
+      inpDA.addEventListener('keydown', handleKeydown);
+      tdDA.appendChild(inpDA);
+      tr.appendChild(tdDA);
+
+      // PERCENTUAL (automático)
+      const tdPct = document.createElement('td');
+      tdPct.className = 'auto-field percent-cell';
+      tdPct.dataset.id = atividade.id;
+      tdPct.dataset.field = 'percent';
+      tdPct.textContent = '0%';
+      tr.appendChild(tdPct);
+
+      tbody.appendChild(tr);
+    });
+
+    // LINHA TOTAL DO SISTEMA
+    const trTotal = document.createElement('tr');
+    trTotal.className = 'total-row';
+    trTotal.dataset.sistema = sistema.nome;
+
+    const tdLabel = document.createElement('td');
+    tdLabel.className = 'atividade-cell';
+    tdLabel.style.fontWeight = '800';
+    tdLabel.textContent = 'TOTAL';
+    trTotal.appendChild(tdLabel);
+
+    const totalFields = [
+      'total_encMes','total_d1','total_d0','total_dp1','total_dp2','total_dg3',
+      'total_totalAbertos','total_status','total_evolucao','total_diaAnterior','total_percent'
+    ];
+    totalFields.forEach(f => {
+      const td = document.createElement('td');
+      td.className = 'auto-field';
+      td.dataset.field = f;
+      td.textContent = '0';
+      if (f === 'total_status') td.textContent = '-';
+      if (f === 'total_percent') td.textContent = '0.0%';
+      trTotal.appendChild(td);
+    });
+    tbody.appendChild(trTotal);
+  });
+
+  // TOTAL GERAL
+  const trGrand = document.createElement('tr');
+  trGrand.className = 'grand-total-row';
+  trGrand.id = 'grandTotalRow';
+
+  const tdGL = document.createElement('td');
+  tdGL.className = 'sistema-cell';
+  tdGL.colSpan = 2;
+  tdGL.textContent = 'TOTAL GERAL';
+  trGrand.appendChild(tdGL);
+
+  const grandFields = [
+    'grand_encMes','grand_d1','grand_d0','grand_dp1','grand_dp2','grand_dg3',
+    'grand_totalAbertos','grand_status','grand_evolucao','grand_diaAnterior','grand_percent'
+  ];
+  grandFields.forEach(f => {
+    const td = document.createElement('td');
+    td.className = 'auto-field';
+    td.dataset.field = f;
+    td.textContent = '0';
+    if (f === 'grand_status') td.textContent = '-';
+    if (f === 'grand_percent') td.textContent = '100%';
+    trGrand.appendChild(td);
+  });
+  tbody.appendChild(trGrand);
+
+  recalculateAll();
+}
+
+// ============================================================
+// INPUT HANDLERS
+// ============================================================
+function handleInput(e) {
+  const inp = e.target;
+  if (inp.value !== '' && !/^\d+$/.test(inp.value)) {
+    inp.value = inp.value.replace(/\D/g, '');
+  }
+  const id = inp.dataset.atividade;
+  const field = inp.dataset.field;
+  if (appData[id]) appData[id][field] = inp.value;
+
+  saveHistory();
+  recalculateAll();
+}
+
+// Campo compartilhado: Enc Mês e D-1 entre VT Qualidade e VT Offline
+function handleVTSharedInput(e) {
+  const inp = e.target;
+  if (inp.value !== '' && !/^\d+$/.test(inp.value)) {
+    inp.value = inp.value.replace(/\D/g, '');
+  }
+  const id = inp.dataset.atividade;
+  const field = inp.dataset.field;
+  const val = inp.value;
+
+  // Determinar o sistema
+  const isVoalle = id.startsWith('voalle');
+  const systemName = isVoalle ? 'VOALLE' : 'HUBSOFT';
+  const qualId = systemName.toLowerCase() + '_vt_qualidade';
+  const offId = systemName.toLowerCase() + '_vt_offline';
+
+  // Sincronizar ambos
+  appData[qualId] = appData[qualId] || {encMes:'',d1:'',d0:'',dp1:'',dp2:'',dg3:'',diaAnterior:''};
+  appData[offId] = appData[offId] || {encMes:'',d1:'',d0:'',dp1:'',dp2:'',dg3:'',diaAnterior:''};
+  appData[qualId][field] = val;
+  appData[offId][field] = val;
+
+  // Atualizar visualmente apenas o input de VT do mesmo sistema
+  const otherId = id === qualId ? offId : qualId;
+  const allInputs = document.querySelectorAll('td input');
+  allInputs.forEach(other => {
+    if (other.dataset.field === field && other.dataset.atividade === otherId) {
+      other.value = val;
+    }
+  });
+
+  saveHistory();
+  recalculateAll();
+}
+
+function handleFocus(e) { e.target.select(); }
+
+function handleKeydown(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const allInputs = Array.from(document.querySelectorAll('#tableBody td input'));
+    const idx = allInputs.indexOf(e.target);
+    if (idx < allInputs.length - 1) allInputs[idx + 1].focus();
+  }
+}
+
+// ============================================================
+// CÁLCULOS
+// ============================================================
+function recalculateAll() {
+  // 1. Calcular cada atividade individual
+  DATA_CONFIG.sistemas.forEach(s => {
+    s.atividades.forEach(a => {
+      const d = appData[a.id];
+      if (!d) return;
+      const d0 = parseInt(d.d0)||0, dp1 = parseInt(d.dp1)||0, dp2 = parseInt(d.dp2)||0, dg3 = parseInt(d.dg3)||0;
+      const diaAnt = parseInt(d.diaAnterior)||0;
+
+      const total = d0 + dp1 + dp2 + dg3;
+      const evol = total - diaAnt;
+      let status = 'IGUAL';
+      if (evol > 0) status = 'MAIOR';
+      else if (evol < 0) status = 'MENOR';
+
+      // Total Abertos
+      const elTA = document.querySelector('td[data-id="'+a.id+'"][data-field="totalAbertos"]');
+      if (elTA) elTA.textContent = total;
+
+      // Status
+      const elSt = document.querySelector('tr[data-id="'+a.id+'"] td[data-field="status"]');
+      if (elSt) { elSt.textContent = status; setClass(elSt, status); }
+
+      // Evolução
+      const elEv = document.querySelector('tr[data-id="'+a.id+'"] td[data-field="evolucao"]');
+      if (elEv) { elEv.textContent = (evol>=0?'+':'')+evol; setEvClass(elEv, evol); }
+    });
+  });
+
+  // 2. Calcular total por sistema
+  DATA_CONFIG.sistemas.forEach(s => {
+    let tE=0, t1=0, t0=0, tp1=0, tp2=0, t3=0, tDA=0;
+    s.atividades.forEach(a => {
+      const d = appData[a.id]||{};
+      if (a.tipo === 'NORMAL') { tE += parseInt(d.encMes)||0; t1 += parseInt(d.d1)||0; }
+      t0 += parseInt(d.d0)||0; tp1 += parseInt(d.dp1)||0; tp2 += parseInt(d.dp2)||0; t3 += parseInt(d.dg3)||0;
+      tDA += parseInt(d.diaAnterior)||0;
+    });
+    const tT = t0+tp1+tp2+t3, tEv = tT - tDA;
+    let tS = 'IGUAL';
+    if (tEv > 0) tS = 'MAIOR'; else if (tEv < 0) tS = 'MENOR';
+
+    setCell('total_encMes', tE); setCell('total_d1', t1);
+    setCell('total_d0', t0); setCell('total_dp1', tp1);
+    setCell('total_dp2', tp2); setCell('total_dg3', t3);
+    setCell('total_totalAbertos', tT);
+
+    const elSt = document.querySelector('tr[data-sistema="'+s.nome+'"] td[data-field="total_status"]');
+    if (elSt) { elSt.textContent = tS; setClass(elSt, tS); }
+
+    const elEv = document.querySelector('tr[data-sistema="'+s.nome+'"] td[data-field="total_evolucao"]');
+    if (elEv) { elEv.textContent = (tEv>=0?'+':'')+tEv; setEvClass(elEv, tEv); }
+
+    setCell('total_diaAnterior', tDA);
+  });
+
+  // 3. Calcular total geral
+  const grandTotal = calculateGrandTotal();
+
+  // 4. Atualizar percentuais
+  updatePercentages(grandTotal);
+
+  // 5. Atualizar gráfico
+  updateChart();
+}
+
+function setCell(field, value) {
+  const el = document.querySelector('td[data-field="'+field+'"]');
+  if (el) el.textContent = value;
+}
+
+function setClass(td, status) {
+  td.className = 'auto-field';
+  if (status === 'MAIOR') td.classList.add('status-maior');
+  else if (status === 'MENOR') td.classList.add('status-menor');
+  else td.classList.add('status-igual');
+}
+
+function setEvClass(td, val) {
+  td.className = 'auto-field evolucao-cell';
+  if (val > 0) td.classList.add('evolucao-positive');
+  else if (val < 0) td.classList.add('evolucao-negative');
+  else td.classList.add('evolucao-zero');
+}
+
+function calculateGrandTotal() {
+  let gE=0, g1=0, g0=0, gp1=0, gp2=0, g3=0, gDA=0;
+  DATA_CONFIG.sistemas.forEach(s => {
+    s.atividades.forEach(a => {
+      const d = appData[a.id]||{};
+      if (a.tipo === 'NORMAL') { gE += parseInt(d.encMes)||0; g1 += parseInt(d.d1)||0; }
+      g0 += parseInt(d.d0)||0; gp1 += parseInt(d.dp1)||0; gp2 += parseInt(d.dp2)||0; g3 += parseInt(d.dg3)||0;
+      gDA += parseInt(d.diaAnterior)||0;
+    });
+  });
+  const gT = g0+gp1+gp2+g3, gEv = gT - gDA;
+  let gS = 'IGUAL';
+  if (gEv > 0) gS = 'MAIOR'; else if (gEv < 0) gS = 'MENOR';
+
+  setCell('grand_encMes', gE); setCell('grand_d1', g1);
+  setCell('grand_d0', g0); setCell('grand_dp1', gp1);
+  setCell('grand_dp2', gp2); setCell('grand_dg3', g3);
+  setCell('grand_totalAbertos', gT);
+
+  const elSt = document.querySelector('#grandTotalRow td[data-field="grand_status"]');
+  if (elSt) { elSt.textContent = gS; setClass(elSt, gS); }
+
+  const elEv = document.querySelector('#grandTotalRow td[data-field="grand_evolucao"]');
+  if (elEv) { elEv.textContent = (gEv>=0?'+':'')+gEv; setEvClass(elEv, gEv); }
+
+  setCell('grand_diaAnterior', gDA);
+
+  return gT;
+}
+
+function updatePercentages(grandTotal) {
+  DATA_CONFIG.sistemas.forEach(s => {
+    s.atividades.forEach(a => {
+      const d = appData[a.id]||{};
+      const tot = (parseInt(d.d0)||0)+(parseInt(d.dp1)||0)+(parseInt(d.dp2)||0)+(parseInt(d.dg3)||0);
+      const pct = grandTotal > 0 ? ((tot/grandTotal)*100).toFixed(1) : '0.0';
+      const el = document.querySelector('tr[data-id="'+a.id+'"] td[data-field="percent"]');
+      if (el) el.textContent = pct + '%';
+    });
+
+    // Percentual do sistema (total)
+    let sysTot = 0;
+    s.atividades.forEach(a => {
+      const d = appData[a.id]||{};
+      sysTot += (parseInt(d.d0)||0)+(parseInt(d.dp1)||0)+(parseInt(d.dp2)||0)+(parseInt(d.dg3)||0);
+    });
+    const sysPct = grandTotal > 0 ? ((sysTot/grandTotal)*100).toFixed(1) : '0.0';
+    const elSys = document.querySelector('tr[data-sistema="'+s.nome+'"] td[data-field="total_percent"]');
+    if (elSys) elSys.textContent = sysPct + '%';
+  });
+
+  const elG = document.querySelector('#grandTotalRow td[data-field="grand_percent"]');
+  if (elG) elG.textContent = '100%';
+}
+
+// ============================================================
+// HISTÓRICO
+// ============================================================
+function saveHistory() {
+  const today = getToday();
+  DATA_CONFIG.sistemas.forEach(s => {
+    const vq = appData[s.nome.toLowerCase()+'_vt_qualidade'];
+    const vo = appData[s.nome.toLowerCase()+'_vt_offline'];
+    if (vq && vo) {
+      const keyVQ = s.nome.toLowerCase()+'_vt_qualidade';
+      const keyVO = s.nome.toLowerCase()+'_vt_offline';
+      dailyHistory[today] = dailyHistory[today] || {};
+      dailyHistory[today][keyVQ] = calcVT(vq);
+      dailyHistory[today][keyVO] = calcVT(vo);
+    }
+  });
+  try { localStorage.setItem('backlogHistory', JSON.stringify(dailyHistory)); } catch(e) {}
+}
+
+function calcVT(d) {
+  return (parseInt(d.d0)||0)+(parseInt(d.dp1)||0)+(parseInt(d.dp2)||0)+(parseInt(d.dg3)||0);
+}
+
+function loadHistory() {
+  try {
+    const s = localStorage.getItem('backlogHistory');
+    if (s) dailyHistory = JSON.parse(s);
+  } catch(e) {}
+}
+
+// ============================================================
+// GRÁFICO
+// ============================================================
+let chartVoalle = null;
+let chartHubsoft = null;
+
+function updateChart() {
+  const dates = Object.keys(dailyHistory).sort();
+  const last7 = dates.slice(-7);
+
+  const labels = last7.map(d => {
+    const p = d.split('-');
+    return p[2]+'/'+p[1];
+  });
+
+  const vqData = last7.map(d => (dailyHistory[d]||{})['voalle_vt_qualidade']||0);
+  const voData = last7.map(d => (dailyHistory[d]||{})['voalle_vt_offline']||0);
+  const hqData = last7.map(d => (dailyHistory[d]||{})['hubsoft_vt_qualidade']||0);
+  const hoData = last7.map(d => (dailyHistory[d]||{})['hubsoft_vt_offline']||0);
+
+  // Se poucos dados, usar dados atuais
+  if (labels.length < 1) {
+    const today = getToday().split('-').slice(1).reverse().join('/');
+    labels.push(today);
+    vqData.push(calcVT(appData['voalle_vt_qualidade']||{}));
+    voData.push(calcVT(appData['voalle_vt_offline']||{}));
+    hqData.push(calcVT(appData['hubsoft_vt_qualidade']||{}));
+    hoData.push(calcVT(appData['hubsoft_vt_offline']||{}));
+  }
+
+  const dsConfig = {
+    tension: 0.3, pointRadius: 5, pointHoverRadius: 7, borderWidth: 2.5
+  };
+
+  // Voalle chart
+  const ctxV = document.getElementById('chartVoalle').getContext('2d');
+  if (chartVoalle) chartVoalle.destroy();
+  chartVoalle = new Chart(ctxV, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'VT Qualidade', data: vqData, borderColor: '#e67e22', backgroundColor: 'rgba(230,126,34,0.1)', fill: true, ...dsConfig },
+        { label: 'VT Offline', data: voData, borderColor: '#2980b9', backgroundColor: 'rgba(41,128,185,0.1)', fill: true, ...dsConfig }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'VOALLE', font: { size: 14, weight: 'bold' }, color: '#a86424', padding: 12 },
+        legend: { position: 'top', labels: { font: { size: 11 }, usePointStyle: true } }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Hubsoft chart
+  const ctxH = document.getElementById('chartHubsoft').getContext('2d');
+  if (chartHubsoft) chartHubsoft.destroy();
+  chartHubsoft = new Chart(ctxH, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'VT Qualidade', data: hqData, borderColor: '#e67e22', backgroundColor: 'rgba(230,126,34,0.1)', fill: true, ...dsConfig },
+        { label: 'VT Offline', data: hoData, borderColor: '#2980b9', backgroundColor: 'rgba(41,128,185,0.1)', fill: true, ...dsConfig }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'HUBSOFT', font: { size: 14, weight: 'bold' }, color: '#1a5276', padding: 12 },
+        legend: { position: 'top', labels: { font: { size: 11 }, usePointStyle: true } }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ============================================================
+// SALVAR / CARREGAR
+// ============================================================
+function saveData() {
+  try {
+    localStorage.setItem('backlogOperacional', JSON.stringify(appData));
+    const btn = document.getElementById('btnSave');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Salvo!';
+    btn.style.background = '#1a7a42';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+  } catch(e) { console.error(e); }
+}
+
+function loadData() {
+  try {
+    const s = localStorage.getItem('backlogOperacional');
+    if (s) { appData = JSON.parse(s); return true; }
+  } catch(e) { console.error(e); }
+  return false;
+}
+
+function restoreInputs() {
+  document.querySelectorAll('#tableBody td input').forEach(inp => {
+    const id = inp.dataset.atividade;
+    const f = inp.dataset.field;
+    if (appData[id] && appData[id][f] !== undefined) inp.value = appData[id][f];
+  });
+}
+
+// ============================================================
+// EXPORTAR EXCEL
+// ============================================================
+function exportToExcel() {
+  const wb = XLSX.utils.book_new();
+  const wsData = [];
+  wsData.push(['SISTEMA','ATIVIDADE','ENC MÊS','D-1','D0','D+1','D+2','D>=3','TOTAL ABERTOS','STATUS','EVOLUÇÃO','DIA ANTERIOR','%']);
+
+  DATA_CONFIG.sistemas.forEach(sis => {
+    sis.atividades.forEach(att => {
+      const d = appData[att.id]||{};
+      const d0=parseInt(d.d0)||0, dp1=parseInt(d.dp1)||0, dp2=parseInt(d.dp2)||0, dg3=parseInt(d.dg3)||0;
+      const diaAnt = parseInt(d.diaAnterior)||0;
+      const total = d0+dp1+dp2+dg3;
+      const evol = total - diaAnt;
+      let status = 'IGUAL';
+      if (evol > 0) status = 'MAIOR'; else if (evol < 0) status = 'MENOR';
+
+      let grandTotal = 0;
+      DATA_CONFIG.sistemas.forEach(s => {
+        s.atividades.forEach(a => {
+          const ad = appData[a.id]||{};
+          grandTotal += (parseInt(ad.d0)||0)+(parseInt(ad.dp1)||0)+(parseInt(ad.dp2)||0)+(parseInt(ad.dg3)||0);
+        });
+      });
+      const pct = grandTotal > 0 ? parseFloat(((total/grandTotal)*100).toFixed(1)) : 0;
+
+      wsData.push([sis.nome, att.nome, parseInt(d.encMes)||0, parseInt(d.d1)||0, d0, dp1, dp2, dg3, total, status, evol, diaAnt, pct]);
+    });
+
+    // Total sistema
+    let tE=0,t1=0,t0=0,tp1=0,tp2=0,t3=0,tDA=0;
+    sis.atividades.forEach(att => {
+      const d = appData[att.id]||{};
+      if (att.tipo==='NORMAL') { tE+=parseInt(d.encMes)||0; t1+=parseInt(d.d1)||0; }
+      t0+=parseInt(d.d0)||0; tp1+=parseInt(d.dp1)||0; tp2+=parseInt(d.dp2)||0; t3+=parseInt(d.dg3)||0;
+      tDA+=parseInt(d.diaAnterior)||0;
+    });
+    const tT=t0+tp1+tp2+t3, tEv=tT-tDA;
+    let tS='IGUAL'; if(tEv>0) tS='MAIOR'; else if(tEv<0) tS='MENOR';
+    wsData.push(['','TOTAL',tE,t1,t0,tp1,tp2,t3,tT,tS,tEv,tDA,'']);
+  });
+
+  // Total Geral
+  let gE=0,g1=0,g0=0,gp1=0,gp2=0,g3=0,gDA=0;
+  DATA_CONFIG.sistemas.forEach(s => {
+    s.atividades.forEach(a => {
+      const d = appData[a.id]||{};
+      if (a.tipo==='NORMAL') { gE+=parseInt(d.encMes)||0; g1+=parseInt(d.d1)||0; }
+      g0+=parseInt(d.d0)||0; gp1+=parseInt(d.dp1)||0; gp2+=parseInt(d.dp2)||0; g3+=parseInt(d.dg3)||0;
+      gDA+=parseInt(d.diaAnterior)||0;
+    });
+  });
+  const gT=g0+gp1+gp2+g3, gEv=gT-gDA;
+  let gS='IGUAL'; if(gEv>0) gS='MAIOR'; else if(gEv<0) gS='MENOR';
+  wsData.push(['','TOTAL GERAL',gE,g1,g0,gp1,gp2,g3,gT,gS,gEv,gDA,100]);
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [{wch:12},{wch:16},{wch:10},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:12},{wch:8},{wch:10},{wch:12},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Backlog');
+  XLSX.writeFile(wb, 'backlog_operacional.xlsx');
+}
+
+// ============================================================
+// LIMPAR
+// ============================================================
+function clearAll() {
+  if (!confirm('Limpar todos os dados? Esta ação não pode ser desfeita.')) return;
+  DATA_CONFIG.sistemas.forEach(s => {
+    s.atividades.forEach(a => {
+      appData[a.id] = {encMes:'',d1:'',d0:'',dp1:'',dp2:'',dg3:'',diaAnterior:''};
+    });
+  });
+  restoreInputs();
+  recalculateAll();
+  saveData();
+}
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+document.getElementById('btnSave').addEventListener('click', saveData);
+document.getElementById('btnExport').addEventListener('click', exportToExcel);
+document.getElementById('btnClear').addEventListener('click', clearAll);
+
+function init() {
+  updateDates();
+  setInterval(updateDates, 1000);
+  loadHistory();
+  const loaded = loadData();
+  if (!loaded) initAppData();
+  renderTable();
+  if (loaded) { restoreInputs(); recalculateAll(); }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
